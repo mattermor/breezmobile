@@ -17,10 +17,10 @@ class PaymentRequestModel {
 
   PaymentRequestModel(this._invoice, this._rawPayReq); 
 
+  Int64 get amount => _invoice.amount;
   String get description => _invoice.description;
+  bool get loaded => _invoice != null ? true : false;
   String get payeeImageURL => _invoice.payeeImageURL;
   String get payeeName => _invoice.payeeName;
-  Int64 get amount => _invoice.amount;
   String get rawPayReq => _rawPayReq;
-  bool get loaded => _invoice != null ? true : false;
 }

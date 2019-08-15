@@ -19,6 +19,21 @@ class _PulseAnimationDecoratorState extends State<PulseAnimationDecorator> with 
   Animation<double> _decorationRadius;
 
   @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      child: widget._child,
+      builder: _buildAnimation,
+      animation: _animationController,
+    );    
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _animationController = new AnimationController(vsync: this, duration: Duration(milliseconds: 500));
@@ -38,32 +53,6 @@ class _PulseAnimationDecoratorState extends State<PulseAnimationDecorator> with 
     _startAnimation();
   }
 
-  _startAnimation() {    
-    _animationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _animationController.reverse();
-      } else if (status == AnimationStatus.dismissed) {
-        _animationController.forward();
-      }
-    });
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      child: widget._child,
-      builder: _buildAnimation,
-      animation: _animationController,
-    );    
-  }
-
   Widget _buildAnimation(BuildContext context, Widget child) {    
     return Stack(
       alignment: AlignmentDirectional.center,
@@ -80,5 +69,16 @@ class _PulseAnimationDecoratorState extends State<PulseAnimationDecorator> with 
         Positioned(child: child)
       ],
     );
+  }
+
+  _startAnimation() {    
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        _animationController.forward();
+      }
+    });
+    _animationController.forward();
   }
 }

@@ -24,22 +24,6 @@ class PaymentFilterSliver extends StatefulWidget {
 class PaymentFilterSliverState extends State<PaymentFilterSliver> {
   bool _hasNoFilter;
   @override
-  void initState() {
-    super.initState();
-    widget._controller.addListener(onScroll);
-  }
-
-  @override 
-  void dispose() {
-    widget._controller.removeListener(onScroll);
-    super.dispose();
-  }
-
-  void onScroll(){
-    setState((){});
-  }
-
-  @override
   Widget build(BuildContext context) {
     double scrollOffset = widget._controller.position.pixels;
     _hasNoFilter = (widget._paymentsModel.filter.paymentType.contains(PaymentType.SENT) &&
@@ -60,6 +44,22 @@ class PaymentFilterSliverState extends State<PaymentFilterSliver> {
         }),
       );
   }
+
+  @override 
+  void dispose() {
+    widget._controller.removeListener(onScroll);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget._controller.addListener(onScroll);
+  }
+
+  void onScroll(){
+    setState((){});
+  }
 }
 
 class PaymentsFilter extends StatefulWidget {
@@ -76,12 +76,6 @@ class PaymentsFilter extends StatefulWidget {
 
 class PaymentsFilterState extends State<PaymentsFilter> {
   String _filter;
-
-  @override
-  void initState() {
-    super.initState();
-    _filter = "All Activities";
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +132,12 @@ class PaymentsFilterState extends State<PaymentsFilter> {
       ),
     );
     return Row(children: children);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _filter = "All Activities";
   }
 
   _getFilterType(String _filter){

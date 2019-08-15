@@ -29,21 +29,6 @@ class PosTransactionsPageState extends State<PosTransactionsPage> {
   bool _isInit = false;
 
   @override
-  void didChangeDependencies() {        
-    if (!_isInit) {
-      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);      
-      _isInit = true;
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
-  dispose() {
-    _accountActionsSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder<AccountModel>(
             stream: _accountBloc.accountStream,
@@ -71,6 +56,26 @@ class PosTransactionsPageState extends State<PosTransactionsPage> {
             });
   }
 
+  @override
+  void didChangeDependencies() {        
+    if (!_isInit) {
+      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);      
+      _isInit = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  dispose() {
+    _accountActionsSubscription.cancel();
+    super.dispose();
+  }
+
+  _buildDateFilterChip(PaymentFilterModel filter) {
+    return (filter.startDate != null && filter.endDate != null) ?
+    _filterChip(filter) : Container();
+  }
+
   Widget _buildScaffold(Widget body, [Widget actions]) {
     return new Scaffold(
       key: _scaffoldKey,
@@ -88,17 +93,6 @@ class PosTransactionsPageState extends State<PosTransactionsPage> {
       ),
       body: body,
     );
-  }
-
-  Widget _calendarButton(PaymentsModel paymentsModel) {
-    return Padding(padding: EdgeInsets.only(right: 16.0), child:
-    IconButton(icon: ImageIcon(AssetImage("src/icon/calendar.png"), color: Colors.white, size: 24.0),
-        onPressed: () =>
-            showDialog(
-                context: context,
-                builder: (_) => CalendarDialog(context, paymentsModel.firstDate)).then(((result) =>
-                _accountBloc.paymentFilterSink.add(
-                    paymentsModel.filter.copyWith(startDate: result[0], endDate: result[1]))))));
   }
 
   Widget _buildTransactions(PaymentsModel paymentsModel) {
@@ -128,9 +122,15 @@ class PosTransactionsPageState extends State<PosTransactionsPage> {
     );
   }
 
-  _buildDateFilterChip(PaymentFilterModel filter) {
-    return (filter.startDate != null && filter.endDate != null) ?
-    _filterChip(filter) : Container();
+  Widget _calendarButton(PaymentsModel paymentsModel) {
+    return Padding(padding: EdgeInsets.only(right: 16.0), child:
+    IconButton(icon: ImageIcon(AssetImage("src/icon/calendar.png"), color: Colors.white, size: 24.0),
+        onPressed: () =>
+            showDialog(
+                context: context,
+                builder: (_) => CalendarDialog(context, paymentsModel.firstDate)).then(((result) =>
+                _accountBloc.paymentFilterSink.add(
+                    paymentsModel.filter.copyWith(startDate: result[0], endDate: result[1]))))));
   }
 
   Widget _filterChip(PaymentFilterModel filter) {

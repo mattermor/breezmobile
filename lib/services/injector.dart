@@ -35,44 +35,44 @@ class ServiceInjector {
 
   ServiceInjector._internal();
 
-  static void configure(ServiceInjector injector) {
-    _injector = injector;
-  }
-
-  Notifications get notifications {
-    return _notifications ??= FirebaseNotifications();
-  }
-
-  NFCService get nfc {
-    return _nfcService ??= new NFCService();
-  }
-
-  BreezServer get breezServer {
-    return _breezServer ??= new BreezServer();
+  BackgroundTaskService get backgroundTaskService {
+    return _backroundTaskService ??= BackgroundTaskService();
   }
 
   BreezBridge get breezBridge {
     return _breezBridge ??= new BreezBridge();
   }
 
+  BreezServer get breezServer {
+    return _breezServer ??= new BreezServer();
+  }
+
+  CurrencyService get currencyService {
+    return _currencyService ??= CurrencyService();
+  }
+
+  DeepLinksService get deepLinks => _deepLinksService ??= new DeepLinksService();
+
   Device get device {
     return _device ??= Device();
   }
 
-  DeepLinksService get deepLinks => _deepLinksService ??= new DeepLinksService();
   LightningLinksService get lightningLinks => _lightningLinksService ??= new LightningLinksService();
+  NFCService get nfc {
+    return _nfcService ??= new NFCService();
+  }
 
-  Future<SharedPreferences> get sharedPreferences => _sharedPreferences ??= SharedPreferences.getInstance();     
+  Notifications get notifications {
+    return _notifications ??= FirebaseNotifications();
+  }     
 
   Permissions get permissions  {
     return _permissions ??= Permissions();
   }
 
-  BackgroundTaskService get backgroundTaskService {
-    return _backroundTaskService ??= BackgroundTaskService();
-  }
+  Future<SharedPreferences> get sharedPreferences => _sharedPreferences ??= SharedPreferences.getInstance();
 
-  CurrencyService get currencyService {
-    return _currencyService ??= CurrencyService();
+  static void configure(ServiceInjector injector) {
+    _injector = injector;
   }
 }

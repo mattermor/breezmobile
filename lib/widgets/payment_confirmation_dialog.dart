@@ -37,24 +37,40 @@ class PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)));
   }
 
+  Container _buildActions() {
+    List<Widget> children = <Widget>[
+      new FlatButton(
+        child: new Text("NO", style: theme.buttonStyle),
+        onPressed: () => widget._onStateChange(PaymentRequestState.USER_CANCELLED),
+      ),
+      new FlatButton(
+        child: new Text("YES", style: theme.buttonStyle),
+        onPressed: () {
+          widget.accountBloc.userActionsSink.add(SendPayment(PayRequest(widget.invoice.rawPayReq, widget._amountToPay)));
+          widget._onStateChange(PaymentRequestState.PROCESSING_PAYMENT);
+        },
+      ),
+    ];
+
+    return Container(
+      height: 64.0,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0, right: 8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: children,
+        ),
+      ),
+    );
+  }
+
   List<Widget> _buildConfirmationDialog() {
     List<Widget> _confirmationDialog = <Widget>[];
     _confirmationDialog.add(_buildTitle());
     _confirmationDialog.add(_buildContent());
     _confirmationDialog.add(_buildActions());
     return _confirmationDialog;
-  }
-
-  Container _buildTitle() {
-    return Container(
-      height: 64.0,
-      padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 8.0),
-      child: Text(
-        "Payment Confirmation",
-        style: theme.alertTitleStyle,
-        textAlign: TextAlign.center,
-      ),
-    );
   }
 
   Expanded _buildContent() {
@@ -84,30 +100,14 @@ class PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> {
     );
   }
 
-  Container _buildActions() {
-    List<Widget> children = <Widget>[
-      new FlatButton(
-        child: new Text("NO", style: theme.buttonStyle),
-        onPressed: () => widget._onStateChange(PaymentRequestState.USER_CANCELLED),
-      ),
-      new FlatButton(
-        child: new Text("YES", style: theme.buttonStyle),
-        onPressed: () {
-          widget.accountBloc.userActionsSink.add(SendPayment(PayRequest(widget.invoice.rawPayReq, widget._amountToPay)));
-          widget._onStateChange(PaymentRequestState.PROCESSING_PAYMENT);
-        },
-      ),
-    ];
-
+  Container _buildTitle() {
     return Container(
       height: 64.0,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0, right: 8.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: children,
-        ),
+      padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 8.0),
+      child: Text(
+        "Payment Confirmation",
+        style: theme.alertTitleStyle,
+        textAlign: TextAlign.center,
       ),
     );
   }

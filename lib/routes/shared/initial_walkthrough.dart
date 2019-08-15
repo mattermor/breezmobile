@@ -36,118 +36,6 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
   bool _registered = false;
 
   @override
-  void initState() {
-    super.initState();
-
-    _instructions = widget._isPos ?
-    "The simplest, fastest & safest way\nto earn bitcoin" :
-    "The simplest, fastest & safest way\nto spend your bitcoins";
-
-    _multipleRestoreSubscription =
-        widget._backupBloc.multipleRestoreStream.listen((options) async {
-      if (options.length == 0) {
-        popToWalkthrough(error: "Could not locate backup for this account");
-        return;
-      }
-
-
-      SnapshotInfo toRestore;
-      if (options.length == 1) {
-        toRestore = options.first;
-      } else {
-        popToWalkthrough();
-        toRestore = await showDialog<SnapshotInfo>(
-            context: context,
-            builder: (_) =>
-                new RestoreDialog(context, widget._backupBloc, options));
-      }
-
-      String restorePIN;
-      if (toRestore != null) {
-        if (toRestore.encrypted) {
-          restorePIN = await getRestorePIN();
-          if (restorePIN == null) {
-            return;
-          }
-        }
-        widget._backupBloc.restoreRequestSink
-            .add(RestoreRequest(toRestore, restorePIN));
-        Navigator.push(
-            context,
-            createLoaderRoute(context,
-                message: "Restoring data...", opacity: 0.8));
-      }
-    }, onError: (error) {
-      popToWalkthrough(
-          error: error.runtimeType != SignInFailedException
-              ? error.toString()
-              : null);
-    });
-
-    _restoreFinishedSubscription =
-        widget._backupBloc.restoreFinishedStream.listen((restored) {
-      popToWalkthrough();
-      if (restored) {
-        _proceedToRegister();
-      }
-    }, onError: (error) {
-      popToWalkthrough(
-          error: error.runtimeType != SignInFailedException
-              ? error.toString()
-              : null);
-    });
-
-    _controller = new AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 2720))
-      ..forward(from: 0.0);
-    _animation = new IntTween(begin: 0, end: 67).animate(_controller);
-    if (_controller.isCompleted) {
-      _controller.stop();
-      _controller.dispose();
-    }
-  }
-
-  Future<String> getRestorePIN() {
-    return Navigator.of(context).push(new FadeInRoute(
-      builder: (BuildContext context) {
-        return RestorePinCode();
-      },
-    ));
-  }
-
-  void popToWalkthrough({String error}) {
-    Navigator.popUntil(context, (route) {
-      return route.settings.name == "/intro";
-    });
-    if (error != null) {
-      _scaffoldKey.currentState.showSnackBar(new SnackBar(
-          duration: new Duration(seconds: 3),
-          content: new Text(error.toString())));
-    }
-  }
-
-  @override
-  void dispose() {
-    _multipleRestoreSubscription.cancel();
-    _restoreFinishedSubscription.cancel();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _proceedToRegister() {
-    widget._registrationBloc.registerSink.add(null);
-    _registered = true;
-    Navigator.of(context).pop();
-  }
-
-  Future<bool> _onWillPop() async {
-    if (!_registered) {
-      exit(0);
-    }
-    return true;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return new Scaffold(
       key: _scaffoldKey,
@@ -238,5 +126,117 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
             ])),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _multipleRestoreSubscription.cancel();
+    _restoreFinishedSubscription.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<String> getRestorePIN() {
+    return Navigator.of(context).push(new FadeInRoute(
+      builder: (BuildContext context) {
+        return RestorePinCode();
+      },
+    ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _instructions = widget._isPos ?
+    "The simplest, fastest & safest way\nto earn bitcoin" :
+    "The simplest, fastest & safest way\nto spend your bitcoins";
+
+    _multipleRestoreSubscription =
+        widget._backupBloc.multipleRestoreStream.listen((options) async {
+      if (options.length == 0) {
+        popToWalkthrough(error: "Could not locate backup for this account");
+        return;
+      }
+
+
+      SnapshotInfo toRestore;
+      if (options.length == 1) {
+        toRestore = options.first;
+      } else {
+        popToWalkthrough();
+        toRestore = await showDialog<SnapshotInfo>(
+            context: context,
+            builder: (_) =>
+                new RestoreDialog(context, widget._backupBloc, options));
+      }
+
+      String restorePIN;
+      if (toRestore != null) {
+        if (toRestore.encrypted) {
+          restorePIN = await getRestorePIN();
+          if (restorePIN == null) {
+            return;
+          }
+        }
+        widget._backupBloc.restoreRequestSink
+            .add(RestoreRequest(toRestore, restorePIN));
+        Navigator.push(
+            context,
+            createLoaderRoute(context,
+                message: "Restoring data...", opacity: 0.8));
+      }
+    }, onError: (error) {
+      popToWalkthrough(
+          error: error.runtimeType != SignInFailedException
+              ? error.toString()
+              : null);
+    });
+
+    _restoreFinishedSubscription =
+        widget._backupBloc.restoreFinishedStream.listen((restored) {
+      popToWalkthrough();
+      if (restored) {
+        _proceedToRegister();
+      }
+    }, onError: (error) {
+      popToWalkthrough(
+          error: error.runtimeType != SignInFailedException
+              ? error.toString()
+              : null);
+    });
+
+    _controller = new AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2720))
+      ..forward(from: 0.0);
+    _animation = new IntTween(begin: 0, end: 67).animate(_controller);
+    if (_controller.isCompleted) {
+      _controller.stop();
+      _controller.dispose();
+    }
+  }
+
+  void popToWalkthrough({String error}) {
+    Navigator.popUntil(context, (route) {
+      return route.settings.name == "/intro";
+    });
+    if (error != null) {
+      _scaffoldKey.currentState.showSnackBar(new SnackBar(
+          duration: new Duration(seconds: 3),
+          content: new Text(error.toString())));
+    }
+  }
+
+  Future<bool> _onWillPop() async {
+    if (!_registered) {
+      exit(0);
+    }
+    return true;
+  }
+
+  void _proceedToRegister() {
+    widget._registrationBloc.registerSink.add(null);
+    _registered = true;
+    Navigator.of(context).pop();
   }
 }

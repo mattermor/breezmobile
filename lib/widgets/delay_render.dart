@@ -2,6 +2,31 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+class DelatedRenderState extends State<DelayRender> {
+  bool _childVisible = false;
+  Timer _timer;
+
+  @override
+  Widget build(BuildContext context) {
+    return _childVisible ? widget.child : widget.initialChild;
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {    
+    super.initState();
+    _timer = Timer(widget.duration, () => setState((){
+      _childVisible = true;
+    }));
+  }
+
+}
+
 class DelayRender extends StatefulWidget {
   final Duration duration;
   final Widget child;  
@@ -13,29 +38,4 @@ class DelayRender extends StatefulWidget {
   State<StatefulWidget> createState() {
     return DelatedRenderState();
   }
-}
-
-class DelatedRenderState extends State<DelayRender> {
-  bool _childVisible = false;
-  Timer _timer;
-
-  @override
-  void initState() {    
-    super.initState();
-    _timer = Timer(widget.duration, () => setState((){
-      _childVisible = true;
-    }));
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _childVisible ? widget.child : widget.initialChild;
-  }
-
 }

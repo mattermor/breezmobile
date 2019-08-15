@@ -17,12 +17,6 @@ class InvoiceBottomSheetState extends State<InvoiceBottomSheet> with TickerProvi
   bool isExpanded;
 
   @override
-  void initState() {
-    super.initState();
-    isExpanded = false;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
         transform: isExpanded ? Matrix4.translationValues(0, 0, 0) : Matrix4.translationValues(0, 112.0, 0),
@@ -43,6 +37,12 @@ class InvoiceBottomSheetState extends State<InvoiceBottomSheet> with TickerProvi
               }),
               _buildInvoiceMenuItem("CREATE", "src/icon/paste.png", () => Navigator.of(context).pushNamed('/create_invoice')),
             ]));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    isExpanded = false;
   }
 
   Widget _buildInvoiceMenuItem(String title, String iconPath, Function function, {bool isFirst = false}) {

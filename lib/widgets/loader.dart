@@ -2,27 +2,6 @@ import 'package:breez/theme_data.dart' as theme;
 import 'package:breez/widgets/transparent_page_route.dart';
 import 'package:flutter/material.dart';
 
-class Loader extends StatelessWidget {
-  final double value;
-  final String label;
-  final Color color;
-
-  Loader({this.value, this.label, this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(alignment: FractionalOffset.center, children: <Widget>[
-      new CircularProgressIndicator(
-        value: this.value,
-        semanticsLabel: label,
-        valueColor: new AlwaysStoppedAnimation<Color>(
-          this.color ?? theme.circularLoaderColor,
-        ),        
-      ),
-    ]);
-  }
-}
-
 TransparentPageRoute createLoaderRoute(BuildContext context,
     {String message, double opacity = 0.5, Future action}) {
   return TransparentPageRoute((context) {
@@ -83,6 +62,27 @@ class FullScreenLoader extends StatelessWidget {
   }
 }
 
+class Loader extends StatelessWidget {
+  final double value;
+  final String label;
+  final Color color;
+
+  Loader({this.value, this.label, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(alignment: FractionalOffset.center, children: <Widget>[
+      new CircularProgressIndicator(
+        value: this.value,
+        semanticsLabel: label,
+        valueColor: new AlwaysStoppedAnimation<Color>(
+          this.color ?? theme.circularLoaderColor,
+        ),        
+      ),
+    ]);
+  }
+}
+
 class TransparentRouteLoader extends StatefulWidget {
   final String message;
   final double opacity;
@@ -99,6 +99,11 @@ class TransparentRouteLoader extends StatefulWidget {
 
 class TransparentRouteLoaderState extends State<TransparentRouteLoader> {
   
+  @override
+  Widget build(BuildContext context) {
+    return FullScreenLoader(message: widget.message, opacity: widget.opacity);
+  }
+
   @override void initState() {    
     super.initState();
     if (widget.action != null) {
@@ -108,10 +113,5 @@ class TransparentRouteLoaderState extends State<TransparentRouteLoader> {
         }
       });
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FullScreenLoader(message: widget.message, opacity: widget.opacity);
   }
 }

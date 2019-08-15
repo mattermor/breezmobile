@@ -33,43 +33,26 @@ class VendorWebViewPageState extends State<VendorWebViewPage> {
   Uint8List _screenshotData;
 
   @override
-  void initState() {
-    super.initState();    
-    _widgetWebview.onDestroy.listen((_) {
-      if (Navigator.canPop(context)) {
-        Navigator.of(context).pop();
-      }
-    });    
-  }
-
-  Future<String> loadAsset(String path) async {
-    return await rootBundle.loadString(path);
-  }
-
-  Future onBeforeCallHandler(String handlerName){
-    if (_screenshotData != null || !["makeInvoice", "sendPayment"].contains(handlerName)){
-      return Future.value(null);
-    }
-
-    Completer beforeCompleter = Completer(); 
-    FocusScope.of(context).requestFocus(FocusNode());
-      // Wait for keyboard and screen animations to settle
-    Timer(Duration(milliseconds: 750), () {
-      // Take screenshot and show payment request dialog
-      _takeScreenshot().then((imageData) {
-        setState(() {
-          _screenshotData = imageData;
-        });
-        // Wait for memory image to load
-        Timer(Duration(milliseconds: 200), () {
-          // Hide Webview to interact with payment request dialog
-          _widgetWebview.hide(); 
-          beforeCompleter.complete();
-        });
-      });
-    }); 
-
-    return beforeCompleter.future; 
+  Widget build(BuildContext context) {
+    return new WebviewScaffold(
+      appBar: new AppBar(
+        leading: backBtn.BackButton(),
+        automaticallyImplyLeading: false,
+        iconTheme: theme.appBarIconTheme,
+        textTheme: theme.appBarTextTheme,
+        backgroundColor: theme.BreezColors.blue[500],
+        title: new Text(
+          widget._title,
+          style: theme.appBarTextStyle,
+        ),
+        elevation: 0.0,
+      ),
+      url: widget._url,
+      withJavascript: true,
+      withZoom: false,
+      clearCache: true,
+      initialChild: _screenshotData != null ? Image.memory(_screenshotData) : null,
+    );
   }
 
   @override
@@ -116,26 +99,43 @@ class VendorWebViewPageState extends State<VendorWebViewPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return new WebviewScaffold(
-      appBar: new AppBar(
-        leading: backBtn.BackButton(),
-        automaticallyImplyLeading: false,
-        iconTheme: theme.appBarIconTheme,
-        textTheme: theme.appBarTextTheme,
-        backgroundColor: theme.BreezColors.blue[500],
-        title: new Text(
-          widget._title,
-          style: theme.appBarTextStyle,
-        ),
-        elevation: 0.0,
-      ),
-      url: widget._url,
-      withJavascript: true,
-      withZoom: false,
-      clearCache: true,
-      initialChild: _screenshotData != null ? Image.memory(_screenshotData) : null,
-    );
+  void initState() {
+    super.initState();    
+    _widgetWebview.onDestroy.listen((_) {
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+    });    
+  }
+
+  Future<String> loadAsset(String path) async {
+    return await rootBundle.loadString(path);
+  }
+
+  Future onBeforeCallHandler(String handlerName){
+    if (_screenshotData != null || !["makeInvoice", "sendPayment"].contains(handlerName)){
+      return Future.value(null);
+    }
+
+    Completer beforeCompleter = Completer(); 
+    FocusScope.of(context).requestFocus(FocusNode());
+      // Wait for keyboard and screen animations to settle
+    Timer(Duration(milliseconds: 750), () {
+      // Take screenshot and show payment request dialog
+      _takeScreenshot().then((imageData) {
+        setState(() {
+          _screenshotData = imageData;
+        });
+        // Wait for memory image to load
+        Timer(Duration(milliseconds: 200), () {
+          // Hide Webview to interact with payment request dialog
+          _widgetWebview.hide(); 
+          beforeCompleter.complete();
+        });
+      });
+    }); 
+
+    return beforeCompleter.future; 
   }
 
   Future _takeScreenshot() async {

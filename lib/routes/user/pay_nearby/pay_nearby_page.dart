@@ -26,18 +26,6 @@ class PayNearbyPageState extends State<PayNearbyPage> {
   final FocusNode _amountFocusNode = FocusNode();
   KeyboardDoneAction _doneAction;
 
-  @override 
-  void initState() {
-    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
-    super.initState();
-  }
-
-  @override 
-  void dispose() {
-    _doneAction.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     InvoiceBloc invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
@@ -125,5 +113,17 @@ class PayNearbyPageState extends State<PayNearbyPage> {
         ),
       ),
     );
+  }
+
+  @override 
+  void dispose() {
+    _doneAction.dispose();
+    super.dispose();
+  }
+
+  @override 
+  void initState() {
+    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
+    super.initState();
   }
 }

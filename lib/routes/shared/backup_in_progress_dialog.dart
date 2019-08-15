@@ -24,6 +24,17 @@ class _BackupInProgressDialogState extends State<_BackupInProgressDialog> {
   StreamSubscription<BackupState> _stateSubscription;
 
   @override
+  Widget build(BuildContext context) {
+    return createAnimatedLoaderDialog(context, "Backup is in progress");
+  }
+
+  @override
+  void dispose() {
+    _stateSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _stateSubscription = widget.backupStateStream.listen((state) {
@@ -33,18 +44,7 @@ class _BackupInProgressDialogState extends State<_BackupInProgressDialog> {
     }, onError: (err) => _pop());
   }
 
-  @override
-  void dispose() {
-    _stateSubscription?.cancel();
-    super.dispose();
-  }
-
   _pop() {
     Navigator.of(context).pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return createAnimatedLoaderDialog(context, "Backup is in progress");
   }
 }

@@ -59,86 +59,34 @@ class POSInvoiceState extends State<POSInvoice> {
   FocusNode _focusNode;
   bool _isInit = false;
 
-  @override
-  void didChangeDependencies() {    
-    if (!_isInit) {
-      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
-      _invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
-      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
-      _posProfileBloc = AppBlocsProvider.of<POSProfileBloc>(context);      
-      registerListeners();      
-      _isInit = true;  
-    } 
-    itemHeight = (MediaQuery.of(context).size.height - kToolbarHeight - 16) / 4;
-    itemWidth = (MediaQuery.of(context).size.width) / 2; 
-    super.didChangeDependencies();
-  }
-
-  void registerListeners() {    
-    _focusNode = new FocusNode();
-    _focusNode.addListener(_onOnFocusNodeEvent);
-    _invoiceDescriptionController.text = "";
-    _accountSubscription = _accountBloc.accountStream.listen((acc) {
-      setState(() {
-        _currency = acc.currency;
-        _maxPaymentAmount = acc.maxPaymentAmount;
-        _maxAllowedToReceive = acc.maxAllowedToReceive;
-        _amountController.text = _currency.format((Int64(_currentAmount)),
-            fixedDecimals: true, includeSymbol: false);
-        _chargeAmountController.text = _currency.format(
-            (Int64(_totalAmount + _currentAmount)),
-            fixedDecimals: true,
-            includeSymbol: true);
-      });
-    });
-    _posProfileSubscription =
-        _posProfileBloc.posProfileStream.listen((posProfile) {
-      _posProfile = posProfile;
-      cancellationTimeoutValue =
-          _posProfile.cancellationTimeoutValue.toStringAsFixed(0);
-    });
-    _invoiceReadyNotificationsSubscription =
-        _invoiceBloc.readyInvoicesStream.listen((invoiceReady) {
-      // show the simple dialog with 3 states
-      if (invoiceReady != null) {
-        showDialog<bool>(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return new PosPaymentDialog(_invoiceBloc, _posProfileBloc, _scaffoldKey);
-            }).then((result) {
-          setState(() {
-            _currentAmount = 0;
-            _totalAmount = 0;
-            _amountController.text = _currency.format((Int64(_currentAmount)),
-                fixedDecimals: true, includeSymbol: false);
-            _chargeAmountController.text = _currency.format(
-                (Int64(_totalAmount + _currentAmount)),
-                fixedDecimals: true,
-                includeSymbol: true);
-            _invoiceDescriptionController.text = "";
-          });
-        });
-      }
-      },
-      onError: (err) => _scaffoldKey.currentState.showSnackBar(
-          new SnackBar(
-              duration: new Duration(seconds: 10),
-              content: new Text(err.toString()))));
-  }
-
-  @override
-  void dispose() {
-    closeListeners();
-    _focusNode?.dispose();
-    super.dispose();
-  }
-
-  void closeListeners() {
-    _accountSubscription?.cancel();
-    _posProfileSubscription?.cancel();
-    _invoiceReadyNotificationsSubscription?.cancel();
-    _invoiceNotificationsSubscription?.cancel();    
+  approveClear() {
+    if (_totalAmount + _currentAmount != 0) {
+      AlertDialog dialog = new AlertDialog(
+        title: new Text(
+          "Clear Sale?",
+          textAlign: TextAlign.center,
+          style: theme.alertTitleStyle,
+        ),
+        content: new Text("This will clear the current transaction.",
+            style: theme.alertStyle),
+        contentPadding:
+            EdgeInsets.only(left: 24.0, right: 24.0, bottom: 12.0, top: 24.0),
+        actions: <Widget>[
+          new FlatButton(
+              onPressed: () => Navigator.pop(context),
+              child: new Text("Cancel", style: theme.buttonStyle)),
+          new FlatButton(
+              onPressed: () {
+                Navigator.pop(context);
+                clearSale();
+              },
+              child: new Text("Clear", style: theme.buttonStyle))
+        ],
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      );
+      showDialog(context: context, builder: (_) => dialog);
+    }
   }
 
   @override
@@ -285,9 +233,77 @@ class POSInvoiceState extends State<POSInvoice> {
     );
   }
 
-  _onOnFocusNodeEvent() {
+  changeCurrency(value) {
     setState(() {
-      _isButtonDisabled = true;
+      _currency = Currency.fromSymbol(value);
+      _userProfileBloc.currencySink
+          .add(Currency.currencies[Currency.currencies.indexOf(_currency)]);
+    });
+  }
+
+  clearSale() {
+    setState(() {
+      _currentAmount = 0;
+      _totalAmount = 0;
+      _amountController.text = _currency.format((Int64(_currentAmount)),
+          fixedDecimals: true, includeSymbol: false);
+      _chargeAmountController.text = _currency.format(
+          (Int64(_totalAmount + _currentAmount)),
+          fixedDecimals: true,
+          includeSymbol: true);
+      _invoiceDescriptionController.text = "";
+    });
+  }
+
+  void closeListeners() {
+    _accountSubscription?.cancel();
+    _posProfileSubscription?.cancel();
+    _invoiceReadyNotificationsSubscription?.cancel();
+    _invoiceNotificationsSubscription?.cancel();    
+  }
+
+  @override
+  void didChangeDependencies() {    
+    if (!_isInit) {
+      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
+      _invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
+      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
+      _posProfileBloc = AppBlocsProvider.of<POSProfileBloc>(context);      
+      registerListeners();      
+      _isInit = true;  
+    } 
+    itemHeight = (MediaQuery.of(context).size.height - kToolbarHeight - 16) / 4;
+    itemWidth = (MediaQuery.of(context).size.width) / 2; 
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    closeListeners();
+    _focusNode?.dispose();
+    super.dispose();
+  }
+
+  onAddition() {
+    setState(() {
+      _totalAmount += _currentAmount;
+      _chargeAmountController.text = _currency.format((Int64(_totalAmount)),
+          fixedDecimals: true, includeSymbol: true);
+      _currentAmount = 0;
+      _amountController.text = _currency.format((Int64(_currentAmount)),
+          fixedDecimals: true, includeSymbol: false);
+    });
+  }
+
+  onClear() {
+    setState(() {
+      _currentAmount = 0;
+      _amountController.text = _currency.format((Int64(_currentAmount)),
+          fixedDecimals: true, includeSymbol: false);
+      _chargeAmountController.text = _currency.format(
+          (Int64(_totalAmount + _currentAmount)),
+          fixedDecimals: true,
+          includeSymbol: true);
     });
   }
 
@@ -360,17 +376,6 @@ class POSInvoiceState extends State<POSInvoice> {
     }
   }
 
-  onAddition() {
-    setState(() {
-      _totalAmount += _currentAmount;
-      _chargeAmountController.text = _currency.format((Int64(_totalAmount)),
-          fixedDecimals: true, includeSymbol: true);
-      _currentAmount = 0;
-      _amountController.text = _currency.format((Int64(_currentAmount)),
-          fixedDecimals: true, includeSymbol: false);
-    });
-  }
-
   onNumButtonPressed(String numberText) {
     setState(() {
       _currentAmount = (_currentAmount * 10) + int.parse(numberText);
@@ -383,68 +388,57 @@ class POSInvoiceState extends State<POSInvoice> {
     });
   }
 
-  changeCurrency(value) {
-    setState(() {
-      _currency = Currency.fromSymbol(value);
-      _userProfileBloc.currencySink
-          .add(Currency.currencies[Currency.currencies.indexOf(_currency)]);
+  void registerListeners() {    
+    _focusNode = new FocusNode();
+    _focusNode.addListener(_onOnFocusNodeEvent);
+    _invoiceDescriptionController.text = "";
+    _accountSubscription = _accountBloc.accountStream.listen((acc) {
+      setState(() {
+        _currency = acc.currency;
+        _maxPaymentAmount = acc.maxPaymentAmount;
+        _maxAllowedToReceive = acc.maxAllowedToReceive;
+        _amountController.text = _currency.format((Int64(_currentAmount)),
+            fixedDecimals: true, includeSymbol: false);
+        _chargeAmountController.text = _currency.format(
+            (Int64(_totalAmount + _currentAmount)),
+            fixedDecimals: true,
+            includeSymbol: true);
+      });
     });
-  }
-
-  onClear() {
-    setState(() {
-      _currentAmount = 0;
-      _amountController.text = _currency.format((Int64(_currentAmount)),
-          fixedDecimals: true, includeSymbol: false);
-      _chargeAmountController.text = _currency.format(
-          (Int64(_totalAmount + _currentAmount)),
-          fixedDecimals: true,
-          includeSymbol: true);
+    _posProfileSubscription =
+        _posProfileBloc.posProfileStream.listen((posProfile) {
+      _posProfile = posProfile;
+      cancellationTimeoutValue =
+          _posProfile.cancellationTimeoutValue.toStringAsFixed(0);
     });
-  }
-
-  clearSale() {
-    setState(() {
-      _currentAmount = 0;
-      _totalAmount = 0;
-      _amountController.text = _currency.format((Int64(_currentAmount)),
-          fixedDecimals: true, includeSymbol: false);
-      _chargeAmountController.text = _currency.format(
-          (Int64(_totalAmount + _currentAmount)),
-          fixedDecimals: true,
-          includeSymbol: true);
-      _invoiceDescriptionController.text = "";
-    });
-  }
-
-  approveClear() {
-    if (_totalAmount + _currentAmount != 0) {
-      AlertDialog dialog = new AlertDialog(
-        title: new Text(
-          "Clear Sale?",
-          textAlign: TextAlign.center,
-          style: theme.alertTitleStyle,
-        ),
-        content: new Text("This will clear the current transaction.",
-            style: theme.alertStyle),
-        contentPadding:
-            EdgeInsets.only(left: 24.0, right: 24.0, bottom: 12.0, top: 24.0),
-        actions: <Widget>[
-          new FlatButton(
-              onPressed: () => Navigator.pop(context),
-              child: new Text("Cancel", style: theme.buttonStyle)),
-          new FlatButton(
-              onPressed: () {
-                Navigator.pop(context);
-                clearSale();
-              },
-              child: new Text("Clear", style: theme.buttonStyle))
-        ],
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12.0))),
-      );
-      showDialog(context: context, builder: (_) => dialog);
-    }
+    _invoiceReadyNotificationsSubscription =
+        _invoiceBloc.readyInvoicesStream.listen((invoiceReady) {
+      // show the simple dialog with 3 states
+      if (invoiceReady != null) {
+        showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return new PosPaymentDialog(_invoiceBloc, _posProfileBloc, _scaffoldKey);
+            }).then((result) {
+          setState(() {
+            _currentAmount = 0;
+            _totalAmount = 0;
+            _amountController.text = _currency.format((Int64(_currentAmount)),
+                fixedDecimals: true, includeSymbol: false);
+            _chargeAmountController.text = _currency.format(
+                (Int64(_totalAmount + _currentAmount)),
+                fixedDecimals: true,
+                includeSymbol: true);
+            _invoiceDescriptionController.text = "";
+          });
+        });
+      }
+      },
+      onError: (err) => _scaffoldKey.currentState.showSnackBar(
+          new SnackBar(
+              duration: new Duration(seconds: 10),
+              content: new Text(err.toString()))));
   }
 
   Container _numberButton(String number) {
@@ -484,5 +478,11 @@ class POSInvoiceState extends State<POSInvoice> {
                   onPressed: onAddition,
                   child: new Text("+", style: theme.numPadAdditionStyle))),
         ]).toList());
+  }
+
+  _onOnFocusNodeEvent() {
+    setState(() {
+      _isButtonDisabled = true;
+    });
   }
 }

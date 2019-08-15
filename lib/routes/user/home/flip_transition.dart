@@ -16,32 +16,9 @@ class FlipTransition extends StatefulWidget {
 
 class FlipTransitionState extends State<FlipTransition>
     with TickerProviderStateMixin {
+  static const flipDuration = Duration(seconds: 2);
   AnimationController _flipAnimationController;
   Animation _flipAnimation;
-  static const flipDuration = Duration(seconds: 2);
-
-  @override
-  void initState() {
-    super.initState();
-    _flipAnimationController =
-        new AnimationController(vsync: this, duration: flipDuration);
-    _flipAnimation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-        parent: _flipAnimationController,
-        curve: Interval(0.0, 1.0, curve: Curves.fastOutSlowIn)));
-
-    _flipAnimationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _flipAnimationController.reverse();
-      }
-    });
-    _flipAnimationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _flipAnimationController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,5 +35,28 @@ class FlipTransitionState extends State<FlipTransition>
                 child:_flipAnimationController.value >= 0.4 ? widget.secondChild : widget.firstChild,
               ));
         });
+  }
+
+  @override
+  void dispose() {
+    _flipAnimationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _flipAnimationController =
+        new AnimationController(vsync: this, duration: flipDuration);
+    _flipAnimation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+        parent: _flipAnimationController,
+        curve: Interval(0.0, 1.0, curve: Curves.fastOutSlowIn)));
+
+    _flipAnimationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _flipAnimationController.reverse();
+      }
+    });
+    _flipAnimationController.forward();
   }
 }

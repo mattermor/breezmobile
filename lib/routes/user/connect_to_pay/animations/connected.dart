@@ -22,6 +22,18 @@ class ConnectedWidgetState extends State<ConnectedWidget> with TickerProviderSta
   Animation<double> _circleRadius;
 
   @override
+  Widget build(BuildContext context) {
+    return CustomPaint(painter: _ConnectedCustomPainter(_lineWidthFactor, showCircle: widget._waitingAction, circleLoation: this._circleLoation, circleRadius: this._circleRadius));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _circleController.dispose();
+    super.dispose();    
+  }
+
+  @override
   void initState() {
     super.initState();
     _animationController = new AnimationController(vsync: this, duration: widget._connectionEmulationDuration);
@@ -70,18 +82,6 @@ class ConnectedWidgetState extends State<ConnectedWidget> with TickerProviderSta
 
     _animationController.forward();  
     _circleController.repeat();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _circleController.dispose();
-    super.dispose();    
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(painter: _ConnectedCustomPainter(_lineWidthFactor, showCircle: widget._waitingAction, circleLoation: this._circleLoation, circleRadius: this._circleRadius));
   }
 }
 

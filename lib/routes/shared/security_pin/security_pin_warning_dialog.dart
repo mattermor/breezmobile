@@ -11,6 +11,41 @@ class _SecurityPINWarningDialogState extends State<SecurityPINWarningDialog> {
   bool _showReminderText = false;
 
   @override
+  Widget build(BuildContext context) {
+    return Theme(
+        data: Theme.of(context).copyWith(
+          unselectedWidgetColor: Theme.of(context).canvasColor,
+        ),
+        child: new AlertDialog(
+          contentPadding: EdgeInsets.fromLTRB(8.0, 24.0, 8.0, 16.0),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: _getContent(),
+          ),
+          actions: [
+            new SimpleDialogOption(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: new Text("Cancel", style: theme.buttonStyle),
+            ),
+            new SimpleDialogOption(
+              onPressed: (() {
+                if (_isUnderstood) {
+                  Navigator.of(context).pop(_isUnderstood);
+                } else {
+                  setState(() {
+                    _showReminderText = !_isUnderstood;
+                  });
+                }
+              }),
+              child: new Text("Continue", style: theme.buttonStyle),
+            ),
+          ],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
+        ));
+  }
+
+  @override
   void initState() {
     super.initState();
   }
@@ -55,40 +90,5 @@ class _SecurityPINWarningDialogState extends State<SecurityPINWarningDialog> {
     ];
 
     return children;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Theme(
-        data: Theme.of(context).copyWith(
-          unselectedWidgetColor: Theme.of(context).canvasColor,
-        ),
-        child: new AlertDialog(
-          contentPadding: EdgeInsets.fromLTRB(8.0, 24.0, 8.0, 16.0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: _getContent(),
-          ),
-          actions: [
-            new SimpleDialogOption(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: new Text("Cancel", style: theme.buttonStyle),
-            ),
-            new SimpleDialogOption(
-              onPressed: (() {
-                if (_isUnderstood) {
-                  Navigator.of(context).pop(_isUnderstood);
-                } else {
-                  setState(() {
-                    _showReminderText = !_isUnderstood;
-                  });
-                }
-              }),
-              child: new Text("Continue", style: theme.buttonStyle),
-            ),
-          ],
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
-        ));
   }
 }

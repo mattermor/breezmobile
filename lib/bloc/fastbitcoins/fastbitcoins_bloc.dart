@@ -15,26 +15,15 @@ class FastbitcoinsBloc {
 
   final _validateRequestController =
       new StreamController<ValidateRequestModel>.broadcast();
-  Sink<ValidateRequestModel> get validateRequestSink =>
-      _validateRequestController.sink;
-
   final _validateResponseController =
       new StreamController<ValidateResponseModel>.broadcast();
-  Stream<ValidateResponseModel> get validateResponseStream =>
-      _validateResponseController.stream;
 
   final _redeemRequestController =
       new StreamController<RedeemRequestModel>.broadcast();
-  Sink<RedeemRequestModel> get redeemRequestSink =>
-      _redeemRequestController.sink;
-
   final _redeemResponseController =
       new StreamController<RedeemResponseModel>.broadcast();
-  Stream<RedeemResponseModel> get redeemResponseStream =>
-      _redeemResponseController.stream;
 
   String _baseURL = TESTING_URL;
-
   BreezBridge _breezLib;
 
   FastbitcoinsBloc({bool production}) {
@@ -45,23 +34,23 @@ class FastbitcoinsBloc {
     _listenValidateRequests();
     _listenRedeemRequests();
   }
+  Sink<RedeemRequestModel> get redeemRequestSink =>
+      _redeemRequestController.sink;
 
-  void _listenValidateRequests() {
-    _validateRequestController.stream.listen((request) async {
-      try {
-        var response = await http.post(_baseURL + "/quote",            
-            body: jsonEncode(request.toJson()));
-        _validateResponse(response);
-        ValidateResponseModel res = ValidateResponseModel.fromJson(jsonDecode(response.body));
-        if (res.error == 1 && res.kycRequired != 1) {
-          throw res.errorMessage;
-        }
-        _validateResponseController
-            .add(res);
-      } catch (error) {        
-        _validateResponseController.addError(error);
-      }
-    });
+  Stream<RedeemResponseModel> get redeemResponseStream =>
+      _redeemResponseController.stream;
+
+  Sink<ValidateRequestModel> get validateRequestSink =>
+      _validateRequestController.sink;
+
+  Stream<ValidateResponseModel> get validateResponseStream =>
+      _validateResponseController.stream;
+
+  void close() {
+    _validateRequestController.close();
+    _validateResponseController.close();
+    _redeemRequestController.close();
+    _redeemResponseController.close();
   }
 
   void _listenRedeemRequests() {
@@ -87,17 +76,28 @@ class FastbitcoinsBloc {
     });
   }
 
+  void _listenValidateRequests() {
+    _validateRequestController.stream.listen((request) async {
+      try {
+        var response = await http.post(_baseURL + "/quote",            
+            body: jsonEncode(request.toJson()));
+        _validateResponse(response);
+        ValidateResponseModel res = ValidateResponseModel.fromJson(jsonDecode(response.body));
+        if (res.error == 1 && res.kycRequired != 1) {
+          throw res.errorMessage;
+        }
+        _validateResponseController
+            .add(res);
+      } catch (error) {        
+        _validateResponseController.addError(error);
+      }
+    });
+  }
+
   void _validateResponse<T>(Response response) {    
     if (response.statusCode != 200) {
       log.severe('fastbitcoins response error: ${response.body.substring(0,100)}');
       throw "Service Unavailable. Please try again later.";
     }
-  }
-
-  void close() {
-    _validateRequestController.close();
-    _validateResponseController.close();
-    _redeemRequestController.close();
-    _redeemResponseController.close();
   }
 }

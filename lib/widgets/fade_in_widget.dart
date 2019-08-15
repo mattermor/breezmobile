@@ -16,15 +16,15 @@ class FadeInWidgetState extends State<FadeInWidget> with SingleTickerProviderSta
   CurvedAnimation _fadeIn;
 
   @override
+  Widget build(BuildContext context) {
+    return FadeTransition(opacity: _fadeIn, child: widget.child);
+  }
+  
+  @override
   void initState() {    
     super.initState();
     AnimationController controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
     _fadeIn = CurvedAnimation(parent: controller, curve: Curves.easeIn);
     controller.forward(); 
-  }
-  
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(opacity: _fadeIn, child: widget.child);
   }
 }

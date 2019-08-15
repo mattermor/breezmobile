@@ -11,15 +11,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-class ActivateCardPageState extends State<ActivateCardPage> with WidgetsBindingObserver {
-  final String _title = "Activate Card";
-  final String _instructions = "To activate your Breez card,\nhold it close to your mobile device";
+class ActivateCardPage extends StatefulWidget {  
+  final platform = const MethodChannel('com.breez.client/nfc');
 
+  ActivateCardPage();
+  @override
+  State<StatefulWidget> createState() {
+    return new ActivateCardPageState();
+  }
+}
+
+class ActivateCardPageState extends State<ActivateCardPage> with WidgetsBindingObserver {
   static ServiceInjector injector = new ServiceInjector();
+  final String _title = "Activate Card";
+
+  final String _instructions = "To activate your Breez card,\nhold it close to your mobile device";
   NFCService nfc = injector.nfc;
 
   StreamSubscription _streamSubscription;
   bool _isInit = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildCardActivation(context);
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -27,20 +42,6 @@ class ActivateCardPageState extends State<ActivateCardPage> with WidgetsBindingO
       UserProfileBloc userBloc = AppBlocsProvider.of<UserProfileBloc>(context);
       userBloc.cardActivationInit();
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    
-    nfc.checkNFCSettings().then((isNfcEnabled) {
-      if (!isNfcEnabled) {
-        return new Timer(new Duration(milliseconds: 500), () {
-          _showAlertDialog();
-        });
-      }
-    });   
   }
 
   @override void didChangeDependencies() {            
@@ -59,25 +60,6 @@ class ActivateCardPageState extends State<ActivateCardPage> with WidgetsBindingO
       super.didChangeDependencies();
     }
 
-  void _showAlertDialog() {
-    AlertDialog dialog = new AlertDialog(
-      content: new Text("Breez requires NFC to be enabled in your device in order to activate a card.",
-          style: theme.alertStyle),
-      actions: <Widget>[
-        new FlatButton(onPressed: () => Navigator.pop(context), child: new Text("CANCEL", style: theme.buttonStyle)),
-        new FlatButton(
-            onPressed: () {
-              nfc.openSettings();
-              Navigator.pop(context);
-            },
-            child: new Text("SETTINGS", style: theme.buttonStyle))
-      ],
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
-    );
-    showDialog(context: context, builder: (_) => dialog);
-  }
-
   @override
   void dispose() {    
     _streamSubscription?.cancel();
@@ -86,8 +68,17 @@ class ActivateCardPageState extends State<ActivateCardPage> with WidgetsBindingO
   }
 
   @override
-  Widget build(BuildContext context) {
-    return _buildCardActivation(context);
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    
+    nfc.checkNFCSettings().then((isNfcEnabled) {
+      if (!isNfcEnabled) {
+        return new Timer(new Duration(milliseconds: 500), () {
+          _showAlertDialog();
+        });
+      }
+    });   
   }
 
   Widget _buildCardActivation(BuildContext context) {
@@ -134,14 +125,23 @@ class ActivateCardPageState extends State<ActivateCardPage> with WidgetsBindingO
       ),
     );
   }
-}
 
-class ActivateCardPage extends StatefulWidget {  
-  final platform = const MethodChannel('com.breez.client/nfc');
-
-  ActivateCardPage();
-  @override
-  State<StatefulWidget> createState() {
-    return new ActivateCardPageState();
+  void _showAlertDialog() {
+    AlertDialog dialog = new AlertDialog(
+      content: new Text("Breez requires NFC to be enabled in your device in order to activate a card.",
+          style: theme.alertStyle),
+      actions: <Widget>[
+        new FlatButton(onPressed: () => Navigator.pop(context), child: new Text("CANCEL", style: theme.buttonStyle)),
+        new FlatButton(
+            onPressed: () {
+              nfc.openSettings();
+              Navigator.pop(context);
+            },
+            child: new Text("SETTINGS", style: theme.buttonStyle))
+      ],
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+    );
+    showDialog(context: context, builder: (_) => dialog);
   }
 }

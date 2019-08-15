@@ -58,26 +58,6 @@ class BreezAvatar extends StatelessWidget {
   }
 }
 
-class _UnknownAvatar extends StatelessWidget {
-  final double radius;
-  final Color backgroundColor;
-
-  _UnknownAvatar(this.radius, this.backgroundColor);
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      backgroundColor: backgroundColor,
-      radius: radius,
-      child: ImageIcon(
-          AssetImage("src/icon/alien.png"),
-          color: Color.fromARGB(255, 0, 166, 68),
-          size: 0.70 * radius * 2,
-      ) // Used to be: Icon(Icons.person, color: theme.BreezColors.blue[500], size: 0.7 * radius * 2,)
-    );
-  }
-}
-
 class _GeneratedAvatar extends StatelessWidget {
   final double radius;
   final String animal;
@@ -118,6 +98,26 @@ class _NetworkImageAvatar extends StatelessWidget {
   }
 }
 
+class _UnknownAvatar extends StatelessWidget {
+  final double radius;
+  final Color backgroundColor;
+
+  _UnknownAvatar(this.radius, this.backgroundColor);
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      backgroundColor: backgroundColor,
+      radius: radius,
+      child: ImageIcon(
+          AssetImage("src/icon/alien.png"),
+          color: Color.fromARGB(255, 0, 166, 68),
+          size: 0.70 * radius * 2,
+      ) // Used to be: Icon(Icons.person, color: theme.BreezColors.blue[500], size: 0.7 * radius * 2,)
+    );
+  }
+}
+
 class _VendorAvatar extends StatelessWidget {
   final double radius;
   final String avatarURL;
@@ -125,16 +125,13 @@ class _VendorAvatar extends StatelessWidget {
   _VendorAvatar(this.radius, this.avatarURL);
 
 
-  Widget _fastbitcoinsAvatar() {
-    return CircleAvatar(
-        backgroundColor: theme.fastbitcoins.iconBgColor,
-        radius: radius,
-        child: ImageIcon(
-          AssetImage(avatarURL),
-          color: theme.fastbitcoins.iconFgColor,
-          size: 0.6 * radius * 2,
-        )
-    );
+  @override
+  Widget build(BuildContext context) {
+    if(avatarURL.contains("fastbitcoins")){
+      return _fastbitcoinsAvatar();
+    } else {
+      return _vendorAvatar();
+    }
   }
 
   Widget _bitrefillAvatar() {
@@ -150,6 +147,18 @@ class _VendorAvatar extends StatelessWidget {
     );
   }
 
+  Widget _fastbitcoinsAvatar() {
+    return CircleAvatar(
+        backgroundColor: theme.fastbitcoins.iconBgColor,
+        radius: radius,
+        child: ImageIcon(
+          AssetImage(avatarURL),
+          color: theme.fastbitcoins.iconFgColor,
+          size: 0.6 * radius * 2,
+        )
+    );
+  }
+
   Widget _vendorAvatar() {
     var _bgColor = avatarURL.contains("lnpizza") ? theme.lnpizza.iconBgColor : theme.bitrefill.iconBgColor;
     var _fgColor = avatarURL.contains("lnpizza") ? theme.lnpizza.iconFgColor : theme.bitrefill.iconFgColor;
@@ -162,14 +171,5 @@ class _VendorAvatar extends StatelessWidget {
       width: radius * 2,
       height: radius * 2,
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if(avatarURL.contains("fastbitcoins")){
-      return _fastbitcoinsAvatar();
-    } else {
-      return _vendorAvatar();
-    }
   }
 }

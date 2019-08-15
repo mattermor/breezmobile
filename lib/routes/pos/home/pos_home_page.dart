@@ -13,8 +13,6 @@ class PosHome extends StatefulWidget {
   final AccountBloc accountBloc;
   final BackupBloc backupBloc;
 
-  PosHome(this.accountBloc, this.backupBloc);
-
   final List<DrawerItemConfig> _screens =
       new List<DrawerItemConfig>.unmodifiable([]);
 
@@ -35,6 +33,8 @@ class PosHome extends StatefulWidget {
         "/developers", "Developers", "src/icon/developers.png"),
   ]);
 
+  PosHome(this.accountBloc, this.backupBloc);
+
   @override
   State<StatefulWidget> createState() {
     return new PosHomeState();
@@ -43,13 +43,6 @@ class PosHome extends StatefulWidget {
 
 class PosHomeState extends State<PosHome> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
-  @override
-  void initState() {
-    super.initState();
-    new SyncUIHandler(widget.accountBloc, context);
-    listenNoConnection(context, widget.accountBloc);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +82,13 @@ class PosHomeState extends State<PosHome> {
         body: new Builder(builder: (BuildContext context) {
           return POSInvoice();
         }));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    new SyncUIHandler(widget.accountBloc, context);
+    listenNoConnection(context, widget.accountBloc);
   }
 
   _onNavigationItemSelected(String itemName) {

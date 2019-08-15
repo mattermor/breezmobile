@@ -24,6 +24,17 @@ class _TransferFundsInProgressDialogState extends State<_TransferFundsInProgress
   StreamSubscription<AccountModel> _stateSubscription;
 
   @override
+  Widget build(BuildContext context) {
+    return createAnimatedLoaderDialog(context, "Transferring funds");
+  }
+
+  @override
+  void dispose() {
+    _stateSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _stateSubscription = widget.accountStream.listen((state) {
@@ -33,18 +44,7 @@ class _TransferFundsInProgressDialogState extends State<_TransferFundsInProgress
     }, onError: (err) => _pop());
   }
 
-  @override
-  void dispose() {
-    _stateSubscription?.cancel();
-    super.dispose();
-  }
-
   _pop() {
     Navigator.of(context).pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return createAnimatedLoaderDialog(context, "Transferring funds");
   }
 }

@@ -9,12 +9,41 @@ import 'package:flutter/material.dart';
 /*
 ConnectedPeer is a widget that shows both sides with presence awareness indicator.
 */
+class AlienAvatar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AvatarDecorator(ImageIcon(AssetImage("src/icon/alien.png"), color: Color.fromARGB(255, 0, 166, 68)));
+  }
+}
+
+class AvatarDecorator extends StatelessWidget {
+  final Widget child;
+
+  const AvatarDecorator(this.child);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 60.0,
+        height: 60.0,
+        decoration: BoxDecoration(color: theme.sessionAvatarBackgroundColor, shape: BoxShape.circle),
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: child,
+        ));
+  }
+}
+
 class ConnectedPeer extends StatelessWidget {
   final PaymentSessionState _paymentSessionData;
   final bool _renderPayer;
   final Function() _onShareInvite;
 
   const ConnectedPeer(this._renderPayer, this._paymentSessionData, this._onShareInvite);
+
+  bool get _me => _paymentSessionData.payer ? _renderPayer : !_renderPayer;
+
+  bool get _online => _renderPayer ? _paymentSessionData.payerData.status.online : _paymentSessionData.payeeData.status.online;
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +98,6 @@ class ConnectedPeer extends StatelessWidget {
             opacity: 1.0,
             child: BreezAvatar(imageURL, radius: 30.0, backgroundColor: theme.sessionAvatarBackgroundColor));    
   }
-
-  bool get _online => _renderPayer ? _paymentSessionData.payerData.status.online : _paymentSessionData.payeeData.status.online;
-
-  bool get _me => _paymentSessionData.payer ? _renderPayer : !_renderPayer;
 }
 
 class _ShareInviteWidget extends StatelessWidget {
@@ -107,30 +132,5 @@ class _ShareInviteWidget extends StatelessWidget {
         ))
       ]      
     );   
-  }
-}
-
-class AvatarDecorator extends StatelessWidget {
-  final Widget child;
-
-  const AvatarDecorator(this.child);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        width: 60.0,
-        height: 60.0,
-        decoration: BoxDecoration(color: theme.sessionAvatarBackgroundColor, shape: BoxShape.circle),
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: child,
-        ));
-  }
-}
-
-class AlienAvatar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return AvatarDecorator(ImageIcon(AssetImage("src/icon/alien.png"), color: Color.fromARGB(255, 0, 166, 68)));
   }
 }

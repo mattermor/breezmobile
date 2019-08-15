@@ -41,14 +41,6 @@ class PayeeSessionWidget extends StatelessWidget {
         });
   }
 
-  _onAction(BuildContext context, String action){
-    if (action == "Reject") {
-        _currentSession.rejectPaymentSink.add(null);
-      } else {
-        _currentSession.approvePaymentSink.add(null);
-      }
-  }
-
   _getActions(PaymentSessionState sessionState){
     if (_account.synced) {
       if (sessionState.payerData.amount != null && sessionState.payeeData.paymentRequest == null) {
@@ -63,6 +55,14 @@ class PayeeSessionWidget extends StatelessWidget {
       return ["Approve"];
     }
     return [];
+  }
+
+  _onAction(BuildContext context, String action){
+    if (action == "Reject") {
+        _currentSession.rejectPaymentSink.add(null);
+      } else {
+        _currentSession.approvePaymentSink.add(null);
+      }
   }
 }
 

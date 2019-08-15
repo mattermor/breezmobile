@@ -18,6 +18,22 @@ class QrCodeDialog extends StatelessWidget {
     return _buildQrCodeDialog();
   }
 
+  Widget _buildCloseButton() {
+    return new FlatButton(
+      onPressed: (() {
+        Navigator.pop(context);
+      }),
+      child: new Text("CLOSE", style: theme.buttonStyle),
+    );
+  }
+
+  Widget _buildExpiryMessage() {
+    return new Column(children: <Widget>[
+      Text("Keep the Breez app open in order to receive payment.",
+          style: theme.createInvoiceDialogWarningStyle)
+    ]);
+  }
+
   Widget _buildQrCodeDialog() {
     return new SimpleDialog(
       title: new Row(
@@ -110,22 +126,6 @@ class QrCodeDialog extends StatelessWidget {
       ],
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
-    );
-  }
-
-  Widget _buildExpiryMessage() {
-    return new Column(children: <Widget>[
-      Text("Keep the Breez app open in order to receive payment.",
-          style: theme.createInvoiceDialogWarningStyle)
-    ]);
-  }
-
-  Widget _buildCloseButton() {
-    return new FlatButton(
-      onPressed: (() {
-        Navigator.pop(context);
-      }),
-      child: new Text("CLOSE", style: theme.buttonStyle),
     );
   }
 }

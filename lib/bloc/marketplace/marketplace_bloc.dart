@@ -7,10 +7,14 @@ import 'package:rxdart/rxdart.dart';
 
 class MarketplaceBloc {
   final _vendorController = new BehaviorSubject<List<VendorModel>>();
-  Stream<List<VendorModel>> get vendorsStream => _vendorController.stream;
-
   MarketplaceBloc() {
     initMarketplace();
+  }
+
+  Stream<List<VendorModel>> get vendorsStream => _vendorController.stream;
+
+  close() {
+    _vendorController.close();
   }
 
   Future initMarketplace() async {
@@ -31,9 +35,5 @@ class MarketplaceBloc {
   Future<Config> _readConfig() async {
     String lines = await rootBundle.loadString('conf/marketplace.conf');
     return Config.fromString(lines);
-  }
-
-  close() {
-    _vendorController.close();
   }
 }

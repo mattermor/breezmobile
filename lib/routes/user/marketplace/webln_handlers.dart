@@ -37,6 +37,12 @@ class WeblnHandlers {
 
   Future<String> get initWeblnScript => rootBundle.loadString('src/scripts/initializeWebLN.js');
 
+  void dispose(){
+    _sentPaymentResultSubscription?.cancel();
+    _readyInvoicesSubscription?.cancel();
+    _accountModelSubscription?.cancel();
+  }
+
   Future<String> handleMessage(postMessage) async {
     Map<String, Future<Map<String, dynamic>> Function(Map<String, dynamic> data)> _handlersMapping = {
       "sendPayment": _sendPayment,
@@ -65,15 +71,6 @@ class WeblnHandlers {
     return null;
   }
 
-  Future<Map<String, dynamic>> _sendPayment(postMessage) {
-    String bolt11 = postMessage["payReq"];
-    invoiceBloc.newLightningLinkSink.add(bolt11);
-    if (bolt11.toLowerCase().startsWith("lightning:")) {
-      bolt11 = bolt11.toLowerCase().substring(10);
-    }
-    return _trackPayment(bolt11).then((_) => Future.value({}));
-  }
-
   Future<Map<String, dynamic>> _makeInvoice(postMessage) async{
     Map<String, dynamic> invoiceArgs = postMessage["invoiceArgs"];
     if (invoiceArgs == null) {
@@ -93,10 +90,13 @@ class WeblnHandlers {
     return Future.error("Request denied");   
   }
 
-  void dispose(){
-    _sentPaymentResultSubscription?.cancel();
-    _readyInvoicesSubscription?.cancel();
-    _accountModelSubscription?.cancel();
+  Future<Map<String, dynamic>> _sendPayment(postMessage) {
+    String bolt11 = postMessage["payReq"];
+    invoiceBloc.newLightningLinkSink.add(bolt11);
+    if (bolt11.toLowerCase().startsWith("lightning:")) {
+      bolt11 = bolt11.toLowerCase().substring(10);
+    }
+    return _trackPayment(bolt11).then((_) => Future.value({}));
   }
 
   Future<String> _trackInvoice() {

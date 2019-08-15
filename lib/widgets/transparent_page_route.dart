@@ -6,9 +6,6 @@ class TransparentPageRoute<T> extends ModalRoute<T> {
 
   TransparentPageRoute( this.builder);
 
-  @override
-  bool get opaque => false;
-
   @override  
   Color get barrierColor => null;
 
@@ -18,14 +15,17 @@ class TransparentPageRoute<T> extends ModalRoute<T> {
   @override  
   String get barrierLabel => null;
 
+  @override  
+  bool get maintainState => false;
+
+  @override
+  bool get opaque => false;
+
+  @override  
+  Duration get transitionDuration => Duration(seconds: 0);
+
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     return builder(context);
   }
-
-  @override  
-  bool get maintainState => false;
-
-  @override  
-  Duration get transitionDuration => Duration(seconds: 0);
 }

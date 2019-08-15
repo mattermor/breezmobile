@@ -24,37 +24,46 @@ A concrete implementation of RemoteSession from the payee side.
 */
 class PayeeRemoteSession extends RemoteSession with OnlineStatusUpdater{
   final StreamController<void>  _terminationStreamController = new StreamController<void>();
-  Stream<void> get terminationStream => _terminationStreamController.stream;
-
   final _approvePaymentController = new StreamController<BreezUserModel>();
-  Sink<BreezUserModel> get approvePaymentSink => _approvePaymentController.sink;
 
   final _rejectPaymentController = new StreamController<void>();
-  Sink<void> get rejectPaymentSink => _rejectPaymentController.sink;
-
   final _paymentSessionController = new BehaviorSubject<PaymentSessionState>();
-  Stream<PaymentSessionState> get paymentSessionStateStream => _paymentSessionController.stream;
 
   final _sessionErrorsController = new StreamController<PaymentSessionError>.broadcast();
-  Stream<PaymentSessionError> get sessionErrors => _sessionErrorsController.stream;
-
   BreezServer _breezServer = ServiceInjector().breezServer;
+
   StreamSubscription _invoicesPaidSubscription;
   PaymentSessionChannel _channel;
+
   BreezBridge _breezLib = ServiceInjector().breezBridge;
   BackgroundTaskService _backgroundService = ServiceInjector().backgroundTaskService;
+
   BreezUserModel _currentUser;
   var sessionState = Map<String, dynamic>();
   SessionLinkModel sessionLink;
-  String get sessionID => sessionLink?.sessionID;
   Completer _sessionCompleter = new Completer();
-
   PayeeRemoteSession(this._currentUser, {PayerSessionData existingPayerData}) : super(_currentUser) {
     var initialState = PaymentSessionState.payeeStart(sessionID, _currentUser.name, _currentUser.avatarURL);
     if (existingPayerData != null) {
       initialState = initialState.copyWith(payerData: existingPayerData);
     }
     _paymentSessionController.add(initialState);
+  }
+  Sink<BreezUserModel> get approvePaymentSink => _approvePaymentController.sink;
+  Stream<PaymentSessionState> get paymentSessionStateStream => _paymentSessionController.stream;
+  Sink<void> get rejectPaymentSink => _rejectPaymentController.sink;
+  Stream<PaymentSessionError> get sessionErrors => _sessionErrorsController.stream;
+  String get sessionID => sessionLink?.sessionID;
+
+  Stream<void> get terminationStream => _terminationStreamController.stream;
+
+  PaymentSessionState get _currentSession => _paymentSessionController.value;
+
+  bool get _isTerminated => _terminationStreamController.isClosed;
+
+  Future pushStateUpdate(Map<String, dynamic> updates){
+    sessionState.addAll(updates);
+    return _channel.sendStateUpdate(sessionState);
   }
 
   Future start(SessionLinkModel sessionLink) async{    
@@ -73,14 +82,25 @@ class PayeeRemoteSession extends RemoteSession with OnlineStatusUpdater{
     _handleIncomingMessages();    
   }
 
-  _loadPersistedPayerDetails() async{
-    var sessionInfo = await _breezLib.ratchetSessionInfo(sessionID);
-    if (sessionInfo == null || sessionInfo.userInfo.isEmpty) {
-      return null;
+  Future terminate({bool permanent=false}) async {    
+    if (_isTerminated) {
+      return Future.value(null);
     }
-    Map<String, dynamic> payerData =  json.decode(sessionInfo.userInfo);
-    var persistedPayer = PayerSessionData.fromJson(payerData["payerData"]).copyWith(status: PeerStatus.start());
-    _paymentSessionController.add(_currentSession.copyWith(payerData: persistedPayer));
+    _sessionCompleter.complete();
+    await _invoicesPaidSubscription.cancel();
+    await stopStatusUpdates();
+    if (permanent &&  !_currentSession.paymentFulfilled) {  
+      await pushStateUpdate({"cancelled":true});
+    }
+    await _channel.terminate(destroyHistory: permanent);    
+    await _approvePaymentController.close();
+    await _paymentSessionController.close();
+    await _sessionErrorsController.close();
+    await _rejectPaymentController.close();    
+    _terminationStreamController.add(null);    
+    if (permanent) {
+      await _breezServer.terminateSession(sessionID);
+    }      
   }
 
   _handleIncomingMessages(){    
@@ -107,16 +127,6 @@ class PayeeRemoteSession extends RemoteSession with OnlineStatusUpdater{
     _watchPaymentFulfilled();  
   }
 
-  Future _resetSessionState() async {    
-    var sessionResetState = PaymentSessionState.payeeStart(sessionID, _currentUser.name, _currentUser.avatarURL)
-      .copyWith(payerData: _currentSession.payerData); 
-    
-    _paymentSessionController.add(sessionResetState);
-    _handleStatusUpdates();
-    sessionState.clear();
-    return pushStateUpdate({"userName": _currentUser.name, "imageURL":  _currentUser.avatarURL});    
-  }
-
   Future _handleStatusUpdates() async {
     await stopStatusUpdates();
     startStatusUpdates('remote-payments/$sessionID/payee/status', (status) {
@@ -129,39 +139,40 @@ class PayeeRemoteSession extends RemoteSession with OnlineStatusUpdater{
     });  
   }
 
-  Future pushStateUpdate(Map<String, dynamic> updates){
-    sessionState.addAll(updates);
-    return _channel.sendStateUpdate(sessionState);
+  _loadPersistedPayerDetails() async{
+    var sessionInfo = await _breezLib.ratchetSessionInfo(sessionID);
+    if (sessionInfo == null || sessionInfo.userInfo.isEmpty) {
+      return null;
+    }
+    Map<String, dynamic> payerData =  json.decode(sessionInfo.userInfo);
+    var persistedPayer = PayerSessionData.fromJson(payerData["payerData"]).copyWith(status: PeerStatus.start());
+    _paymentSessionController.add(_currentSession.copyWith(payerData: persistedPayer));
   }
 
-  _onInvoiceError(err){
+   _onInvoiceError(err){
     pushStateUpdate({"error": err.toString()}).then((_){
       _sessionErrorsController.add(PaymentSessionError.unknown(err.toString()));
     });
   }
 
-  Future terminate({bool permanent=false}) async {    
-    if (_isTerminated) {
-      return Future.value(null);
-    }
-    _sessionCompleter.complete();
-    await _invoicesPaidSubscription.cancel();
-    await stopStatusUpdates();
-    if (permanent &&  !_currentSession.paymentFulfilled) {  
-      await pushStateUpdate({"cancelled":true});
-    }
-    await _channel.terminate(destroyHistory: permanent);    
-    await _approvePaymentController.close();
-    await _paymentSessionController.close();
-    await _sessionErrorsController.close();
-    await _rejectPaymentController.close();    
-    _terminationStreamController.add(null);    
-    if (permanent) {
-      await _breezServer.terminateSession(sessionID);
-    }      
+  Future _persistPayerData(PayerSessionData newPayerData) {
+    return _breezLib.ratchetSessionSetInfo(sessionID, json.encode(
+      {"payerData": {
+        "imageURL": newPayerData.imageURL,
+        "userName": newPayerData.userName
+      }})
+    );
   }
 
-   bool get _isTerminated => _terminationStreamController.isClosed;
+  Future _resetSessionState() async {    
+    var sessionResetState = PaymentSessionState.payeeStart(sessionID, _currentUser.name, _currentUser.avatarURL)
+      .copyWith(payerData: _currentSession.payerData); 
+    
+    _paymentSessionController.add(sessionResetState);
+    _handleStatusUpdates();
+    sessionState.clear();
+    return pushStateUpdate({"userName": _currentUser.name, "imageURL":  _currentUser.avatarURL});    
+  }
 
   Future<void> _sendPaymentRequest(String payReq) {
     return pushStateUpdate({"paymentRequest": payReq}).then((res) {
@@ -186,15 +197,6 @@ class PayeeRemoteSession extends RemoteSession with OnlineStatusUpdater{
     });
   }
 
-  Future _persistPayerData(PayerSessionData newPayerData) {
-    return _breezLib.ratchetSessionSetInfo(sessionID, json.encode(
-      {"payerData": {
-        "imageURL": newPayerData.imageURL,
-        "userName": newPayerData.userName
-      }})
-    );
-  }
-
   void _watchPaymentFulfilled() {
     _invoicesPaidSubscription = _breezLib.notificationStream.where((event) => event.type == NotificationEvent_NotificationType.INVOICE_PAID).listen((_) {
       if (_currentSession.payeeData.paymentRequest != null) {
@@ -206,6 +208,4 @@ class PayeeRemoteSession extends RemoteSession with OnlineStatusUpdater{
       }
     });
   }
-
-  PaymentSessionState get _currentSession => _paymentSessionController.value;
 }

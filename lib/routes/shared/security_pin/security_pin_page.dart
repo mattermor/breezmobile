@@ -66,84 +66,6 @@ class SecurityPageState extends State<SecurityPage> {
         });
   }
 
-  List<Widget> _buildSecurityPINTiles(SecurityModel securityModel) {
-    List<Widget> _tiles = <Widget>[_buildDisablePINTile(securityModel)];
-    if (securityModel.pinCode != null)
-      _tiles..add(
-        Divider())
-        ..add(_buildSecureBackupWithPinTile(securityModel))
-        ..add(Divider())
-        ..add(_buildPINIntervalTile(securityModel))
-        ..add(Divider())
-        ..add(_buildChangePINTile(securityModel));        
-    return _tiles;
-  }
-
-  ListTile _buildSecureBackupWithPinTile(SecurityModel securityModel) {
-    return ListTile(
-      title: Text(
-        "Use in Backup/Restore",
-        style: TextStyle(color: Colors.white),
-      ),
-      trailing: Switch(
-        value: securityModel.secureBackupWithPin,
-        activeColor: Colors.white,
-        onChanged: (bool value) async {
-          if (this.mounted) {
-            if (value) {
-              bool approved = await showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext context) {
-                  return SecurityPINWarningDialog();
-                }
-              );
-              if (!approved) {
-                return;
-              }                                                
-            }
-            _updateSecurityModel(securityModel, securityModel.copyWith(secureBackupWithPin: value));                        
-          }
-        },
-      ),
-    );
-  }
-
-  ListTile _buildPINIntervalTile(SecurityModel securityModel) {
-    return ListTile(
-      title: Text(
-        "Lock Automatically",
-        style: TextStyle(color: Colors.white),
-      ),
-      trailing: DropdownButtonHideUnderline(
-        child: new DropdownButton(
-          value: securityModel.automaticallyLockInterval,
-          isDense: true,
-          onChanged: (int newValue) {
-            _updateSecurityModel(securityModel, securityModel.copyWith(automaticallyLockInterval: newValue));
-          },
-          items: SecurityModel.lockIntervals.map((int seconds) {
-            return new DropdownMenuItem(
-              value: seconds,
-              child: new Text(_formatSeconds(seconds),
-                  style: theme
-                      .FieldTextStyle
-                      .textStyle),
-            );
-          }).toList(),
-        ),
-      ),
-      onTap: () => _onChangePinSelected(securityModel),
-    );
-  }
-
-  String _formatSeconds(int seconds) {
-    if (seconds == 0) {
-      return "Immediate";
-    }
-    return printDuration(Duration(seconds: seconds));    
-  }
-
   ListTile _buildChangePINTile(SecurityModel securityModel) {
     return ListTile(
       title: Text(
@@ -176,6 +98,84 @@ class SecurityPageState extends State<SecurityPage> {
           ? null
           : () => _onChangePinSelected(securityModel),
     );
+  }
+
+  ListTile _buildPINIntervalTile(SecurityModel securityModel) {
+    return ListTile(
+      title: Text(
+        "Lock Automatically",
+        style: TextStyle(color: Colors.white),
+      ),
+      trailing: DropdownButtonHideUnderline(
+        child: new DropdownButton(
+          value: securityModel.automaticallyLockInterval,
+          isDense: true,
+          onChanged: (int newValue) {
+            _updateSecurityModel(securityModel, securityModel.copyWith(automaticallyLockInterval: newValue));
+          },
+          items: SecurityModel.lockIntervals.map((int seconds) {
+            return new DropdownMenuItem(
+              value: seconds,
+              child: new Text(_formatSeconds(seconds),
+                  style: theme
+                      .FieldTextStyle
+                      .textStyle),
+            );
+          }).toList(),
+        ),
+      ),
+      onTap: () => _onChangePinSelected(securityModel),
+    );
+  }
+
+  ListTile _buildSecureBackupWithPinTile(SecurityModel securityModel) {
+    return ListTile(
+      title: Text(
+        "Use in Backup/Restore",
+        style: TextStyle(color: Colors.white),
+      ),
+      trailing: Switch(
+        value: securityModel.secureBackupWithPin,
+        activeColor: Colors.white,
+        onChanged: (bool value) async {
+          if (this.mounted) {
+            if (value) {
+              bool approved = await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) {
+                  return SecurityPINWarningDialog();
+                }
+              );
+              if (!approved) {
+                return;
+              }                                                
+            }
+            _updateSecurityModel(securityModel, securityModel.copyWith(secureBackupWithPin: value));                        
+          }
+        },
+      ),
+    );
+  }
+
+  List<Widget> _buildSecurityPINTiles(SecurityModel securityModel) {
+    List<Widget> _tiles = <Widget>[_buildDisablePINTile(securityModel)];
+    if (securityModel.pinCode != null)
+      _tiles..add(
+        Divider())
+        ..add(_buildSecureBackupWithPinTile(securityModel))
+        ..add(Divider())
+        ..add(_buildPINIntervalTile(securityModel))
+        ..add(Divider())
+        ..add(_buildChangePINTile(securityModel));        
+    return _tiles;
+  }
+
+  String _formatSeconds(int seconds) {
+    if (seconds == 0) {
+      return "Immediate";
+    }
+    return printDuration(Duration(seconds: seconds));    
   }
 
   void _onChangePinSelected(SecurityModel securityModel){

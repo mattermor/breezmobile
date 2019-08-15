@@ -10,17 +10,17 @@ class SecurityModel {
 
   SecurityModel({this.requiresPin, this.pinCode, this.secureBackupWithPin, this.automaticallyLockInterval});
 
-  SecurityModel copyWith({bool requiresPin, String pinCode, bool secureBackupWithPin, int automaticallyLockInterval}) {
-    return new SecurityModel(requiresPin: requiresPin ?? this.requiresPin, pinCode: pinCode ?? this.pinCode, secureBackupWithPin: secureBackupWithPin ?? this.secureBackupWithPin, automaticallyLockInterval: automaticallyLockInterval ?? this.automaticallyLockInterval);
-  }
-
-  SecurityModel.initial() : this(requiresPin:false, pinCode: null, secureBackupWithPin: false, automaticallyLockInterval: _defaultLockInterval);
-
   SecurityModel.fromJson(Map<String, dynamic> json)
       : pinCode = null,
         requiresPin = json['requiresPin'] ?? false,
         automaticallyLockInterval = json['automaticallyLockInterval'] ?? _defaultLockInterval,
         secureBackupWithPin = json['secureBackupWithPin'] ?? false;
+
+  SecurityModel.initial() : this(requiresPin:false, pinCode: null, secureBackupWithPin: false, automaticallyLockInterval: _defaultLockInterval);
+
+  SecurityModel copyWith({bool requiresPin, String pinCode, bool secureBackupWithPin, int automaticallyLockInterval}) {
+    return new SecurityModel(requiresPin: requiresPin ?? this.requiresPin, pinCode: pinCode ?? this.pinCode, secureBackupWithPin: secureBackupWithPin ?? this.secureBackupWithPin, automaticallyLockInterval: automaticallyLockInterval ?? this.automaticallyLockInterval);
+  }
 
   Map<String, dynamic> toJson() => {
         'secureBackupWithPin': secureBackupWithPin,

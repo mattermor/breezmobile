@@ -6,6 +6,24 @@ import 'package:breez/widgets/loading_animated_text.dart';
 import 'package:breez/widgets/transparent_page_route.dart';
 import 'package:flutter/material.dart';
 
+ModalRoute _createSyncRoute(AccountBloc accBloc){
+  return SyncUIRoute((context){
+    return StreamBuilder<AccountModel>(
+        stream: accBloc.accountStream,
+        builder: (ctx, snapshot){
+          var account = snapshot.data;
+          double progress = account?.syncProgress ?? 0;
+          return TransparentRouteLoader(
+            message: "Please wait while Breez is synchronizing", 
+            value: progress, 
+            opacity: 0.9,
+            onClose: () => accBloc.userActionsSink.add(ChangeSyncUIState(SyncUIState.COLLAPSED)),
+          );
+        },
+      );
+  });
+}
+
 class SyncUIHandler {  
   final AccountBloc _accountBloc;
   final BuildContext _context;
@@ -39,36 +57,18 @@ class SyncUIHandler {
   }
 }
 
-ModalRoute _createSyncRoute(AccountBloc accBloc){
-  return SyncUIRoute((context){
-    return StreamBuilder<AccountModel>(
-        stream: accBloc.accountStream,
-        builder: (ctx, snapshot){
-          var account = snapshot.data;
-          double progress = account?.syncProgress ?? 0;
-          return TransparentRouteLoader(
-            message: "Please wait while Breez is synchronizing", 
-            value: progress, 
-            opacity: 0.9,
-            onClose: () => accBloc.userActionsSink.add(ChangeSyncUIState(SyncUIState.COLLAPSED)),
-          );
-        },
-      );
-  });
-}
-
 class SyncUIRoute extends TransparentPageRoute {
 
   SyncUIRoute(Widget Function(BuildContext context) builder) : super(builder);
   
+  @override
+  Duration get transitionDuration => Duration(milliseconds: 300);
+
   @override Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {    
     
     var curv = CurvedAnimation(parent: controller, curve: Curves.easeOut);
     return ScaleTransition(scale: curv, child: child, alignment: Alignment.topRight);    
   }
-
-  @override
-  Duration get transitionDuration => Duration(milliseconds: 300);
 }
 
 class TransparentRouteLoader extends StatefulWidget {
@@ -87,13 +87,6 @@ class TransparentRouteLoader extends StatefulWidget {
 }
 
 class TransparentRouteLoaderState extends State<TransparentRouteLoader> {
-
-  @override void didUpdateWidget(TransparentRouteLoader oldWidget) {    
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.message != this.widget.message || oldWidget.opacity != this.widget.opacity || oldWidget.value != this.widget.value) {
-      setState(() {});
-    }
-  }
 
   @override
   Widget build(BuildContext context) {    
@@ -146,5 +139,12 @@ class TransparentRouteLoaderState extends State<TransparentRouteLoader> {
         ],
       ),
     );   
+  }
+
+  @override void didUpdateWidget(TransparentRouteLoader oldWidget) {    
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.message != this.widget.message || oldWidget.opacity != this.widget.opacity || oldWidget.value != this.widget.value) {
+      setState(() {});
+    }
   }
 }

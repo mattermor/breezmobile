@@ -33,18 +33,6 @@ class _PaymentDetailsFormState extends State<PaymentDetailsForm> {
   KeyboardDoneAction _doneAction;
 
   @override
-  void initState() {
-    super.initState();
-    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
-  }
-
-  @override 
-  void dispose() {
-    _doneAction.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     const double bottomBarHeight = 96.0;
     const double bottomBarTopMargin = 24.0;
@@ -129,5 +117,17 @@ class _PaymentDetailsFormState extends State<PaymentDetailsForm> {
         ],
       );
     });
+  }
+
+  @override 
+  void dispose() {
+    _doneAction.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
   }
 }

@@ -16,6 +16,37 @@ class BreezServer {
 
   ClientChannel _channel;
 
+  Future<JoinCTPSessionResponse> joinSession(
+      bool payer, String userName, String notificationToken,
+      {String sessionID}) async {
+    await _ensureValidChannel();
+    var ctpClient = new CTPClient(_channel, options: defaultCallOptions);
+    return await ctpClient.joinCTPSession(new JoinCTPSessionRequest()
+      ..partyType = payer
+          ? JoinCTPSessionRequest_PartyType.PAYER
+          : JoinCTPSessionRequest_PartyType.PAYEE
+      ..partyName = userName
+      ..notificationToken = notificationToken
+      ..sessionID = sessionID ?? "");
+  }
+
+  Future<OrderReply> orderCard(String fullName, String email, String address,
+      String city, String state, String zip, String country) async {
+    await _ensureValidChannel();
+    var cardOrderClient =
+        new CardOrdererClient(_channel, options: defaultCallOptions);
+    var response = await cardOrderClient.order(new OrderRequest()
+      ..fullName = fullName
+      ..email = email
+      ..address = address
+      ..city = city
+      ..state = state
+      ..zip = zip
+      ..country = country);
+
+    return response;
+  }  
+
   Future<String> registerDevice(String id) async {
     await _ensureValidChannel();
     var invoicerClient =
@@ -38,46 +69,6 @@ class BreezServer {
       ..amount = amount);
     log.info('sendInvoice response: $response');
     return response.toString();
-  }  
-
-  Future<String> uploadLogo(List<int> logo) async {
-    await _ensureValidChannel();
-    var posClient = new PosClient(_channel,
-        options: CallOptions(timeout: Duration(seconds: 30)));
-    return posClient
-        .uploadLogo(new UploadFileRequest()..content = logo)
-        .then((reply) => reply.url);
-  }
-
-  Future<OrderReply> orderCard(String fullName, String email, String address,
-      String city, String state, String zip, String country) async {
-    await _ensureValidChannel();
-    var cardOrderClient =
-        new CardOrdererClient(_channel, options: defaultCallOptions);
-    var response = await cardOrderClient.order(new OrderRequest()
-      ..fullName = fullName
-      ..email = email
-      ..address = address
-      ..city = city
-      ..state = state
-      ..zip = zip
-      ..country = country);
-
-    return response;
-  }
-
-  Future<JoinCTPSessionResponse> joinSession(
-      bool payer, String userName, String notificationToken,
-      {String sessionID}) async {
-    await _ensureValidChannel();
-    var ctpClient = new CTPClient(_channel, options: defaultCallOptions);
-    return await ctpClient.joinCTPSession(new JoinCTPSessionRequest()
-      ..partyType = payer
-          ? JoinCTPSessionRequest_PartyType.PAYER
-          : JoinCTPSessionRequest_PartyType.PAYEE
-      ..partyName = userName
-      ..notificationToken = notificationToken
-      ..sessionID = sessionID ?? "");
   }
 
   Future<TerminateCTPSessionResponse> terminateSession(String sessionID) async {
@@ -87,20 +78,13 @@ class BreezServer {
         TerminateCTPSessionRequest()..sessionID = sessionID);
   }
 
-  Future _ensureValidChannel() async {
-    if (_channel == null) {
-      _channel = await _createChannel();
-      return;
-    }
-
-    var infoClient = new InformationClient(_channel,
-        options: CallOptions(timeout: Duration(seconds: 2)));
-    try {
-      await infoClient.ping(new PingRequest());
-    } catch (e) {
-      _channel.shutdown();
-      _channel = await _createChannel();
-    }
+  Future<String> uploadLogo(List<int> logo) async {
+    await _ensureValidChannel();
+    var posClient = new PosClient(_channel,
+        options: CallOptions(timeout: Duration(seconds: 30)));
+    return posClient
+        .uploadLogo(new UploadFileRequest()..content = logo)
+        .then((reply) => reply.url);
   }
 
   Future<ClientChannel> _createChannel() async {
@@ -117,5 +101,21 @@ class BreezServer {
         options: ChannelOptions(
             credentials: ChannelCredentials.secure(
                 certificates: cert.buffer.asUint8List())));
+  }
+
+  Future _ensureValidChannel() async {
+    if (_channel == null) {
+      _channel = await _createChannel();
+      return;
+    }
+
+    var infoClient = new InformationClient(_channel,
+        options: CallOptions(timeout: Duration(seconds: 2)));
+    try {
+      await infoClient.ping(new PingRequest());
+    } catch (e) {
+      _channel.shutdown();
+      _channel = await _createChannel();
+    }
   }
 }

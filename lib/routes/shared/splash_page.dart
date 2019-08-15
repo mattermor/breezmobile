@@ -16,32 +16,6 @@ class SplashPage extends StatefulWidget {
 
 class SplashPageState extends State<SplashPage> {
   @override
-  void initState() {
-    super.initState();
-    checkIfFirstRun();
-  }
-
-  Future checkIfFirstRun() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool _isFirstRun = (prefs.getBool('isFirstRun') ?? true);
-    if (widget._user.registered == null ||
-        widget._user.registered == false ||
-        _isFirstRun) {
-      prefs.setBool('isFirstRun', false);
-      _startTime();
-    } else {
-      prefs.setBool('isFirstRun', true);
-      Navigator.of(context).pushReplacementNamed('/home');
-    }
-  }
-
-  _startTime() async {
-    return new Timer(new Duration(milliseconds: 3600), () {
-      Navigator.of(context).pushReplacementNamed('/intro');
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: new Stack(children: <Widget>[
@@ -61,5 +35,31 @@ class SplashPageState extends State<SplashPage> {
             new Image.asset('src/images/waves-bottom.png', fit: BoxFit.cover)
           ])
     ]));
+  }
+
+  Future checkIfFirstRun() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool _isFirstRun = (prefs.getBool('isFirstRun') ?? true);
+    if (widget._user.registered == null ||
+        widget._user.registered == false ||
+        _isFirstRun) {
+      prefs.setBool('isFirstRun', false);
+      _startTime();
+    } else {
+      prefs.setBool('isFirstRun', true);
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfFirstRun();
+  }
+
+  _startTime() async {
+    return new Timer(new Duration(milliseconds: 3600), () {
+      Navigator.of(context).pushReplacementNamed('/intro');
+    });
   }
 }

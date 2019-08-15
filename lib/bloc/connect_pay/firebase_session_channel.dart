@@ -14,24 +14,20 @@ class PaymentSessionChannel {
   static int _activeChannels = 0;
 
   final StreamController<Map<dynamic, dynamic>> _incomingMessagesController = new StreamController<Map<dynamic, dynamic>>.broadcast();
-  Stream<Map<dynamic, dynamic>> get incomingMessagesStream => _incomingMessagesController.stream;
-
   final StreamController<void> _peerTerminatedController = new StreamController<void>();
-  Stream<void> get peerTerminatedStream => _peerTerminatedController.stream;
 
   final StreamController<void> peerResetStreamController = new StreamController<void>();
-  Stream<void> get peerResetStream => peerResetStreamController.stream;
+  final String _sessionID;
 
-  final String _sessionID;  
   final bool _payer;
   String _myKey;
-  String _theirKey;
+
+  String _theirKey;  
   StreamSubscription _theirDataListener;
   StreamSubscription _sessionRootListener;
   StreamSubscription _peerResetListener;
   bool _terminated = false;
   MessageInterceptor interceptor;
-
   PaymentSessionChannel(this._sessionID, this._payer, {this.interceptor}) {
     _activeChannels++;
     FirebaseDatabase.instance.goOnline();
@@ -43,6 +39,16 @@ class PaymentSessionChannel {
     sessionCreated.then((res) => _watchSessionTermination);
     _watchSessionTermination();
     _watchPeerReset();
+  }
+  Stream<Map<dynamic, dynamic>> get incomingMessagesStream => _incomingMessagesController.stream;
+  Stream<void> get peerResetStream => peerResetStreamController.stream;
+
+  Stream<void> get peerTerminatedStream => _peerTerminatedController.stream;
+
+  bool get terminated => _terminated;
+
+  Future sendResetMessage() async{
+    await FirebaseDatabase.instance.reference().child('remote-payments/$_sessionID/${_payer ? "payee" : "payer"}').remove();
   }
 
   Future sendStateUpdate(Map<String, dynamic> newState) {
@@ -56,10 +62,6 @@ class PaymentSessionChannel {
         return FirebaseDatabase.instance.reference().child('remote-payments/$_sessionID/$_myKey').update({"state": valueToSend});
       }
     });    
-  }
-
-  Future sendResetMessage() async{
-    await FirebaseDatabase.instance.reference().child('remote-payments/$_sessionID/${_payer ? "payee" : "payer"}').remove();
   }
 
   Future terminate({bool destroyHistory = false}) async {
@@ -81,8 +83,6 @@ class PaymentSessionChannel {
     }
   }
 
-  bool get terminated => _terminated;
-
   void _listenIncomingMessages() async {    
     var theirData = FirebaseDatabase.instance.reference().child('remote-payments/$_sessionID/$_theirKey/state');
     _theirDataListener = theirData.onValue.listen((event) async{
@@ -102,15 +102,6 @@ class PaymentSessionChannel {
     });
   }
   
-  void _watchSessionTermination() {    
-    var sessionRoot = FirebaseDatabase.instance.reference().child('remote-payments/$_sessionID');
-    _sessionRootListener = sessionRoot.onValue.listen((event) {
-      if (event.snapshot.value == null) {        
-        _peerTerminatedController.add(null);
-      }      
-    });
-  }
-
   void _watchPeerReset(){
     var terminationPath = _payer ? '$_sessionID/payer' : '$_sessionID/payee';
     var terminationRef = FirebaseDatabase.instance.reference().child('remote-payments/$terminationPath');
@@ -121,5 +112,14 @@ class PaymentSessionChannel {
           peerResetStreamController.add(null);
         }      
       });
+  }
+
+  void _watchSessionTermination() {    
+    var sessionRoot = FirebaseDatabase.instance.reference().child('remote-payments/$_sessionID');
+    _sessionRootListener = sessionRoot.onValue.listen((event) {
+      if (event.snapshot.value == null) {        
+        _peerTerminatedController.add(null);
+      }      
+    });
   }
 }

@@ -19,6 +19,11 @@ class KeyboardDoneAction {
     _overlayEntry?.remove();
   }
 
+  void _hideOverlay(){
+    _overlayEntry.remove();
+    _overlayEntry = null;
+  }
+
   void _onFocus(){
     bool hasFocus = focusNodes.any((f) => f.hasFocus);
     if (hasFocus && _overlayEntry == null) {
@@ -60,10 +65,5 @@ class KeyboardDoneAction {
       );
     });
     os.insert(_overlayEntry);
-  }
-
-  void _hideOverlay(){
-    _overlayEntry.remove();
-    _overlayEntry = null;
   }
 }

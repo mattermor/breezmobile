@@ -1,34 +1,5 @@
 import "dart:math";
 
-final List<String> colors = [
-  "Salmon",
-  "Blue",
-  "Turquoise",
-  "Orchid",
-  "Purple",
-  "Tomato",
-  "Cyan",
-  "Crimson",
-  "Orange",
-  "Lime",
-  "Pink",
-  "Green",
-  "Red",
-  "Yellow",
-  "Azure",
-  "Silver",
-  "Magenta",
-  "Olive",
-  "Violet",
-  "Rose",
-  "Wine",
-  "Mint",
-  "Indigo",
-  "Jade",
-  "Coral",
-];
-
-// In alphabetical order
 final List<String> animals = [
   "Bat",
   "Bear",
@@ -56,6 +27,35 @@ final List<String> animals = [
   "Seagull",
   "Sheep",
   "Snake"
+];
+
+// In alphabetical order
+final List<String> colors = [
+  "Salmon",
+  "Blue",
+  "Turquoise",
+  "Orchid",
+  "Purple",
+  "Tomato",
+  "Cyan",
+  "Crimson",
+  "Orange",
+  "Lime",
+  "Pink",
+  "Green",
+  "Red",
+  "Yellow",
+  "Azure",
+  "Silver",
+  "Magenta",
+  "Olive",
+  "Violet",
+  "Rose",
+  "Wine",
+  "Mint",
+  "Indigo",
+  "Jade",
+  "Coral",
 ];
 
 List generateDefaultProfile() {

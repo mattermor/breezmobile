@@ -3,16 +3,26 @@ import 'dart:io';
 
 import 'package:breez/logger.dart';
 
+class DownloadFileInfo {
+  final String fileURL;
+  final int contentLength;
+  final int bytesDownloaded;
+
+  DownloadFileInfo(this.fileURL, this.contentLength, this.bytesDownloaded);
+
+  String get fileName => fileURL.split('/').last;
+}
+
 class ProgressDownloader {
   final StreamController<DownloadFileInfo> _progressController =
       new StreamController.broadcast();
-  Stream<DownloadFileInfo> get progressStream => _progressController.stream;
   StreamSubscription<List<int>> responseListener;
-
   final String url;
-  final String targetFilePath;
 
+  final String targetFilePath;
   ProgressDownloader(this.url, this.targetFilePath);
+
+  Stream<DownloadFileInfo> get progressStream => _progressController.stream;
 
   void download() {
     final HttpClient client = new HttpClient();
@@ -51,14 +61,4 @@ class ProgressDownloader {
       });
     });
   }
-}
-
-class DownloadFileInfo {
-  final String fileURL;
-  final int contentLength;
-  final int bytesDownloaded;
-
-  String get fileName => fileURL.split('/').last;
-
-  DownloadFileInfo(this.fileURL, this.contentLength, this.bytesDownloaded);
 }

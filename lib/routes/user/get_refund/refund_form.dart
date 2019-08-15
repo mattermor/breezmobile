@@ -72,6 +72,16 @@ class _RefundFormState extends State<RefundForm> {
     );
   }
 
+  Future<bool> _asyncValidate() {
+    return _breezLib.validateAddress(_addressController.text).then((data) {
+      _addressValidated = data;
+      return _formKey.currentState.validate();
+    }).catchError((err) {
+      _addressValidated = null;
+      return _formKey.currentState.validate();
+    });
+  }
+
   Form _buildAddressForm() {
     return Form(key: _formKey,
         child: Column(
@@ -106,16 +116,6 @@ class _RefundFormState extends State<RefundForm> {
             )
           ],
         ));
-  }
-
-  Future<bool> _asyncValidate() {
-    return _breezLib.validateAddress(_addressController.text).then((data) {
-      _addressValidated = data;
-      return _formKey.currentState.validate();
-    }).catchError((err) {
-      _addressValidated = null;
-      return _formKey.currentState.validate();
-    });
   }
 
   Future _scanBarcode() async {

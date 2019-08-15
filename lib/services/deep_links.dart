@@ -8,10 +8,21 @@ class DeepLinksService {
   static const SESSION_SECRET = "sessionSecret";
 
   final StreamController<String> _linksNotificationsController = new BehaviorSubject<String>();
-  Stream<String> get linksNotifications => _linksNotificationsController.stream;
-
   DeepLinksService(){    
     Timer(Duration(seconds: 2), listen);
+  }
+
+  Stream<String> get linksNotifications => _linksNotificationsController.stream;
+
+  Future<String> generateSessionInviteLink(SessionLinkModel link) async {
+    ShortDynamicLink shortLink = await new DynamicLinkParameters(
+      link: Uri.parse('https://breez.technology?${link.toLinkQuery()}'),
+      uriPrefix: "https://breez.page.link",
+      androidParameters: AndroidParameters(packageName: "com.breez.client"),
+      iosParameters: IosParameters(bundleId: "technology.breez.client")      
+    ).buildShortLink();
+
+    return shortLink.shortUrl.toString();
   }
 
   void listen() async {
@@ -32,17 +43,6 @@ class DeepLinksService {
 
   SessionLinkModel parseSessionInviteLink(String link) {     
     return SessionLinkModel.fromLinkQuery( Uri.parse(link).query);
-  }
-
-  Future<String> generateSessionInviteLink(SessionLinkModel link) async {
-    ShortDynamicLink shortLink = await new DynamicLinkParameters(
-      link: Uri.parse('https://breez.technology?${link.toLinkQuery()}'),
-      uriPrefix: "https://breez.page.link",
-      androidParameters: AndroidParameters(packageName: "com.breez.client"),
-      iosParameters: IosParameters(bundleId: "technology.breez.client")      
-    ).buildShortLink();
-
-    return shortLink.shortUrl.toString();
   }
 }
 

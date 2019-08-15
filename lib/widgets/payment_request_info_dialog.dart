@@ -42,6 +42,26 @@ class PaymentRequestInfoDialogState extends State<PaymentRequestInfoDialog> {
 
   bool _showFiatCurrency = false;
 
+  Int64 amountToPay(AccountModel acc) {
+    Int64 amount = widget.invoice.amount;
+    if (amount == 0) {
+      try {
+        amount = acc.currency.parse(_invoiceAmountController.text);
+      } catch (e) {}
+    }
+    return amount;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildPaymentRequestDialog();
+  }
+
+  @override void dispose() {
+    _doneAction.dispose();    
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -51,114 +71,48 @@ class PaymentRequestInfoDialogState extends State<PaymentRequestInfoDialog> {
     _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
   }
 
-  @override void dispose() {
-    _doneAction.dispose();    
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildPaymentRequestDialog();
-  }
-
-  Widget _buildPaymentRequestDialog() {
-    List<Widget> _paymentRequestDialog = <Widget>[];
-    _addIfNotNull(_paymentRequestDialog, _buildPaymentRequestTitle());
-    _addIfNotNull(_paymentRequestDialog, _buildPaymentRequestContent());
-    return Dialog(
-        child: Container(
-            key: _dialogKey,
-            width: MediaQuery.of(context).size.width,
-            constraints: BoxConstraints(minHeight: 220.0, maxHeight: 320.0),
-            child: Column(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: _paymentRequestDialog)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)));
-  }
-
-  Widget _buildPaymentRequestTitle() {
-    return widget.invoice.payeeImageURL.isEmpty
-        ? null
-        : Container(
-            height: widget.invoice.payeeImageURL.isEmpty ? 64.0 : 128.0,
-            padding: widget.invoice.payeeImageURL.isEmpty ? EdgeInsets.zero : EdgeInsets.only(top: 48.0),
-            child: Stack(
-              children: <Widget>[
-                Center(
-                    child: CircularProgressIndicator(
-                  valueColor: new AlwaysStoppedAnimation<Color>(
-                    theme.BreezColors.blue[500],
-                  ),
-                )),
-                Center(
-                    child: ClipOval(
-                  child: FadeInImage(
-                      width: 64.0,
-                      height: 64.0,
-                      placeholder: MemoryImage(widget._transparentImage),
-                      image: AdvancedNetworkImage(widget.invoice.payeeImageURL, useDiskCache: true),
-                      fadeOutDuration: new Duration(milliseconds: 200),
-                      fadeInDuration: new Duration(milliseconds: 200)),
-                )),
-              ],
-            ));
-  }
-
-  Widget _buildPaymentRequestContent() {
-    return StreamBuilder<AccountModel>(
-      stream: widget.accountBloc.accountStream,
-      builder: (context, snapshot) {
-        var account = snapshot.data;
-        if (account == null) {
-          return new Container(width: 0.0, height: 0.0);
-        }
-        List<Widget> children = [];
-        _addIfNotNull(children, _buildPayeeNameWidget());
-        _addIfNotNull(children, _buildRequestPayTextWidget());
-        _addIfNotNull(children, _buildAmountWidget(account));
-        _addIfNotNull(children, _buildDescriptionWidget());
-        _addIfNotNull(children, _buildErrorMessage(account));
-        _addIfNotNull(children, _buildActions(account));
-
-        return Container(
-          padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 16.0),
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: children,
-          ),
-        );
-      },
-    );
-  }
-
   void _addIfNotNull(List<Widget> widgets, Widget w) {
     if (w != null) {
       widgets.add(w);
     }
   }
 
-  Widget _buildPayeeNameWidget() {
-    return widget.invoice.payeeName == null
-        ? null
-        : Text(
-            "${widget.invoice.payeeName}",
-            style: theme.paymentRequestTitleStyle,
-            textAlign: TextAlign.center,
-          );
-  }
+  Widget _buildActions(AccountModel account) {
+    List<Widget> actions = [
+      SimpleDialogOption(
+        onPressed: () => widget._onStateChange(PaymentRequestState.USER_CANCELLED),
+        child: new Text("CANCEL", style: theme.buttonStyle),
+      )
+    ];
 
-  Widget _buildRequestPayTextWidget() {
-    return widget.invoice.payeeName == null || widget.invoice.payeeName.isEmpty
-        ? new Text(
-            "You are requested to pay:",
-            style: theme.paymentRequestSubtitleStyle,
-            textAlign: TextAlign.center,
-          )
-        : new Text(
-            "is requesting you to pay:",
-            style: theme.paymentRequestSubtitleStyle,
-            textAlign: TextAlign.center,
-          );
+    Int64 toPay = amountToPay(account);
+    if (toPay > 0 && account.maxAllowedToPay >= toPay) {
+      actions.add(SimpleDialogOption(
+        onPressed: (() async {
+          if (widget.invoice.amount > 0 || _formKey.currentState.validate()) {
+            widget._setDialogHeight(_getDialogSize());
+            if (widget.invoice.amount == 0) {
+              _amountToPayMap["_amountToPay"] = toPay;
+              _amountToPayMap["_amountToPayStr"] = account.currency.format(amountToPay(account));
+              widget._setAmountToPay(_amountToPayMap);
+              widget._onStateChange(PaymentRequestState.WAITING_FOR_CONFIRMATION);
+            } else {
+              widget.accountBloc.userActionsSink.add(SendPayment(PayRequest(widget.invoice.rawPayReq, amountToPay(account))));
+              widget._onStateChange(PaymentRequestState.PROCESSING_PAYMENT);
+            }
+          }
+        }),
+        child: new Text("APPROVE", style: theme.buttonStyle),
+      ));
+    }
+    return Padding(
+      padding: const EdgeInsets.only(top: 24.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: actions,
+      ),
+    );
   }
 
   Widget _buildAmountWidget(AccountModel account) {
@@ -243,56 +197,102 @@ class PaymentRequestInfoDialogState extends State<PaymentRequestInfoDialog> {
     );
   }
 
-  Widget _buildActions(AccountModel account) {
-    List<Widget> actions = [
-      SimpleDialogOption(
-        onPressed: () => widget._onStateChange(PaymentRequestState.USER_CANCELLED),
-        child: new Text("CANCEL", style: theme.buttonStyle),
-      )
-    ];
+  Widget _buildPayeeNameWidget() {
+    return widget.invoice.payeeName == null
+        ? null
+        : Text(
+            "${widget.invoice.payeeName}",
+            style: theme.paymentRequestTitleStyle,
+            textAlign: TextAlign.center,
+          );
+  }
 
-    Int64 toPay = amountToPay(account);
-    if (toPay > 0 && account.maxAllowedToPay >= toPay) {
-      actions.add(SimpleDialogOption(
-        onPressed: (() async {
-          if (widget.invoice.amount > 0 || _formKey.currentState.validate()) {
-            widget._setDialogHeight(_getDialogSize());
-            if (widget.invoice.amount == 0) {
-              _amountToPayMap["_amountToPay"] = toPay;
-              _amountToPayMap["_amountToPayStr"] = account.currency.format(amountToPay(account));
-              widget._setAmountToPay(_amountToPayMap);
-              widget._onStateChange(PaymentRequestState.WAITING_FOR_CONFIRMATION);
-            } else {
-              widget.accountBloc.userActionsSink.add(SendPayment(PayRequest(widget.invoice.rawPayReq, amountToPay(account))));
-              widget._onStateChange(PaymentRequestState.PROCESSING_PAYMENT);
-            }
-          }
-        }),
-        child: new Text("APPROVE", style: theme.buttonStyle),
-      ));
-    }
-    return Padding(
-      padding: const EdgeInsets.only(top: 24.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: actions,
-      ),
+  Widget _buildPaymentRequestContent() {
+    return StreamBuilder<AccountModel>(
+      stream: widget.accountBloc.accountStream,
+      builder: (context, snapshot) {
+        var account = snapshot.data;
+        if (account == null) {
+          return new Container(width: 0.0, height: 0.0);
+        }
+        List<Widget> children = [];
+        _addIfNotNull(children, _buildPayeeNameWidget());
+        _addIfNotNull(children, _buildRequestPayTextWidget());
+        _addIfNotNull(children, _buildAmountWidget(account));
+        _addIfNotNull(children, _buildDescriptionWidget());
+        _addIfNotNull(children, _buildErrorMessage(account));
+        _addIfNotNull(children, _buildActions(account));
+
+        return Container(
+          padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 16.0),
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: children,
+          ),
+        );
+      },
     );
+  }
+
+  Widget _buildPaymentRequestDialog() {
+    List<Widget> _paymentRequestDialog = <Widget>[];
+    _addIfNotNull(_paymentRequestDialog, _buildPaymentRequestTitle());
+    _addIfNotNull(_paymentRequestDialog, _buildPaymentRequestContent());
+    return Dialog(
+        child: Container(
+            key: _dialogKey,
+            width: MediaQuery.of(context).size.width,
+            constraints: BoxConstraints(minHeight: 220.0, maxHeight: 320.0),
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: _paymentRequestDialog)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)));
+  }
+
+  Widget _buildPaymentRequestTitle() {
+    return widget.invoice.payeeImageURL.isEmpty
+        ? null
+        : Container(
+            height: widget.invoice.payeeImageURL.isEmpty ? 64.0 : 128.0,
+            padding: widget.invoice.payeeImageURL.isEmpty ? EdgeInsets.zero : EdgeInsets.only(top: 48.0),
+            child: Stack(
+              children: <Widget>[
+                Center(
+                    child: CircularProgressIndicator(
+                  valueColor: new AlwaysStoppedAnimation<Color>(
+                    theme.BreezColors.blue[500],
+                  ),
+                )),
+                Center(
+                    child: ClipOval(
+                  child: FadeInImage(
+                      width: 64.0,
+                      height: 64.0,
+                      placeholder: MemoryImage(widget._transparentImage),
+                      image: AdvancedNetworkImage(widget.invoice.payeeImageURL, useDiskCache: true),
+                      fadeOutDuration: new Duration(milliseconds: 200),
+                      fadeInDuration: new Duration(milliseconds: 200)),
+                )),
+              ],
+            ));
+  }
+
+  Widget _buildRequestPayTextWidget() {
+    return widget.invoice.payeeName == null || widget.invoice.payeeName.isEmpty
+        ? new Text(
+            "You are requested to pay:",
+            style: theme.paymentRequestSubtitleStyle,
+            textAlign: TextAlign.center,
+          )
+        : new Text(
+            "is requesting you to pay:",
+            style: theme.paymentRequestSubtitleStyle,
+            textAlign: TextAlign.center,
+          );
   }
 
   double _getDialogSize() {
     RenderBox _dialogBox = _dialogKey.currentContext.findRenderObject();
     return _dialogBox.size.height;
-  }
-
-  Int64 amountToPay(AccountModel acc) {
-    Int64 amount = widget.invoice.amount;
-    if (amount == 0) {
-      try {
-        amount = acc.currency.parse(_invoiceAmountController.text);
-      } catch (e) {}
-    }
-    return amount;
   }
 }

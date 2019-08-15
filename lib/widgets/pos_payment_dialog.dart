@@ -8,7 +8,19 @@ import 'package:breez/theme_data.dart' as theme;
 import 'package:breez/widgets/compact_qr_image.dart';
 import 'package:flutter/material.dart';
 
-enum _PosPaymentState { WAITING_FOR_PAYMENT, PAYMENT_RECEIVED }
+class PosPaymentDialog extends StatefulWidget {
+  final InvoiceBloc _invoiceBloc;
+  final POSProfileBloc _posProfileBloc;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey;
+
+  PosPaymentDialog(this._invoiceBloc, this._posProfileBloc, this._scaffoldKey);
+
+  @override
+  _PosPaymentDialogState createState() {
+    return _PosPaymentDialogState();
+  }
+}
 
 class _PosPaymentDialogState extends State<PosPaymentDialog> {
   _PosPaymentState _state = _PosPaymentState.WAITING_FOR_PAYMENT;
@@ -20,6 +32,82 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
   StreamSubscription<String> _sentInvoicesSubscription;
   StreamSubscription<bool> _paidInvoicesSubscription;
   StreamSubscription<POSProfileModel> _posProfileSubscription;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      contentPadding: EdgeInsets.fromLTRB(40.0, 28.0, 40.0, 0.0),
+      content: new SingleChildScrollView(
+          child: _state == _PosPaymentState.WAITING_FOR_PAYMENT
+              ? new ListBody(
+                  children: <Widget>[
+                    _buildDialogBody(
+                        'Scan the QR code to process this payment.',
+                        StreamBuilder<String>(
+                            stream: widget._invoiceBloc.readyInvoicesStream,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Container(
+                                  height: 230.0,
+                                  width: 230.0,
+                                );
+                              }
+                              return AspectRatio(
+                                  aspectRatio: 1.0,
+                                  child: Container(
+                                      height: 230.0,
+                                      width: 230.0,
+                                      child: AspectRatio(
+                                          aspectRatio: 1.0,
+                                          child: CompactQRImage(
+                                            data: snapshot.data,
+                                          ))));
+                            })),
+                    new Padding(
+                        padding: EdgeInsets.only(top: 15.0),
+                        child: new Text(_countdownString,
+                            textAlign: TextAlign.center,
+                            style: theme.paymentRequestTitleStyle)),
+                    _cancelButton(),
+                  ],
+                )
+              : new GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: new ListBody(
+                    children: <Widget>[
+                      new Padding(
+                        padding: EdgeInsets.only(bottom: 40.0),
+                        child: new Text(
+                          'Payment approved!',
+                          textAlign: TextAlign.center,
+                          style: theme.paymentRequestTitleStyle,
+                        ),
+                      ),
+                      new Padding(
+                          padding: EdgeInsets.only(bottom: 40.0),
+                          child: ImageIcon(
+                            AssetImage("src/icon/ic_done.png"),
+                            size: 48.0,
+                            color: Color.fromRGBO(0, 133, 251, 1.0),
+                          )),
+                    ],
+                  ),
+                )),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timerSubscription?.cancel();
+    _paidInvoicesSubscription?.cancel();
+    _sentInvoicesSubscription?.cancel();
+    _posProfileSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -89,13 +177,18 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
     });
   }
 
-  @override
-  void dispose() {
-    _timerSubscription?.cancel();
-    _paidInvoicesSubscription?.cancel();
-    _sentInvoicesSubscription?.cancel();
-    _posProfileSubscription?.cancel();
-    super.dispose();
+  ListBody _buildDialogBody(String title, Widget body) {
+    return new ListBody(children: <Widget>[
+      new Text(
+        title,
+        textAlign: TextAlign.center,
+        style: theme.paymentRequestTitleStyle,
+      ),
+      new Padding(
+        padding: EdgeInsets.only(top: 15.0),
+        child: body,
+      )
+    ]);
   }
 
   Widget _cancelButton() {
@@ -111,99 +204,6 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
       },
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: EdgeInsets.fromLTRB(40.0, 28.0, 40.0, 0.0),
-      content: new SingleChildScrollView(
-          child: _state == _PosPaymentState.WAITING_FOR_PAYMENT
-              ? new ListBody(
-                  children: <Widget>[
-                    _buildDialogBody(
-                        'Scan the QR code to process this payment.',
-                        StreamBuilder<String>(
-                            stream: widget._invoiceBloc.readyInvoicesStream,
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) {
-                                return Container(
-                                  height: 230.0,
-                                  width: 230.0,
-                                );
-                              }
-                              return AspectRatio(
-                                  aspectRatio: 1.0,
-                                  child: Container(
-                                      height: 230.0,
-                                      width: 230.0,
-                                      child: AspectRatio(
-                                          aspectRatio: 1.0,
-                                          child: CompactQRImage(
-                                            data: snapshot.data,
-                                          ))));
-                            })),
-                    new Padding(
-                        padding: EdgeInsets.only(top: 15.0),
-                        child: new Text(_countdownString,
-                            textAlign: TextAlign.center,
-                            style: theme.paymentRequestTitleStyle)),
-                    _cancelButton(),
-                  ],
-                )
-              : new GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: new ListBody(
-                    children: <Widget>[
-                      new Padding(
-                        padding: EdgeInsets.only(bottom: 40.0),
-                        child: new Text(
-                          'Payment approved!',
-                          textAlign: TextAlign.center,
-                          style: theme.paymentRequestTitleStyle,
-                        ),
-                      ),
-                      new Padding(
-                          padding: EdgeInsets.only(bottom: 40.0),
-                          child: ImageIcon(
-                            AssetImage("src/icon/ic_done.png"),
-                            size: 48.0,
-                            color: Color.fromRGBO(0, 133, 251, 1.0),
-                          )),
-                    ],
-                  ),
-                )),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
-    );
-  }
-
-  ListBody _buildDialogBody(String title, Widget body) {
-    return new ListBody(children: <Widget>[
-      new Text(
-        title,
-        textAlign: TextAlign.center,
-        style: theme.paymentRequestTitleStyle,
-      ),
-      new Padding(
-        padding: EdgeInsets.only(top: 15.0),
-        child: body,
-      )
-    ]);
-  }
 }
 
-class PosPaymentDialog extends StatefulWidget {
-  final InvoiceBloc _invoiceBloc;
-  final POSProfileBloc _posProfileBloc;
-
-  final GlobalKey<ScaffoldState> _scaffoldKey;
-
-  PosPaymentDialog(this._invoiceBloc, this._posProfileBloc, this._scaffoldKey);
-
-  @override
-  _PosPaymentDialogState createState() {
-    return _PosPaymentDialogState();
-  }
-}
+enum _PosPaymentState { WAITING_FOR_PAYMENT, PAYMENT_RECEIVED }

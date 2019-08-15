@@ -42,60 +42,6 @@ class WithdrawFundsPageState extends State<WithdrawFundsPage> {
   KeyboardDoneAction _doneAction;
 
   @override
-  void didChangeDependencies() {        
-    if (!_isInit) {
-      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
-      registerWithdrawalResult();
-      _isInit = true;
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
-  void initState() {
-    super.initState();    
-    _breezLib = new ServiceInjector().breezBridge;  
-    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);     
-  }
-
-  @override
-  void dispose() {
-    withdrawalResultSubscription.cancel();
-    _doneAction.dispose();
-    super.dispose();
-  }
-
-  Future<bool> _onWillPop() async {
-    if (_inProgress) {
-      return false;
-    }
-    return true;
-  }
-
-  void registerWithdrawalResult(){    
-    withdrawalResultSubscription = _accountBloc.withdrawalResultStream
-      .listen((response) {
-          setState(() {
-            _inProgress = false;
-          });
-          Navigator.of(context).pop(); //remove the loading dialog
-          if (response.errorMessage?.isNotEmpty == true) {
-            promptError(context, null,
-                Text(response.errorMessage, style: theme.alertStyle));
-            return;
-          }
-          Navigator.of(context).pop(
-              "The funds were successfully sent to the address you have specified.");
-        }, onError: (err) {
-          setState(() {
-            _inProgress = false;
-          });
-          Navigator.of(context).pop(); //remove the loading dialog
-          promptError(context, null, Text(err.toString(), style: theme.alertStyle));
-      });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final String _title = "Remove Funds";
     return new Scaffold(
@@ -210,6 +156,63 @@ class WithdrawFundsPageState extends State<WithdrawFundsPage> {
     );
   }
 
+  @override
+  void didChangeDependencies() {        
+    if (!_isInit) {
+      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
+      registerWithdrawalResult();
+      _isInit = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    withdrawalResultSubscription.cancel();
+    _doneAction.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();    
+    _breezLib = new ServiceInjector().breezBridge;  
+    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);     
+  }
+
+  void registerWithdrawalResult(){    
+    withdrawalResultSubscription = _accountBloc.withdrawalResultStream
+      .listen((response) {
+          setState(() {
+            _inProgress = false;
+          });
+          Navigator.of(context).pop(); //remove the loading dialog
+          if (response.errorMessage?.isNotEmpty == true) {
+            promptError(context, null,
+                Text(response.errorMessage, style: theme.alertStyle));
+            return;
+          }
+          Navigator.of(context).pop(
+              "The funds were successfully sent to the address you have specified.");
+        }, onError: (err) {
+          setState(() {
+            _inProgress = false;
+          });
+          Navigator.of(context).pop(); //remove the loading dialog
+          promptError(context, null, Text(err.toString(), style: theme.alertStyle));
+      });
+  }
+
+  Future<bool> _asyncValidate() {
+    return _breezLib.validateAddress(_addressController.text).then((data) {
+      _addressValidated = data;
+      return _formKey.currentState.validate();
+    }).catchError((err) {
+      _addressValidated = null;
+      return _formKey.currentState.validate();
+    });
+  }
+
   Widget _buildAvailableBTC(AccountModel acc) {
     return new Row(
       children: <Widget>[
@@ -221,6 +224,37 @@ class WithdrawFundsPageState extends State<WithdrawFundsPage> {
         )
       ],
     );
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_inProgress) {
+      return false;
+    }
+    return true;
+  }
+
+  Future _scanBarcode() async {
+    try {
+      FocusScope.of(context).requestFocus(FocusNode());
+      String barcode = await BarcodeScanner.scan();
+      setState(() {
+        _addressController.text = barcode;
+        _scannerErrorMessage = "";
+      });
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          this._scannerErrorMessage =
+              'Please grant Breez camera permission to scan QR codes.';
+        });
+      } else {
+        setState(() => this._scannerErrorMessage = '');
+      }
+    } on FormatException {
+      setState(() => this._scannerErrorMessage = '');
+    } catch (e) {
+      setState(() => this._scannerErrorMessage = '');
+    }
   }
 
   void _showAlertDialog(Currency currency) {
@@ -285,39 +319,5 @@ class WithdrawFundsPageState extends State<WithdrawFundsPage> {
         context: context,
         barrierDismissible: false,
         builder: (_) => WillPopScope(onWillPop: _onWillPop, child: dialog));
-  }
-
-  Future _scanBarcode() async {
-    try {
-      FocusScope.of(context).requestFocus(FocusNode());
-      String barcode = await BarcodeScanner.scan();
-      setState(() {
-        _addressController.text = barcode;
-        _scannerErrorMessage = "";
-      });
-    } on PlatformException catch (e) {
-      if (e.code == BarcodeScanner.CameraAccessDenied) {
-        setState(() {
-          this._scannerErrorMessage =
-              'Please grant Breez camera permission to scan QR codes.';
-        });
-      } else {
-        setState(() => this._scannerErrorMessage = '');
-      }
-    } on FormatException {
-      setState(() => this._scannerErrorMessage = '');
-    } catch (e) {
-      setState(() => this._scannerErrorMessage = '');
-    }
-  }
-
-  Future<bool> _asyncValidate() {
-    return _breezLib.validateAddress(_addressController.text).then((data) {
-      _addressValidated = data;
-      return _formKey.currentState.validate();
-    }).catchError((err) {
-      _addressValidated = null;
-      return _formKey.currentState.validate();
-    });
   }
 }

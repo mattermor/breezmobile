@@ -22,16 +22,6 @@ class MarketplacePageState extends State<MarketplacePage> {
   bool _isInit = false;
 
   @override
-  void didChangeDependencies() {
-    if (!_isInit) {
-      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
-      _marketplaceBloc = AppBlocsProvider.of<MarketplaceBloc>(context);
-      _isInit = true;
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder(
         stream: _marketplaceBloc.vendorsStream,
@@ -45,6 +35,16 @@ class MarketplacePageState extends State<MarketplacePage> {
 
           return _buildScaffold(_buildVendors(vendorsModel));
         });
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!_isInit) {
+      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
+      _marketplaceBloc = AppBlocsProvider.of<MarketplaceBloc>(context);
+      _isInit = true;
+    }
+    super.didChangeDependencies();
   }
 
   Widget _buildScaffold(Widget body) {

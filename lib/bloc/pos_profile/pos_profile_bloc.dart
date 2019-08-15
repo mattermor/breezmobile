@@ -17,22 +17,28 @@ class POSProfileBloc {
       "BreezUserModel.posProfile";
 
   final _requestPosProfileController = new StreamController<POSProfileModel>();
-  Sink<POSProfileModel> get posProfileSink => _requestPosProfileController.sink;
-
   final _posProfileController = new BehaviorSubject<POSProfileModel>();
-  Stream<POSProfileModel> get posProfileStream => _posProfileController.stream;
 
   final _uploadLogoController = new StreamController<List<int>>();
-  Sink<List<int>> get uploadLogoSink => _uploadLogoController.sink; 
-
   final _profileUpdatesErrorController = new StreamController<Exception>.broadcast();
-  Stream<Exception> get profileUpdatesErrorStream => _profileUpdatesErrorController.stream; 
 
   POSProfileBloc() {
     ServiceInjector injector = new ServiceInjector();
     _initializeWithSavedUser(injector);
     _listenRegistrationRequests(injector);
     _listenUploadLogoRequests(injector);
+  }
+  Sink<POSProfileModel> get posProfileSink => _requestPosProfileController.sink; 
+
+  Stream<POSProfileModel> get posProfileStream => _posProfileController.stream;
+  Stream<Exception> get profileUpdatesErrorStream => _profileUpdatesErrorController.stream; 
+
+  Sink<List<int>> get uploadLogoSink => _uploadLogoController.sink;
+
+  close() {
+    _requestPosProfileController.close(); 
+    _uploadLogoController.close();   
+    _profileUpdatesErrorController.close();
   }
 
   void _initializeWithSavedUser(ServiceInjector injector) {
@@ -76,14 +82,6 @@ class POSProfileBloc {
     );
   }
 
-  _saveProfile(POSProfileModel posProfile, ServiceInjector injector) {
-    injector.sharedPreferences.then((preferences) {
-        preferences.setString(
-            POS_PROFILE_PREFERENCES_KEY, json.encode(posProfile));
-        _posProfileController.add(posProfile);
-      }).catchError(_requestPosProfileController.addError);
-  }
-
   _saveLogoImage(List<int> logoBytes){
     return getApplicationDocumentsDirectory()
         .then((docDir) => new Directory([docDir.path, PROFILE_DATA_FOLDER_PATH].join("/")).create(recursive: true))
@@ -91,9 +89,11 @@ class POSProfileBloc {
           .writeAsBytes(logoBytes, flush: true)); 
   }
 
-  close() {
-    _requestPosProfileController.close(); 
-    _uploadLogoController.close();   
-    _profileUpdatesErrorController.close();
+  _saveProfile(POSProfileModel posProfile, ServiceInjector injector) {
+    injector.sharedPreferences.then((preferences) {
+        preferences.setString(
+            POS_PROFILE_PREFERENCES_KEY, json.encode(posProfile));
+        _posProfileController.add(posProfile);
+      }).catchError(_requestPosProfileController.addError);
   }
 }

@@ -43,58 +43,6 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
   KeyboardDoneAction _doneAction;  
 
   @override
-  void initState() {
-    super.initState();
-    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode, _feeFocusNode]);
-
-    withdrawalResultSubscription =
-        widget._accountBloc.withdrawalResultStream.listen((response) {
-      setState(() {
-        _inProgress = false;
-      });
-      Navigator.of(context).pop();      
-      Navigator.of(context).pop();
-      showFlushbar(context, message: "The funds were successfully sent to the address you have specified.");
-    }, onError: (err) {
-      setState(() {
-        _inProgress = false;
-      });
-      Navigator.of(context).pop();
-      promptError(context, null, Text(err.toString(), style: theme.alertStyle));
-    });
-
-    widget._accountBloc.accountStream.first
-        .then((acc) => _feeController.text = acc.onChainFeeRate?.toString());
-  }
-
-  @override
-  void dispose() {
-    _doneAction.dispose();
-    withdrawalResultSubscription.cancel();
-    super.dispose();
-  }
-
-  void _onDismiss(AccountSettings settings) async {
-    TextStyle textStyle = TextStyle(color: Colors.black);
-    String exitSessionMessage =
-        "Dismissing this dialog means you won't be able to to redeem these funds. Are you sure?";
-    bool cancel = await promptAreYouSure(
-        context, null, Text(exitSessionMessage, style: textStyle),
-        textStyle: textStyle);
-    if (cancel) {
-      widget._accountBloc.accountSettingsSink.add(settings.copyWith(ignoreWalletBalance: true));
-      Navigator.pop(context);    
-    }
-  }
-
-  Future<bool> _onWillPop() async {
-    if (_inProgress) {
-      return false;
-    }
-    return true;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -254,6 +202,48 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
     );
   }
 
+  @override
+  void dispose() {
+    _doneAction.dispose();
+    withdrawalResultSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode, _feeFocusNode]);
+
+    withdrawalResultSubscription =
+        widget._accountBloc.withdrawalResultStream.listen((response) {
+      setState(() {
+        _inProgress = false;
+      });
+      Navigator.of(context).pop();      
+      Navigator.of(context).pop();
+      showFlushbar(context, message: "The funds were successfully sent to the address you have specified.");
+    }, onError: (err) {
+      setState(() {
+        _inProgress = false;
+      });
+      Navigator.of(context).pop();
+      promptError(context, null, Text(err.toString(), style: theme.alertStyle));
+    });
+
+    widget._accountBloc.accountStream.first
+        .then((acc) => _feeController.text = acc.onChainFeeRate?.toString());
+  }
+
+  Future<bool> _asyncValidate() {
+    return _breezLib.validateAddress(_addressController.text).then((data) {
+      _addressValidated = data;
+      return _formKey.currentState.validate();
+    }).catchError((err) {
+      _addressValidated = null;
+      return _formKey.currentState.validate();
+    });
+  }
+
   Widget _buildAvailableBTC(AccountModel acc) {
     return new Row(
       children: <Widget>[
@@ -265,6 +255,50 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
         )
       ],
     );
+  }
+
+  void _onDismiss(AccountSettings settings) async {
+    TextStyle textStyle = TextStyle(color: Colors.black);
+    String exitSessionMessage =
+        "Dismissing this dialog means you won't be able to to redeem these funds. Are you sure?";
+    bool cancel = await promptAreYouSure(
+        context, null, Text(exitSessionMessage, style: textStyle),
+        textStyle: textStyle);
+    if (cancel) {
+      widget._accountBloc.accountSettingsSink.add(settings.copyWith(ignoreWalletBalance: true));
+      Navigator.pop(context);    
+    }
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_inProgress) {
+      return false;
+    }
+    return true;
+  }
+
+  Future _scanBarcode() async {
+    try {
+      FocusScope.of(context).requestFocus(FocusNode());
+      String barcode = await BarcodeScanner.scan();
+      setState(() {
+        _addressController.text = barcode;
+        _scannerErrorMessage = "";
+      });
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          this._scannerErrorMessage =
+              'Please grant Breez camera permission to scan QR codes.';
+        });
+      } else {
+        setState(() => this._scannerErrorMessage = '');
+      }
+    } on FormatException {
+      setState(() => this._scannerErrorMessage = '');
+    } catch (e) {
+      setState(() => this._scannerErrorMessage = '');
+    }
   }
 
   void _showAlertDialog(Currency currency) {
@@ -332,39 +366,5 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
         context: context,
         barrierDismissible: false,
         builder: (_) => WillPopScope(onWillPop: _onWillPop, child: dialog));
-  }
-
-  Future _scanBarcode() async {
-    try {
-      FocusScope.of(context).requestFocus(FocusNode());
-      String barcode = await BarcodeScanner.scan();
-      setState(() {
-        _addressController.text = barcode;
-        _scannerErrorMessage = "";
-      });
-    } on PlatformException catch (e) {
-      if (e.code == BarcodeScanner.CameraAccessDenied) {
-        setState(() {
-          this._scannerErrorMessage =
-              'Please grant Breez camera permission to scan QR codes.';
-        });
-      } else {
-        setState(() => this._scannerErrorMessage = '');
-      }
-    } on FormatException {
-      setState(() => this._scannerErrorMessage = '');
-    } catch (e) {
-      setState(() => this._scannerErrorMessage = '');
-    }
-  }
-
-  Future<bool> _asyncValidate() {
-    return _breezLib.validateAddress(_addressController.text).then((data) {
-      _addressValidated = data;
-      return _formKey.currentState.validate();
-    }).catchError((err) {
-      _addressValidated = null;
-      return _formKey.currentState.validate();
-    });
   }
 }

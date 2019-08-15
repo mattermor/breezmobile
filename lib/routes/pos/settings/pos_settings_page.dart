@@ -27,47 +27,12 @@ class PosSettingsPage extends StatelessWidget {
   }
 }
 
-class _PosSettingsPage extends StatefulWidget {
-  _PosSettingsPage(this._posProfileBloc, this.currentProfile);
-
-  final String _title = "Settings";
-  final int _logoScaledWidth = 200;
-  final int _logoRenderedWidt = 96;
-  final POSProfileBloc _posProfileBloc;
-  final POSProfileModel currentProfile;
-
-  @override
-  State<StatefulWidget> createState() {
-    return new PosSettingsPageState();
-  }
-}
-
 class PosSettingsPageState extends State<_PosSettingsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   StreamSubscription<Exception> _errorStreamSubscription;
   var _invoiceStringController = new TextEditingController();
   var _cancellationTimeoutValueController = new TextEditingController();
   final FocusNode _invoiceStringFocusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    _cancellationTimeoutValueController.text = widget.currentProfile.cancellationTimeoutValue.toString();
-    _invoiceStringController.text = widget.currentProfile.invoiceString;
-    _errorStreamSubscription = widget._posProfileBloc.profileUpdatesErrorStream.listen(
-      (data) {},
-      onError: (error) {
-        promptError(context, "Upload Logo Failed", Text(error.toString()));
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _invoiceStringFocusNode.dispose();
-    _errorStreamSubscription.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,5 +151,40 @@ class PosSettingsPageState extends State<_PosSettingsPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _invoiceStringFocusNode.dispose();
+    _errorStreamSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _cancellationTimeoutValueController.text = widget.currentProfile.cancellationTimeoutValue.toString();
+    _invoiceStringController.text = widget.currentProfile.invoiceString;
+    _errorStreamSubscription = widget._posProfileBloc.profileUpdatesErrorStream.listen(
+      (data) {},
+      onError: (error) {
+        promptError(context, "Upload Logo Failed", Text(error.toString()));
+      },
+    );
+  }
+}
+
+class _PosSettingsPage extends StatefulWidget {
+  final String _title = "Settings";
+
+  final int _logoScaledWidth = 200;
+  final int _logoRenderedWidt = 96;
+  final POSProfileBloc _posProfileBloc;
+  final POSProfileModel currentProfile;
+  _PosSettingsPage(this._posProfileBloc, this.currentProfile);
+
+  @override
+  State<StatefulWidget> createState() {
+    return new PosSettingsPageState();
   }
 }

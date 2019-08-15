@@ -26,29 +26,6 @@ class _WaitBroadcastDialog extends State<WaitBroadcastDialog> {
   StreamSubscription<BroadcastRefundResponseModel> _broadcastSubscription;
 
   @override
-  void initState() {
-    super.initState();
-    _broadcastSubscription =
-        widget._accountBloc.broadcastRefundResponseStream.listen((response) {
-      setState(() {
-        _response = response;
-      });
-    }, onError: (e) {
-      setState(() {
-        _error = e;
-      });
-    });
-
-    var broadcastModel = new BroadcastRefundRequestModel(widget._fromAddress, widget._toAddress);                             
-    widget._accountBloc.broadcastRefundRequestSink.add(broadcastModel);
-  }
-
-  @override void dispose() {
-    _broadcastSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -72,11 +49,9 @@ class _WaitBroadcastDialog extends State<WaitBroadcastDialog> {
     );
   }
 
-  String getTitleText() {
-    if (_error != null) {
-      return "Refund Error";
-    }
-    return "Refund Transaction";
+  @override void dispose() {
+    _broadcastSubscription.cancel();
+    super.dispose();
   }
 
   getContent() {
@@ -88,26 +63,6 @@ class _WaitBroadcastDialog extends State<WaitBroadcastDialog> {
       return getWaitingContent();
     }
     return getResultContent();
-  }
-
-  Widget getWaitingContent() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        new Text(
-          "Please wait while Breez is sending the funds to the specified address.",
-          style: theme.alertStyle,
-          textAlign: TextAlign.center,
-        ),
-        Padding(
-            padding: EdgeInsets.only(top: 8.0),
-            child: new Image.asset(
-              'src/images/breez_loader.gif',
-              gaplessPlayback: true,
-            ))
-      ],
-    );
   }
 
   Widget getResultContent() {
@@ -189,5 +144,50 @@ class _WaitBroadcastDialog extends State<WaitBroadcastDialog> {
             ],
           )
         ]);
+  }
+
+  String getTitleText() {
+    if (_error != null) {
+      return "Refund Error";
+    }
+    return "Refund Transaction";
+  }
+
+  Widget getWaitingContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        new Text(
+          "Please wait while Breez is sending the funds to the specified address.",
+          style: theme.alertStyle,
+          textAlign: TextAlign.center,
+        ),
+        Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: new Image.asset(
+              'src/images/breez_loader.gif',
+              gaplessPlayback: true,
+            ))
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _broadcastSubscription =
+        widget._accountBloc.broadcastRefundResponseStream.listen((response) {
+      setState(() {
+        _response = response;
+      });
+    }, onError: (e) {
+      setState(() {
+        _error = e;
+      });
+    });
+
+    var broadcastModel = new BroadcastRefundRequestModel(widget._fromAddress, widget._toAddress);                             
+    widget._accountBloc.broadcastRefundRequestSink.add(broadcastModel);
   }
 }

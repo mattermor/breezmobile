@@ -25,6 +25,15 @@ class CountDown {
 
   Stream<Duration> get stream => _controller.stream;
 
+  _onCancel() {
+    // on pause we already cancel the _timer
+    if (!isPaused) {
+      _timer.cancel();
+      _timer = null;
+    }
+    // _controller.close(); // close automatically the "pipe" when the sub close it by sub.cancel()
+  }
+
   /// _onListen
   /// invoke when the first subscriber has subscribe and not before to avoid leak of memory
   _onListen() {
@@ -49,15 +58,6 @@ class CountDown {
 
     //  lance le timer
     _timer = new Timer.periodic(_refresh, _tick);
-  }
-
-  _onCancel() {
-    // on pause we already cancel the _timer
-    if (!isPaused) {
-      _timer.cancel();
-      _timer = null;
-    }
-    // _controller.close(); // close automatically the "pipe" when the sub close it by sub.cancel()
   }
 
   void _tick(Timer timer) {

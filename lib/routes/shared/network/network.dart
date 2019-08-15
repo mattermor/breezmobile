@@ -9,11 +9,6 @@ import 'package:breez/widgets/back_button.dart' as backBtn;
 import 'package:breez/widgets/error_dialog.dart';
 import 'package:flutter/material.dart';
 
-class _NetworkData {
-  String peer = '';
-  bool isDefault = false;
-}
-
 class NetworkPage extends StatefulWidget {
   NetworkPage({Key key}) : super(key: key);
 
@@ -29,56 +24,6 @@ class NetworkPageState extends State<NetworkPage> {
   ScrollController _scrollController = new ScrollController();
   final _peerController = TextEditingController();
   _NetworkData _data = new _NetworkData();
-
-  @override
-  void initState() {
-    super.initState();
-    _breezLib = new ServiceInjector().breezBridge;    
-    _loadData();
-    _peerController.addListener(_onChangePeer);
-  }
-
-  @override 
-  void dispose() {    
-    _peerController.removeListener(_onChangePeer);
-    super.dispose();
-  }
-
-  void _loadData() async {
-    await _loadPeer();
-  }
-
-  Future _loadPeer() async {
-    Peers peers = await _breezLib.getPeers();
-    String peer = '';
-    if (peers.peer.length > 0) {
-      peer = peers.peer[0];
-    }
-    setState(() {
-      _data.peer = peer;
-      _data.isDefault = peers.isDefault;
-    });   
-    _peerController.text = peer;
-  }
-
-  void _onChangePeer() {
-    String peer = _peerController.text;
-    setState(() {
-      _data.peer = peer;
-    });
-  }
-
-  Future<bool> _promptForRestart() {
-    return promptAreYouSure(context, null,
-            Text("Please restart Breez to switch to the new Bitcoin Node configuration.", style: theme.alertStyle),
-            cancelText: "Cancel", okText: "Exit Breez")
-        .then((shouldExit) {
-      if (shouldExit) {
-        exit(0);
-      }
-      return true;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -159,8 +104,63 @@ class NetworkPageState extends State<NetworkPage> {
       );    
   }
 
+  @override 
+  void dispose() {    
+    _peerController.removeListener(_onChangePeer);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _breezLib = new ServiceInjector().breezBridge;    
+    _loadData();
+    _peerController.addListener(_onChangePeer);
+  }
+
+  void _loadData() async {
+    await _loadPeer();
+  }
+
+  Future _loadPeer() async {
+    Peers peers = await _breezLib.getPeers();
+    String peer = '';
+    if (peers.peer.length > 0) {
+      peer = peers.peer[0];
+    }
+    setState(() {
+      _data.peer = peer;
+      _data.isDefault = peers.isDefault;
+    });   
+    _peerController.text = peer;
+  }
+
+  void _onChangePeer() {
+    String peer = _peerController.text;
+    setState(() {
+      _data.peer = peer;
+    });
+  }
+
+  Future<bool> _promptForRestart() {
+    return promptAreYouSure(context, null,
+            Text("Please restart Breez to switch to the new Bitcoin Node configuration.", style: theme.alertStyle),
+            cancelText: "Cancel", okText: "Exit Breez")
+        .then((shouldExit) {
+      if (shouldExit) {
+        exit(0);
+      }
+      return true;
+    });
+  }
+
   Future _reset() async {
     await _breezLib.setPeers([]);
     return _loadData();
   }
+}
+
+class _NetworkData {
+  String peer = '';
+  bool isDefault = false;
 }

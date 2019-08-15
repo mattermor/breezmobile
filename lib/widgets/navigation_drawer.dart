@@ -9,81 +9,26 @@ import 'package:breez/widgets/breez_avatar_dialog.dart';
 import 'package:breez/widgets/breez_drawer_header.dart';
 import 'package:flutter/material.dart';
 
-class DrawerItemConfig {
-  final String name;
-  final String title;
-  final String icon;
-  final void Function(String name) onItemSelected;
-
-  DrawerItemConfig(this.name, this.title, this.icon, {this.onItemSelected});
-}
-
-class DrawerItemConfigGroup {
-  final List<DrawerItemConfig> items;
-  final String groupTitle;
-  final String groupAssetImage;
-
-  DrawerItemConfigGroup(this.items, {this.groupTitle, this.groupAssetImage});
-}
-
-class NavigationDrawer extends StatelessWidget {
-  final bool _avatar;
-  final List<DrawerItemConfigGroup> _drawerGroupedItems;
-  final void Function(String screenName) _onItemSelected;  
-
-  NavigationDrawer(this._avatar, this._drawerGroupedItems,
-      this._onItemSelected);
-
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  Widget build(BuildContext context) {
-    UserProfileBloc userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
-
-    List<Widget> children = List<Widget>();
-    _drawerGroupedItems.forEach((gropuItems) {
-      children.addAll(_createDrawerGroupWidgets(gropuItems, context,
-          withDivider: children.length > 0));
-    });
-
-    children.insert(0, _breezDrawerHeader(userProfileBloc, _avatar));
-
-    return new Drawer(
-        child: new ListView(
-            controller: _scrollController,
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.only(bottom: 20.0),
-            children: children));
-  }
-
-  List<Widget> _createDrawerGroupWidgets(
-      DrawerItemConfigGroup group, BuildContext context,
-      {bool withDivider = false}) {
-    List<Widget> groupItems = group.items
-        .map((action) => _actionTile(action, context, action.onItemSelected ?? _onItemSelected))
-        .toList();
-    if (group.groupTitle != null && groupItems.length > 0) {
-      groupItems = List<Widget>()
-        ..add(_ExpansionTile(
-            items: groupItems,
-            title: group.groupTitle,
-            icon: AssetImage(group.groupAssetImage),
-            controller: _scrollController));
-    }
-
-    if (groupItems.length > 0 && withDivider) {
-      groupItems.insert(0, _ListDivider());
-    }
-    return groupItems;
-  }
-}
-
-class _ListDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(left: 8.0, right: 8.0), child: Divider());
-  }
+Widget _actionTile(
+    DrawerItemConfig action, BuildContext context, Function onItemSelected,
+    [bool subTile]) {
+  return new Padding(
+    padding: subTile != null
+        ? EdgeInsets.only(left: 36.0, right: 8.0)
+        : EdgeInsets.only(left: 8.0, right: 8.0),
+    child: new ListTile(
+      leading: ImageIcon(
+        AssetImage(action.icon),
+        size: 26.0,
+        color: Colors.white,
+      ),
+      title: new Text(action.title, style: theme.drawerItemTextStyle),
+      onTap: () {
+        Navigator.pop(context);
+        onItemSelected(action.name);
+      },
+    ),
+  );
 }
 
 Widget _breezDrawerHeader(UserProfileBloc user, bool drawAvatar) {
@@ -146,26 +91,73 @@ Widget _breezDrawerHeader(UserProfileBloc user, bool drawAvatar) {
   );
 }
 
-Widget _actionTile(
-    DrawerItemConfig action, BuildContext context, Function onItemSelected,
-    [bool subTile]) {
-  return new Padding(
-    padding: subTile != null
-        ? EdgeInsets.only(left: 36.0, right: 8.0)
-        : EdgeInsets.only(left: 8.0, right: 8.0),
-    child: new ListTile(
-      leading: ImageIcon(
-        AssetImage(action.icon),
-        size: 26.0,
-        color: Colors.white,
-      ),
-      title: new Text(action.title, style: theme.drawerItemTextStyle),
-      onTap: () {
-        Navigator.pop(context);
-        onItemSelected(action.name);
-      },
-    ),
-  );
+class DrawerItemConfig {
+  final String name;
+  final String title;
+  final String icon;
+  final void Function(String name) onItemSelected;
+
+  DrawerItemConfig(this.name, this.title, this.icon, {this.onItemSelected});
+}
+
+class DrawerItemConfigGroup {
+  final List<DrawerItemConfig> items;
+  final String groupTitle;
+  final String groupAssetImage;
+
+  DrawerItemConfigGroup(this.items, {this.groupTitle, this.groupAssetImage});
+}
+
+class NavigationDrawer extends StatelessWidget {
+  final bool _avatar;
+  final List<DrawerItemConfigGroup> _drawerGroupedItems;
+  final void Function(String screenName) _onItemSelected;  
+
+  final ScrollController _scrollController = ScrollController();
+
+  NavigationDrawer(this._avatar, this._drawerGroupedItems,
+      this._onItemSelected);
+
+  @override
+  Widget build(BuildContext context) {
+    UserProfileBloc userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
+
+    List<Widget> children = List<Widget>();
+    _drawerGroupedItems.forEach((gropuItems) {
+      children.addAll(_createDrawerGroupWidgets(gropuItems, context,
+          withDivider: children.length > 0));
+    });
+
+    children.insert(0, _breezDrawerHeader(userProfileBloc, _avatar));
+
+    return new Drawer(
+        child: new ListView(
+            controller: _scrollController,
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.only(bottom: 20.0),
+            children: children));
+  }
+
+  List<Widget> _createDrawerGroupWidgets(
+      DrawerItemConfigGroup group, BuildContext context,
+      {bool withDivider = false}) {
+    List<Widget> groupItems = group.items
+        .map((action) => _actionTile(action, context, action.onItemSelected ?? _onItemSelected))
+        .toList();
+    if (group.groupTitle != null && groupItems.length > 0) {
+      groupItems = List<Widget>()
+        ..add(_ExpansionTile(
+            items: groupItems,
+            title: group.groupTitle,
+            icon: AssetImage(group.groupAssetImage),
+            controller: _scrollController));
+    }
+
+    if (groupItems.length > 0 && withDivider) {
+      groupItems.insert(0, _ListDivider());
+    }
+    return groupItems;
+  }
 }
 
 class _ExpansionTile extends StatelessWidget {
@@ -207,5 +199,13 @@ class _ExpansionTile extends StatelessWidget {
             // 28 = bottom padding of list + intrinsic bottom padding
           },
         ));
+  }
+}
+
+class _ListDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.only(left: 8.0, right: 8.0), child: Divider());
   }
 }

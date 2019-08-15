@@ -20,21 +20,9 @@ class LoadingAnimatedTextState extends State<LoadingAnimatedText> {
   Timer _loadingTimer;
   int _timerIteration = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadingTimer = Timer.periodic(Duration(milliseconds: 400), (timer) {
-      setState(() {
-        _timerIteration++;
-      });
-    });
-  }
+  String get loadingDots => '${List.filled(_timerIteration % 4, ".").join("")}';
 
-  @override
-  void dispose() {
-    _loadingTimer.cancel();
-    super.dispose();
-  }
+  String get paddingDots => '${List.filled(3 - _timerIteration % 4, ".").join("")}';
 
   @override
   Widget build(BuildContext context) {   
@@ -49,6 +37,18 @@ class LoadingAnimatedTextState extends State<LoadingAnimatedText> {
       textAlign: widget.textAlign == null ? TextAlign.center : widget.textAlign);
   }
 
-  String get loadingDots => '${List.filled(_timerIteration % 4, ".").join("")}';
-  String get paddingDots => '${List.filled(3 - _timerIteration % 4, ".").join("")}';
+  @override
+  void dispose() {
+    _loadingTimer.cancel();
+    super.dispose();
+  }
+  @override
+  void initState() {
+    super.initState();
+    _loadingTimer = Timer.periodic(Duration(milliseconds: 400), (timer) {
+      setState(() {
+        _timerIteration++;
+      });
+    });
+  }
 }

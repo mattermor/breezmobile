@@ -28,10 +28,6 @@ class FiatConversion {
     return Int64((fiatAmount / this.exchangeRate * 100000000).round());
   }
 
-  double satToFiat(Int64 satoshies) {
-    return satoshies.toDouble() / 100000000 * this.exchangeRate;
-  }
-
   String format(Int64 amount) {
     int fractionSize = this.currencyData.fractionSize;
     double minimumAmount = 1 / (pow(10, fractionSize));
@@ -45,5 +41,9 @@ class FiatConversion {
 
     // Otherwise just show the formatted value.
     return "${this.currencyData.symbol}${fiatValue.toStringAsFixed(fractionSize)}";
+  }
+
+  double satToFiat(Int64 satoshies) {
+    return satoshies.toDouble() / 100000000 * this.exchangeRate;
   }
 }

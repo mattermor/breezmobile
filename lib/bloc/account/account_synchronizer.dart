@@ -27,6 +27,8 @@ class AccountSynchronizer {
   final Function(double progress) onProgress;
   final Function onComplete;
 
+  DateTime _lastChainCalcChangeTime;
+
   AccountSynchronizer(this._breezLib,
       {this.onStart, this.onProgress, this.onComplete, this.bootstraping}) {
     _listenBootstrapProgress();
@@ -44,6 +46,64 @@ class AccountSynchronizer {
     _bootstrapSubscription.cancel();
   }
 
+  double _calculateChainProgress(int sincedToTimestamp, bool initialSync) {
+
+    //naive chain progress
+    double chainProgress = (sincedToTimestamp - _startPollTimestamp) /
+        (DateTime.now().millisecondsSinceEpoch - _startPollTimestamp);
+
+    // if in the last second we fetched more than 100 headers then we are synching only headers from memory, no filters.
+    // we use this as a huristics for the progress estimator. We allocate 10% of the progress for headers only sync.
+    if (_previousSyncTimestamp != null  && _lastChainCalcChangeTime != null) {    
+
+      // calculate download rate
+      Duration lastChangeDuration = DateTime.now().difference(_lastChainCalcChangeTime);
+      var downloadRatePerSecond = (sincedToTimestamp - _previousSyncTimestamp) / lastChangeDuration.inSeconds;
+
+      // if the download rate is more than 1000 per second then we are surely 
+      // only going over db headers. no networking yet.
+      if (downloadRatePerSecond > 1000) {      
+        _startFilterDownloadTimestamp = null;
+        chainProgress = chainProgress * 0.1;
+      } else {
+
+        // if we haven't set the filter download timestamp, let's set it now.
+        // it represents the timestamp the heavy sync begins, therefore we will 
+        // give higher percentage weight.
+        if (_startFilterDownloadTimestamp == null) {
+          _startFilterDownloadTimestamp = sincedToTimestamp;
+        }
+        chainProgress = 0.1 + 0.9 *(
+          (sincedToTimestamp - _startFilterDownloadTimestamp) /
+                  (DateTime.now().millisecondsSinceEpoch -
+                      _startFilterDownloadTimestamp)
+        );          
+      }
+    }
+
+    _previousSyncTimestamp = sincedToTimestamp;
+    return chainProgress;
+  }
+
+  void _emitProgress(){    
+    if (!_started) {
+      onStart(_startPollTimestamp, _bootstrapProgress != null);
+      _started = true;
+    }
+
+    var totalProgress = _chainProgress ?? 0.0;
+    if (_bootstrapProgress != null) {
+      totalProgress = (_bootstrapProgress * BOOTSTRAP_FILES_FRACTION + totalProgress * (1- BOOTSTRAP_FILES_FRACTION));
+    }
+    onProgress(totalProgress);
+  }
+
+  bool _isInitialSync(Map<dynamic, dynamic> nodeInfo){
+    var totalChannels = nodeInfo["num_active_channels"] +
+            nodeInfo["num_inactive_channels"] +
+            nodeInfo["num_pending_channels"];
+    return totalChannels == 0;
+  }
   void _listenBootstrapProgress() {
     _bootstrapSubscription =
         _breezLib.chainBootstrapProgress.listen((fileInfo) {
@@ -107,65 +167,5 @@ class AccountSynchronizer {
         _pollSyncStatus();
       });
     });
-  }
-
-  void _emitProgress(){    
-    if (!_started) {
-      onStart(_startPollTimestamp, _bootstrapProgress != null);
-      _started = true;
-    }
-
-    var totalProgress = _chainProgress ?? 0.0;
-    if (_bootstrapProgress != null) {
-      totalProgress = (_bootstrapProgress * BOOTSTRAP_FILES_FRACTION + totalProgress * (1- BOOTSTRAP_FILES_FRACTION));
-    }
-    onProgress(totalProgress);
-  }
-
-  DateTime _lastChainCalcChangeTime;
-  double _calculateChainProgress(int sincedToTimestamp, bool initialSync) {
-
-    //naive chain progress
-    double chainProgress = (sincedToTimestamp - _startPollTimestamp) /
-        (DateTime.now().millisecondsSinceEpoch - _startPollTimestamp);
-
-    // if in the last second we fetched more than 100 headers then we are synching only headers from memory, no filters.
-    // we use this as a huristics for the progress estimator. We allocate 10% of the progress for headers only sync.
-    if (_previousSyncTimestamp != null  && _lastChainCalcChangeTime != null) {    
-
-      // calculate download rate
-      Duration lastChangeDuration = DateTime.now().difference(_lastChainCalcChangeTime);
-      var downloadRatePerSecond = (sincedToTimestamp - _previousSyncTimestamp) / lastChangeDuration.inSeconds;
-
-      // if the download rate is more than 1000 per second then we are surely 
-      // only going over db headers. no networking yet.
-      if (downloadRatePerSecond > 1000) {      
-        _startFilterDownloadTimestamp = null;
-        chainProgress = chainProgress * 0.1;
-      } else {
-
-        // if we haven't set the filter download timestamp, let's set it now.
-        // it represents the timestamp the heavy sync begins, therefore we will 
-        // give higher percentage weight.
-        if (_startFilterDownloadTimestamp == null) {
-          _startFilterDownloadTimestamp = sincedToTimestamp;
-        }
-        chainProgress = 0.1 + 0.9 *(
-          (sincedToTimestamp - _startFilterDownloadTimestamp) /
-                  (DateTime.now().millisecondsSinceEpoch -
-                      _startFilterDownloadTimestamp)
-        );          
-      }
-    }
-
-    _previousSyncTimestamp = sincedToTimestamp;
-    return chainProgress;
-  }
-
-  bool _isInitialSync(Map<dynamic, dynamic> nodeInfo){
-    var totalChannels = nodeInfo["num_active_channels"] +
-            nodeInfo["num_inactive_channels"] +
-            nodeInfo["num_pending_channels"];
-    return totalChannels == 0;
   }
 }

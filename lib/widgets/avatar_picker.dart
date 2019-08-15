@@ -40,6 +40,19 @@ class AvatarPicker extends StatelessWidget {
         ));
   }
 
+  List<int> scaleAndFormatPNG(List<int> imageBytes) {
+    DartImage.Image image = DartImage.decodeImage(imageBytes);
+    DartImage.Image resized = DartImage.copyResize(image,
+        width: image.width < image.height ? -1 : scaledWidth,
+        height: image.width < image.height ? scaledWidth : -1);
+    DartImage.Image centered = DartImage.copyInto(_transparentImage, resized,
+        dstX: ((scaledWidth - resized.width) / 2).round(),
+        dstY: ((scaledWidth - resized.height) / 2).round());
+    log.info(
+        'trimmed.width ${centered.width} trimmed.height ${centered.height}');
+    return DartImage.encodePng(centered);
+  }
+
   _getPickerWidget() {
     Color _overlayColor = imagePath == null
         ? Color.fromRGBO(5, 93, 235, 0.8)
@@ -100,18 +113,5 @@ class AvatarPicker extends StatelessWidget {
     }).catchError((err) {
       log.severe(err.toString());
     });
-  }
-
-  List<int> scaleAndFormatPNG(List<int> imageBytes) {
-    DartImage.Image image = DartImage.decodeImage(imageBytes);
-    DartImage.Image resized = DartImage.copyResize(image,
-        width: image.width < image.height ? -1 : scaledWidth,
-        height: image.width < image.height ? scaledWidth : -1);
-    DartImage.Image centered = DartImage.copyInto(_transparentImage, resized,
-        dstX: ((scaledWidth - resized.width) / 2).round(),
-        dstY: ((scaledWidth - resized.height) / 2).round());
-    log.info(
-        'trimmed.width ${centered.width} trimmed.height ${centered.height}');
-    return DartImage.encodePng(centered);
   }
 }

@@ -22,32 +22,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final _cliInputController = TextEditingController();
 final FocusNode _cliEntryFocusNode = FocusNode();
+final _cliInputController = TextEditingController();
 final FocusNode _runCommandButtonFocusNode = FocusNode();
 
-class LinkTextSpan extends TextSpan {
-  LinkTextSpan({TextStyle style, String command, String text})
-      : super(
-            style: style,
-            text: text ?? command,
-            recognizer: new TapGestureRecognizer()
-              ..onTap = () {
-                _cliInputController.text = command + " ";
-                FocusScope.of(_scaffoldKey.currentState.context)
-                    .requestFocus(_cliEntryFocusNode);
-              });
-}
+final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class Choice {
-  const Choice({this.title, this.icon, this.function});
-
   final String title;
+
   final IconData icon;
   final Function function;
+  const Choice({this.title, this.icon, this.function});
 }
-
-final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class DevView extends StatefulWidget {
   BreezBridge _breezBridge;
@@ -59,13 +46,13 @@ class DevView extends StatefulWidget {
     _permissionsService = injector.permissions;
   }
 
-  void _select(Choice choice) {
-    choice.function();
-  }
-
   @override
   DevViewState createState() {
     return new DevViewState();
+  }
+
+  void _select(Choice choice) {
+    choice.function();
   }
 }
 
@@ -76,35 +63,6 @@ class DevViewState extends State<DevView> {
   var _richCliText = <TextSpan>[];
 
   bool _showDefaultCommands = true;
-
-  @override
-  void initState() {
-    _richCliText = defaultCliCommandsText;
-    super.initState();
-  }
-
-  void _sendCommand(String command) {
-    FocusScope.of(context).requestFocus(new FocusNode());
-    widget._breezBridge.sendCommand(command).then((reply) {
-      setState(() {
-        _showDefaultCommands = false;
-        _cliTextStyle = theme.smallTextStyle;
-        _cliText = reply;
-        _richCliText = <TextSpan>[
-          new TextSpan(text: _cliText),
-        ];
-      });
-    }).catchError((error) {
-      setState(() {
-        _showDefaultCommands = false;
-        _cliText = error;
-        _cliTextStyle = theme.warningStyle;
-        _richCliText = <TextSpan>[
-          new TextSpan(text: _cliText),
-        ];
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -331,30 +289,15 @@ class DevViewState extends State<DevView> {
     return choices;
   }
 
-  void _gotoInitialScreen() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isFirstRun', true);
-    Navigator.of(_scaffoldKey.currentState.context)
-        .pushReplacementNamed("/splash");
-  }
-
-  void _showOptimizationsSettings() async {
-    widget._permissionsService.requestOptimizationSettings();
+  @override
+  void initState() {
+    _richCliText = defaultCliCommandsText;
+    super.initState();
   }
 
   void toggleConnectProgress(AccountBloc bloc, AccountSettings settings) {
     bloc.accountSettingsSink.add(
         settings.copyWith(showConnectProgress: !settings.showConnectProgress));
-  }
-
-  void _resetBugReportBehavior(AccountBloc bloc, AccountSettings settings) {
-    bloc.accountSettingsSink
-        .add(settings.copyWith(failePaymentBehavior: BugReportBehavior.PROMPT));
-  }
-
-  void _setShowExcessFunds(AccountBloc bloc, AccountSettings settings, {bool ignore = false}) {
-    bloc.accountSettingsSink
-        .add(settings.copyWith(ignoreWalletBalance: ignore));
   }
 
   void _describeGraph() async {
@@ -383,4 +326,61 @@ class DevViewState extends State<DevView> {
       }
     });
   }
+
+  void _gotoInitialScreen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isFirstRun', true);
+    Navigator.of(_scaffoldKey.currentState.context)
+        .pushReplacementNamed("/splash");
+  }
+
+  void _resetBugReportBehavior(AccountBloc bloc, AccountSettings settings) {
+    bloc.accountSettingsSink
+        .add(settings.copyWith(failePaymentBehavior: BugReportBehavior.PROMPT));
+  }
+
+  void _sendCommand(String command) {
+    FocusScope.of(context).requestFocus(new FocusNode());
+    widget._breezBridge.sendCommand(command).then((reply) {
+      setState(() {
+        _showDefaultCommands = false;
+        _cliTextStyle = theme.smallTextStyle;
+        _cliText = reply;
+        _richCliText = <TextSpan>[
+          new TextSpan(text: _cliText),
+        ];
+      });
+    }).catchError((error) {
+      setState(() {
+        _showDefaultCommands = false;
+        _cliText = error;
+        _cliTextStyle = theme.warningStyle;
+        _richCliText = <TextSpan>[
+          new TextSpan(text: _cliText),
+        ];
+      });
+    });
+  }
+
+  void _setShowExcessFunds(AccountBloc bloc, AccountSettings settings, {bool ignore = false}) {
+    bloc.accountSettingsSink
+        .add(settings.copyWith(ignoreWalletBalance: ignore));
+  }
+
+  void _showOptimizationsSettings() async {
+    widget._permissionsService.requestOptimizationSettings();
+  }
+}
+
+class LinkTextSpan extends TextSpan {
+  LinkTextSpan({TextStyle style, String command, String text})
+      : super(
+            style: style,
+            text: text ?? command,
+            recognizer: new TapGestureRecognizer()
+              ..onTap = () {
+                _cliInputController.text = command + " ";
+                FocusScope.of(_scaffoldKey.currentState.context)
+                    .requestFocus(_cliEntryFocusNode);
+              });
 }

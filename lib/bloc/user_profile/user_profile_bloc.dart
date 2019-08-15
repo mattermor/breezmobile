@@ -31,33 +31,19 @@ class UserProfileBloc {
   
   Map<Type, Function> _actionHandlers = Map();
   final _userActionsController = new StreamController<AsyncAction>.broadcast();
-  Sink<AsyncAction> get userActionsSink => _userActionsController.sink;
   final _registrationController = new StreamController<void>();
-  Sink<void> get registerSink => _registrationController.sink;
-
   final _userStreamController = BehaviorSubject<BreezUserModel>();
-  Stream<BreezUserModel> get userStream => _userStreamController.stream;
-
   final _userStreamPreviewController = BehaviorSubject<BreezUserModel>();
-  Stream<BreezUserModel> get userPreviewStream => _userStreamPreviewController.stream;
 
   Stream<bool> cardActivationStream;
-
   final _currencyController = new BehaviorSubject<Currency>();
-  Sink<Currency> get currencySink => _currencyController.sink;
 
   final _fiatConversionController = new BehaviorSubject<String>();
-  Sink<String> get fiatConversionSink => _fiatConversionController.sink;
-
   final _userController = new BehaviorSubject<BreezUserModel>();
-  Sink<BreezUserModel> get userSink => _userController.sink;
 
   final _randomizeController = new BehaviorSubject<void>();
-  Sink<void> get randomizeSink => _randomizeController.sink;
 
   final _uploadImageController = new StreamController<List<int>>();
-  Sink<List<int>> get uploadImageSink => _uploadImageController.sink;
-
   UserProfileBloc() {
     ServiceInjector injector = ServiceInjector();    
     _nfc = injector.nfc;    
@@ -94,6 +80,51 @@ class UserProfileBloc {
     _listenUploadImageRequests(injector);
 
     startPINIntervalWatcher();
+  }
+
+  Sink<Currency> get currencySink => _currencyController.sink;
+  Sink<String> get fiatConversionSink => _fiatConversionController.sink;
+
+  Sink<void> get randomizeSink => _randomizeController.sink;
+  Sink<void> get registerSink => _registrationController.sink;
+
+  Sink<List<int>> get uploadImageSink => _uploadImageController.sink;
+  Sink<AsyncAction> get userActionsSink => _userActionsController.sink;
+
+  Stream<BreezUserModel> get userPreviewStream => _userStreamPreviewController.stream;
+  Sink<BreezUserModel> get userSink => _userController.sink;
+
+  Stream<BreezUserModel> get userStream => _userStreamController.stream;
+
+  BreezUserModel get _currentUser => _userStreamController.value;
+
+  void cardActivationInit() {
+    _nfc.startCardActivation(_userStreamController.value.userID);
+  }
+
+  close() {
+    _registrationController.close();
+    _currencyController.close();
+    _fiatConversionController.close();
+    _userController.close();
+    _uploadImageController.close();
+    _randomizeController.close();
+    _userStreamPreviewController.close();
+  }
+
+  Future<BreezUserModel> saveUser(ServiceInjector injector, SharedPreferences preferences, BreezUserModel user) async {    
+    String currentToken = user.token;
+    try {
+      String token = await injector.notifications.getToken();      
+      if (token != currentToken || user.userID == null || user.userID.isEmpty) {
+        var userID = await injector.breezServer.registerDevice(token);                
+        user = user.copyWith(token: token, userID: userID);        
+      }
+      _saveChanges(preferences, user);
+    } catch(e) {
+      _registrationController.addError(e);
+    }
+    return user;
   }
 
   void startPINIntervalWatcher(){
@@ -146,54 +177,6 @@ class UserProfileBloc {
     });
   }
 
-  Future<BreezUserModel> saveUser(ServiceInjector injector, SharedPreferences preferences, BreezUserModel user) async {    
-    String currentToken = user.token;
-    try {
-      String token = await injector.notifications.getToken();      
-      if (token != currentToken || user.userID == null || user.userID.isEmpty) {
-        var userID = await injector.breezServer.registerDevice(token);                
-        user = user.copyWith(token: token, userID: userID);        
-      }
-      _saveChanges(preferences, user);
-    } catch(e) {
-      _registrationController.addError(e);
-    }
-    return user;
-  }
-
-  void _listenUserActions() {
-    _userActionsController.stream.listen((action) {
-      var handler = _actionHandlers[action.runtimeType];
-      if (handler != null) {
-        handler(action).catchError((e) => action.resolveError(e));
-      }
-    });
-  }
-
-  Future _updateSecurityModelAction(UpdateSecurityModel updateSecurityModelAction) async {
-    updateSecurityModelAction.resolve(await _updateSecurityModel(updateSecurityModelAction));
-  }
-
-  Future _updateSecurityModel(UpdateSecurityModel updateSecurityModelAction) async {
-    SecurityModel newModel = updateSecurityModelAction.newModel;
-    if (!newModel.requiresPin) {
-      await _secureStorage.delete(key: 'pinCode');
-    } else if (newModel.pinCode != _currentUser.securityModel.pinCode) {
-      // Write to storage if the new pin code is different from current pin code
-      await _secureStorage.write(key: 'pinCode', value: updateSecurityModelAction.newModel.pinCode);
-    }
-    await _breezLib.setPinCode(newModel.secureBackupWithPin ? newModel.pinCode : null);    
-    _saveChanges(await _preferences, _currentUser.copyWith(securityModel: updateSecurityModelAction.newModel));
-    return updateSecurityModelAction.newModel;
-  }
-
-  void _listenRegistrationRequests(ServiceInjector injector) {
-    _registrationController.stream.listen((request) async {
-      var preferences = await injector.sharedPreferences;
-      saveUser(injector, preferences, _userStreamController.value);
-    });
-  }
-
   void _listenCurrencyChange(ServiceInjector injector) {
     _currencyController.stream.listen((currency) async {
       var preferences = await injector.sharedPreferences;
@@ -208,15 +191,6 @@ class UserProfileBloc {
     });
   }
 
-  void _listenUserChange(ServiceInjector injector) {
-    _userController.stream.listen((userData) async {
-      var preferences = await injector.sharedPreferences;
-      _saveChanges(
-          preferences,
-          userData);
-    });
-  }
-
   void _listenRandomizeRequest(ServiceInjector injector) {
     _randomizeController.stream.listen((request) async {
       var randomProfile = generateDefaultProfile();
@@ -224,6 +198,13 @@ class UserProfileBloc {
           color: randomProfile[0],
           animal: randomProfile[1],
           image: ''));
+    });
+  }
+
+  void _listenRegistrationRequests(ServiceInjector injector) {
+    _registrationController.stream.listen((request) async {
+      var preferences = await injector.sharedPreferences;
+      saveUser(injector, preferences, _userStreamController.value);
     });
   }
 
@@ -240,21 +221,22 @@ class UserProfileBloc {
     });
   }
 
-  _saveImage(List<int> logoBytes) {
-    return getApplicationDocumentsDirectory()
-        .then((docDir) =>
-            new Directory([docDir.path, PROFILE_DATA_FOLDER_PATH].join("/"))
-                .create(recursive: true))
-        .then((profileDir) => new File([
-              profileDir.path,
-              'profile-${DateTime.now().millisecondsSinceEpoch}-.png'
-            ].join("/"))
-                .writeAsBytes(logoBytes, flush: true));
+  void _listenUserActions() {
+    _userActionsController.stream.listen((action) {
+      var handler = _actionHandlers[action.runtimeType];
+      if (handler != null) {
+        handler(action).catchError((e) => action.resolveError(e));
+      }
+    });
   }
 
-  void _saveChanges(SharedPreferences preferences, BreezUserModel user) {
-    preferences.setString(USER_DETAILS_PREFERENCES_KEY, json.encode(user));
-    _publishUser(user);    
+  void _listenUserChange(ServiceInjector injector) {
+    _userController.stream.listen((userData) async {
+      var preferences = await injector.sharedPreferences;
+      _saveChanges(
+          preferences,
+          userData);
+    });
   }
 
   void _publishUser(BreezUserModel user) {
@@ -267,19 +249,37 @@ class UserProfileBloc {
     _userStreamPreviewController.add(user);
   }
 
-  void cardActivationInit() {
-    _nfc.startCardActivation(_userStreamController.value.userID);
+  void _saveChanges(SharedPreferences preferences, BreezUserModel user) {
+    preferences.setString(USER_DETAILS_PREFERENCES_KEY, json.encode(user));
+    _publishUser(user);    
   }
 
-  BreezUserModel get _currentUser => _userStreamController.value;
+  _saveImage(List<int> logoBytes) {
+    return getApplicationDocumentsDirectory()
+        .then((docDir) =>
+            new Directory([docDir.path, PROFILE_DATA_FOLDER_PATH].join("/"))
+                .create(recursive: true))
+        .then((profileDir) => new File([
+              profileDir.path,
+              'profile-${DateTime.now().millisecondsSinceEpoch}-.png'
+            ].join("/"))
+                .writeAsBytes(logoBytes, flush: true));
+  }
 
-  close() {
-    _registrationController.close();
-    _currencyController.close();
-    _fiatConversionController.close();
-    _userController.close();
-    _uploadImageController.close();
-    _randomizeController.close();
-    _userStreamPreviewController.close();
+  Future _updateSecurityModel(UpdateSecurityModel updateSecurityModelAction) async {
+    SecurityModel newModel = updateSecurityModelAction.newModel;
+    if (!newModel.requiresPin) {
+      await _secureStorage.delete(key: 'pinCode');
+    } else if (newModel.pinCode != _currentUser.securityModel.pinCode) {
+      // Write to storage if the new pin code is different from current pin code
+      await _secureStorage.write(key: 'pinCode', value: updateSecurityModelAction.newModel.pinCode);
+    }
+    await _breezLib.setPinCode(newModel.secureBackupWithPin ? newModel.pinCode : null);    
+    _saveChanges(await _preferences, _currentUser.copyWith(securityModel: updateSecurityModelAction.newModel));
+    return updateSecurityModelAction.newModel;
+  }
+
+  Future _updateSecurityModelAction(UpdateSecurityModel updateSecurityModelAction) async {
+    updateSecurityModelAction.resolve(await _updateSecurityModel(updateSecurityModelAction));
   }
 }

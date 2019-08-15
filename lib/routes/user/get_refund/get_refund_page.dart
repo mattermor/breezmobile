@@ -12,6 +12,14 @@ import 'package:flutter/material.dart';
 class GetRefundPage extends StatelessWidget {
   static const String TITLE = "Get Refund";
 
+  broadcastAndWait(BuildContext context, String fromAddress, toAddress){
+    AccountBloc accountBloc = AppBlocsProvider.of<AccountBloc>(context);
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => WaitBroadcastDialog(accountBloc, fromAddress, toAddress));
+  }
+
   @override
   Widget build(BuildContext context) {
     AccountBloc accountBloc = AppBlocsProvider.of<AccountBloc>(context);
@@ -82,13 +90,5 @@ class GetRefundPage extends StatelessWidget {
           Navigator.of(context).pop();        
           broadcastAndWait(context, item.address, address);
         }));
-  }
-
-  broadcastAndWait(BuildContext context, String fromAddress, toAddress){
-    AccountBloc accountBloc = AppBlocsProvider.of<AccountBloc>(context);
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => WaitBroadcastDialog(accountBloc, fromAddress, toAddress));
   }
 }

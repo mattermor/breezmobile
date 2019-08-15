@@ -9,6 +9,13 @@ class OnlineStatusUpdater {
   DatabaseReference _userStatusPath;
 
 
+  pushOnline(){
+    var offlineStatus = {"online": false, "lastChanged": ServerValue.timestamp},
+      onlineStatus = {"online": true, "lastChanged": ServerValue.timestamp};
+    _userStatusPath.set(onlineStatus);
+    _userStatusPath.onDisconnect().set(offlineStatus);
+  }
+
   void startStatusUpdates(String localKey, Function(PeerStatus) onLocalStatusChanged, String remoteKey, Function(PeerStatus) onRemoteStatusChanged) {
     if (_onLocalConnectSubscription != null) {
       throw new Exception("Status tracking alredy started, must be stopped before start again");
@@ -26,13 +33,6 @@ class OnlineStatusUpdater {
       var connected = event.snapshot.value != null && event.snapshot.value["online"];
       onRemoteStatusChanged(PeerStatus(connected, DateTime.now().millisecondsSinceEpoch));
     });
-  }
-
-  pushOnline(){
-    var offlineStatus = {"online": false, "lastChanged": ServerValue.timestamp},
-      onlineStatus = {"online": true, "lastChanged": ServerValue.timestamp};
-    _userStatusPath.set(onlineStatus);
-    _userStatusPath.onDisconnect().set(offlineStatus);
   }
 
   Future stopStatusUpdates(){

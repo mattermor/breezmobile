@@ -24,15 +24,6 @@ class AppBlocs {
   final FastbitcoinsBloc fastbitcoinsBloc;
   final Map<Type, Object> _blocsByType;
 
-  static T _registerBloc<T>(T bloc, Map<Type, Object> blocs) {
-    blocs[bloc.runtimeType] = bloc;
-    return bloc;
-  }
-
-  T getBloc<T>() {
-    return _blocsByType[T];
-  }
-
   factory AppBlocs() {
     var blocsByType = Map<Type, Object>();
     StatusIndicatorBloc statusIndicatorBloc = _registerBloc(StatusIndicatorBloc(), blocsByType);
@@ -57,7 +48,7 @@ class AppBlocs {
       fastbitcoinsBloc,
       blocsByType
     );
-  }  
+  }
 
   AppBlocs._(    
     this.userProfileBloc, 
@@ -71,4 +62,13 @@ class AppBlocs {
     this.fastbitcoinsBloc,
     this._blocsByType,
   );
+
+  T getBloc<T>() {
+    return _blocsByType[T];
+  }  
+
+  static T _registerBloc<T>(T bloc, Map<Type, Object> blocs) {
+    blocs[bloc.runtimeType] = bloc;
+    return bloc;
+  }
 }

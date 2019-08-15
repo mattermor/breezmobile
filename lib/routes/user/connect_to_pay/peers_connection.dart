@@ -12,14 +12,6 @@ class PeersConnection extends StatelessWidget {
 
   PeersConnection(this._sessionState, {Function() onShareInvite}) : _onShareInvite = onShareInvite;
 
-  bool _isPayerWaiting(){
-    return _sessionState.payer && _sessionState.payerData.amount != null && _sessionState.payeeData.paymentRequest == null;
-  }
-
-  bool _isPayeeWaiting(){
-    return !_sessionState.payer && (_sessionState.payerData.amount == null || _sessionState.payeeData.paymentRequest != null && !_sessionState.paymentFulfilled);
-  }
-
   @override
   Widget build(BuildContext context) {
     sessionConnection.ConnectionState connectionState = sessionConnection.ConnectionState.IDLE;
@@ -87,6 +79,14 @@ class PeersConnection extends StatelessWidget {
       return SizedBox();
     }
     return _UserNameWidget("Unknown");  
+  }
+
+  bool _isPayeeWaiting(){
+    return !_sessionState.payer && (_sessionState.payerData.amount == null || _sessionState.payeeData.paymentRequest != null && !_sessionState.paymentFulfilled);
+  }
+
+  bool _isPayerWaiting(){
+    return _sessionState.payer && _sessionState.payerData.amount != null && _sessionState.payeeData.paymentRequest == null;
   }
 }
 

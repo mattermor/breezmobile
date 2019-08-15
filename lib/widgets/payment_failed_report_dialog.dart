@@ -25,21 +25,6 @@ class PaymentFailedReportDialogState extends State<PaymentFailedReportDialog> {
   StreamSubscription<AccountSettings> _settingsSubscription;
 
   @override
-  void initState() {
-    super.initState();
-    _settingsSubscription = widget._accountBloc.accountSettingsStream
-        .listen((settings) => setState(() {
-              _settings = settings;
-            }));
-  }
-
-  @override
-  void dispose() {
-    _settingsSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return buildFailureDialog();
   }
@@ -111,6 +96,21 @@ class PaymentFailedReportDialogState extends State<PaymentFailedReportDialog> {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(12.0))),
         ));
+  }
+
+  @override
+  void dispose() {
+    _settingsSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _settingsSubscription = widget._accountBloc.accountSettingsStream
+        .listen((settings) => setState(() {
+              _settings = settings;
+            }));
   }
 
   void onSubmit(bool yesNo) {

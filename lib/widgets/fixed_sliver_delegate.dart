@@ -11,20 +11,20 @@ class FixedSliverDelegate extends SliverPersistentHeaderDelegate {
   FixedSliverDelegate(this._height, {this.child, this.builder});
 
   @override
+  double get maxExtent => _height;
+
+  // TODO: implement maxExtent
+  @override
+  double get minExtent => _height;
+
+  // TODO: implement minExtent
+  @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     if (builder != null) {
       return builder(context, shrinkOffset, overlapsContent);
     }
     return child;
   }
-
-  // TODO: implement maxExtent
-  @override
-  double get maxExtent => _height;
-
-  // TODO: implement minExtent
-  @override
-  double get minExtent => _height;
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {

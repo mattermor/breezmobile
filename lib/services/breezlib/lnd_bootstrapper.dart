@@ -75,11 +75,6 @@ class LNDBootstrapper {
    return Observable.merge(allDownloadStreams).asBroadcastStream();          
   }
 
-  static Future<Config> _readConfig() async{
-    String lines = await rootBundle.loadString('conf/breez.conf');
-    return Config.fromString(lines);
-  }
-
   static Future<Iterable<File>> _existingBootstrapFiles(String lndDir) async {
     Config config = await _readConfig();
     String network = config.get('Application Options', 'network');            
@@ -92,6 +87,11 @@ class LNDBootstrapper {
     ];
     Iterable<String> destinationFiles = allFiles.map((file) => targetDirPath + file.split('/').last);      
     return destinationFiles.map((f) => File(f));
+  }
+
+  static Future<Config> _readConfig() async{
+    String lines = await rootBundle.loadString('conf/breez.conf');
+    return Config.fromString(lines);
   }
 
 }

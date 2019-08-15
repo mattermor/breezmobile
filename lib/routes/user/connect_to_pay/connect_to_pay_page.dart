@@ -41,100 +41,6 @@ class ConnectToPayPageState extends State<ConnectToPayPage> {
 
   ConnectToPayPageState(this._currentSession);
 
-  @override void didChangeDependencies(){    
-    if (!_isInit) {
-      ConnectPayBloc ctpBloc = AppBlocsProvider.of<ConnectPayBloc>(context);
-      try {
-        if (_currentSession == null) {
-            _currentSession = ctpBloc.createPayerRemoteSession();
-            ctpBloc.startSession(_currentSession);
-        }
-        _payer = _currentSession.runtimeType == PayerRemoteSession;
-        _title = _payer ? "Connect To Pay" : "Receive Payment";
-        registerErrorsListener();
-        registerEndOfSessionListener();
-        _isInit = true;        
-      } catch(error) {
-        _error = error;
-      }
-    }
-    super.didChangeDependencies();
-  }
-
-  void registerErrorsListener() async {    
-    _errorsSubscription = _currentSession.sessionErrors.listen((error) {
-      _popWithMessage(error.description);
-    });
-    
-    _remotePartyErrorSubscription = _currentSession.paymentSessionStateStream.listen((s) {
-      var error = !_payer ? s.payerData?.error : s.payeeData?.error;
-      if (error != null) {
-        _popWithMessage(error);
-      }
-    });
-  }
-
-  void registerEndOfSessionListener() async {    
-    _endOfSessionSubscription = _currentSession.paymentSessionStateStream.listen((s) {      
-      if (_remoteUserName == null) {
-        _remoteUserName = (_payer ? s.payeeData?.userName : s.payerData?.userName);
-      }
-      
-      if (s.remotePartyCancelled) {
-        _popWithMessage('${_remoteUserName ?? (_payer ? "Payee" : "Payer")} has cancelled the payment session');
-        return;
-      }
-
-      if (s.paymentFulfilled) {
-        String formattedAmount = _currentSession.currentUser.currency.format(Int64(s.settledAmount));
-        String successMessage = _payer
-            ? 'You have successfully paid $_remoteUserName $formattedAmount!'
-            : '$_remoteUserName have successfully paid you $formattedAmount!';        
-        _popWithMessage(successMessage, destroySession: _payer);
-      }
-    }, onDone: () => _popWithMessage(null, destroySession: false)); 
-  }
-
-  void _popWithMessage(message, {destroySession: true}) { 
-    _destroySessionOnTerminate = destroySession;   
-    Navigator.pop(_key.currentContext);
-    if (message != null) {
-      showFlushbar(_key.currentContext, message: message);
-    }
-  }
-
-  Future _clearSession() async {
-    _remoteUserName = null;    
-    await _endOfSessionSubscription.cancel();
-    await _errorsSubscription.cancel();
-    await _remotePartyErrorSubscription.cancel();
-  }
-
-  @override
-  void dispose() {
-    if (_currentSession != null) {
-      _currentSession.terminate(permanent: _destroySessionOnTerminate);
-      _clearSession();
-    }
-    super.dispose();
-  }
-
-  void _onTerminateSession() async {
-    TextStyle textStyle = TextStyle(color: Colors.black);
-    String exitSessionMessage =
-        'Are you sure you want to cancel this payment session?';
-    bool cancel = await promptAreYouSure(
-        _key.currentContext, null, Text(exitSessionMessage, style: textStyle),
-        textStyle: textStyle);
-    if (cancel) {
-      _popWithMessage(null);           
-    }
-  }
-
-  void _onBackPressed() async {    
-    _popWithMessage(null, destroySession: false);    
-  }
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -191,6 +97,100 @@ class ConnectToPayPageState extends State<ConnectToPayPage> {
                   });
             },
           );
+  }
+
+  @override void didChangeDependencies(){    
+    if (!_isInit) {
+      ConnectPayBloc ctpBloc = AppBlocsProvider.of<ConnectPayBloc>(context);
+      try {
+        if (_currentSession == null) {
+            _currentSession = ctpBloc.createPayerRemoteSession();
+            ctpBloc.startSession(_currentSession);
+        }
+        _payer = _currentSession.runtimeType == PayerRemoteSession;
+        _title = _payer ? "Connect To Pay" : "Receive Payment";
+        registerErrorsListener();
+        registerEndOfSessionListener();
+        _isInit = true;        
+      } catch(error) {
+        _error = error;
+      }
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    if (_currentSession != null) {
+      _currentSession.terminate(permanent: _destroySessionOnTerminate);
+      _clearSession();
+    }
+    super.dispose();
+  }
+
+  void registerEndOfSessionListener() async {    
+    _endOfSessionSubscription = _currentSession.paymentSessionStateStream.listen((s) {      
+      if (_remoteUserName == null) {
+        _remoteUserName = (_payer ? s.payeeData?.userName : s.payerData?.userName);
+      }
+      
+      if (s.remotePartyCancelled) {
+        _popWithMessage('${_remoteUserName ?? (_payer ? "Payee" : "Payer")} has cancelled the payment session');
+        return;
+      }
+
+      if (s.paymentFulfilled) {
+        String formattedAmount = _currentSession.currentUser.currency.format(Int64(s.settledAmount));
+        String successMessage = _payer
+            ? 'You have successfully paid $_remoteUserName $formattedAmount!'
+            : '$_remoteUserName have successfully paid you $formattedAmount!';        
+        _popWithMessage(successMessage, destroySession: _payer);
+      }
+    }, onDone: () => _popWithMessage(null, destroySession: false)); 
+  }
+
+  void registerErrorsListener() async {    
+    _errorsSubscription = _currentSession.sessionErrors.listen((error) {
+      _popWithMessage(error.description);
+    });
+    
+    _remotePartyErrorSubscription = _currentSession.paymentSessionStateStream.listen((s) {
+      var error = !_payer ? s.payerData?.error : s.payeeData?.error;
+      if (error != null) {
+        _popWithMessage(error);
+      }
+    });
+  }
+
+  Future _clearSession() async {
+    _remoteUserName = null;    
+    await _endOfSessionSubscription.cancel();
+    await _errorsSubscription.cancel();
+    await _remotePartyErrorSubscription.cancel();
+  }
+
+  void _onBackPressed() async {    
+    _popWithMessage(null, destroySession: false);    
+  }
+
+  void _onTerminateSession() async {
+    TextStyle textStyle = TextStyle(color: Colors.black);
+    String exitSessionMessage =
+        'Are you sure you want to cancel this payment session?';
+    bool cancel = await promptAreYouSure(
+        _key.currentContext, null, Text(exitSessionMessage, style: textStyle),
+        textStyle: textStyle);
+    if (cancel) {
+      _popWithMessage(null);           
+    }
+  }
+
+  void _popWithMessage(message, {destroySession: true}) { 
+    _destroySessionOnTerminate = destroySession;   
+    Navigator.pop(_key.currentContext);
+    if (message != null) {
+      showFlushbar(_key.currentContext, message: message);
+    }
   }
 }
 

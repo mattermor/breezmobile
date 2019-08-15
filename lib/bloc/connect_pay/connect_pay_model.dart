@@ -3,32 +3,28 @@ This model represents the state of the payment session for both sides.
 */
 import 'package:fixnum/fixnum.dart';
 
-class PaymentSessionState {
-  static const Duration connectionEmulationDuration = Duration(milliseconds:  1500);
-  final bool payer;
-  final String sessionSecret;
-  final PayerSessionData payerData;
-  final PayeeSessionData payeeData;
-  final bool invitationReady;
-  final bool invitationSent;
-  final bool paymentFulfilled;  
-  final int settledAmount;
+class PayeeSessionData {
+  final String userName;
+  final String imageURL;
+  final PeerStatus status;
+  final String paymentRequest;
+  final String error;
+  final bool cancelled;
+  PayeeSessionData(this.userName, this.imageURL, this.status, this.paymentRequest, this.error, this.cancelled);
 
-  bool get remotePartyCancelled => payer ? payeeData.cancelled : payerData.cancelled;  
+  PayeeSessionData.fromJson(Map<dynamic, dynamic> json)
+      : status = json['status'] == null ? null : PeerStatus.fromJson(json['status']),
+        paymentRequest = json['paymentRequest'],
+        userName = json["userName"],
+        error = json["error"],
+        cancelled = json["cancelled"] ?? false,
+        imageURL = json['imageURL'];
 
-  PaymentSessionState(this.payer, this.sessionSecret, this.payerData, this.payeeData, this.invitationReady, this.invitationSent, this.paymentFulfilled, this.settledAmount);
+  bool get invitationAccepted => status.lastChanged != 0;
 
-  PaymentSessionState copyWith({PayerSessionData payerData, PayeeSessionData payeeData, bool invitationReady, bool invitationSent, bool paymentFulfilled, int settledAmount}) {
-    return new PaymentSessionState(this.payer, this.sessionSecret, payerData ?? this.payerData, payeeData ?? this.payeeData, invitationReady ?? this.invitationReady,
-        invitationSent ?? this.invitationSent, paymentFulfilled ?? this.paymentFulfilled, settledAmount ?? this.settledAmount);
-  }
-
-  PaymentSessionState.payerStart(String sessionSecret, String userName, String imageURL)
-      : this(true, sessionSecret, PayerSessionData(userName, imageURL, PeerStatus.start(), null, null), PayeeSessionData(null, null, PeerStatus.start(), null, null, false),false,  false,
-            false, 0);
-  PaymentSessionState.payeeStart(String sessionSecret, String userName, String imageURL)
-      : this(false, sessionSecret, PayerSessionData(null, null, PeerStatus.start(), null, null), PayeeSessionData(userName, imageURL, PeerStatus.start(), null, null, false), true, true,
-            false, 0);
+  PayeeSessionData copyWith({String userName, String imageURL, PeerStatus status, String paymentRequest, String error, bool cancelled}) {
+    return new PayeeSessionData(userName ?? this.userName, imageURL ?? this.imageURL, status ?? this.status, paymentRequest ?? this.paymentRequest, error ?? this.error, cancelled ?? this.cancelled);
+  }  
 }
 
 class PayerSessionData {
@@ -58,44 +54,6 @@ class PayerSessionData {
   }  
 }
 
-class PayeeSessionData {
-  final String userName;
-  final String imageURL;
-  final PeerStatus status;
-  final String paymentRequest;
-  final String error;
-  final bool cancelled;
-  bool get invitationAccepted => status.lastChanged != 0;
-
-  PayeeSessionData(this.userName, this.imageURL, this.status, this.paymentRequest, this.error, this.cancelled);
-
-  PayeeSessionData.fromJson(Map<dynamic, dynamic> json)
-      : status = json['status'] == null ? null : PeerStatus.fromJson(json['status']),
-        paymentRequest = json['paymentRequest'],
-        userName = json["userName"],
-        error = json["error"],
-        cancelled = json["cancelled"] ?? false,
-        imageURL = json['imageURL'];
-
-  PayeeSessionData copyWith({String userName, String imageURL, PeerStatus status, String paymentRequest, String error, bool cancelled}) {
-    return new PayeeSessionData(userName ?? this.userName, imageURL ?? this.imageURL, status ?? this.status, paymentRequest ?? this.paymentRequest, error ?? this.error, cancelled ?? this.cancelled);
-  }  
-}
-
-class PeerStatus {
-  final bool online;
-  final int lastChanged;
-
-  PeerStatus(this.online, this.lastChanged);
-  PeerStatus.start()
-      : online = false,
-        lastChanged = 0;
-
-  PeerStatus.fromJson(Map<dynamic, dynamic> json)
-      : online = json['online'] ?? false,
-        lastChanged = json['lastChanged'] ?? 0;
-}
-
 class PaymentDetails {
   final Int64 amount;
   final String description;
@@ -103,15 +61,57 @@ class PaymentDetails {
   PaymentDetails(this.amount, this.description);
 }
 
+class PaymentSessionError {
+  final PaymentSessionErrorType type;
+  final String description;
+  
+  PaymentSessionError(this.type, this.description);
+  PaymentSessionError.unknown(this.description) : type = PaymentSessionErrorType.UNKNOWN;
+}
+
 enum PaymentSessionErrorType {
   PAYER_CANCELLED,
   UNKNOWN
 }
 
-class PaymentSessionError {
-  final PaymentSessionErrorType type;
-  final String description;
-  
-  PaymentSessionError.unknown(this.description) : type = PaymentSessionErrorType.UNKNOWN;
-  PaymentSessionError(this.type, this.description);
+class PaymentSessionState {
+  static const Duration connectionEmulationDuration = Duration(milliseconds:  1500);
+  final bool payer;
+  final String sessionSecret;
+  final PayerSessionData payerData;
+  final PayeeSessionData payeeData;
+  final bool invitationReady;
+  final bool invitationSent;
+  final bool paymentFulfilled;  
+  final int settledAmount;
+
+  PaymentSessionState(this.payer, this.sessionSecret, this.payerData, this.payeeData, this.invitationReady, this.invitationSent, this.paymentFulfilled, this.settledAmount);  
+
+  PaymentSessionState.payeeStart(String sessionSecret, String userName, String imageURL)
+      : this(false, sessionSecret, PayerSessionData(null, null, PeerStatus.start(), null, null), PayeeSessionData(userName, imageURL, PeerStatus.start(), null, null, false), true, true,
+            false, 0);
+
+  PaymentSessionState.payerStart(String sessionSecret, String userName, String imageURL)
+      : this(true, sessionSecret, PayerSessionData(userName, imageURL, PeerStatus.start(), null, null), PayeeSessionData(null, null, PeerStatus.start(), null, null, false),false,  false,
+            false, 0);
+
+  bool get remotePartyCancelled => payer ? payeeData.cancelled : payerData.cancelled;
+  PaymentSessionState copyWith({PayerSessionData payerData, PayeeSessionData payeeData, bool invitationReady, bool invitationSent, bool paymentFulfilled, int settledAmount}) {
+    return new PaymentSessionState(this.payer, this.sessionSecret, payerData ?? this.payerData, payeeData ?? this.payeeData, invitationReady ?? this.invitationReady,
+        invitationSent ?? this.invitationSent, paymentFulfilled ?? this.paymentFulfilled, settledAmount ?? this.settledAmount);
+  }
+}
+
+class PeerStatus {
+  final bool online;
+  final int lastChanged;
+
+  PeerStatus(this.online, this.lastChanged);
+  PeerStatus.fromJson(Map<dynamic, dynamic> json)
+      : online = json['online'] ?? false,
+        lastChanged = json['lastChanged'] ?? 0;
+
+  PeerStatus.start()
+      : online = false,
+        lastChanged = 0;
 }

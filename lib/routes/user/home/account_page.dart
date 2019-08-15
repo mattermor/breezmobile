@@ -49,25 +49,6 @@ class AccountPageState extends State<AccountPage> with SingleTickerProviderState
   bool _isInit = false;  
 
   @override
-  void didChangeDependencies() {          
-    if (!_isInit) {
-      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
-      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
-      _connectPayBloc = AppBlocsProvider.of<ConnectPayBloc>(context);
-      _invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
-      _isInit = true;
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
-  dispose() {
-    _accountActionsSubscription.cancel();
-    _paidInvoicesSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {    
     return StreamBuilder<AccountSettings>(
         stream: _accountBloc.accountSettingsStream,
@@ -90,6 +71,25 @@ class AccountPageState extends State<AccountPage> with SingleTickerProviderState
                     });
               });
         });
+  }
+
+  @override
+  void didChangeDependencies() {          
+    if (!_isInit) {
+      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
+      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
+      _connectPayBloc = AppBlocsProvider.of<ConnectPayBloc>(context);
+      _invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
+      _isInit = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  dispose() {
+    _accountActionsSubscription.cancel();
+    _paidInvoicesSubscription.cancel();
+    super.dispose();
   }
 
   Widget _buildBalanceAndPayments(PaymentsModel paymentsModel, AccountModel account, String pendingCTPLink) {
@@ -198,6 +198,12 @@ class WalletDashboardHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   WalletDashboardHeaderDelegate(this.accountBloc, this._userProfileBloc);
   @override
+  double get maxExtent => DASHBOARD_MAX_HEIGHT;
+
+  @override
+  double get minExtent => DASHBOARD_MIN_HEIGHT;
+
+  @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return StreamBuilder<AccountSettings>(
       stream: accountBloc.accountSettingsStream,
@@ -215,12 +221,6 @@ class WalletDashboardHeaderDelegate extends SliverPersistentHeaderDelegate {
       }
     );    
   }
-
-  @override
-  double get maxExtent => DASHBOARD_MAX_HEIGHT;
-
-  @override
-  double get minExtent => DASHBOARD_MIN_HEIGHT;
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {

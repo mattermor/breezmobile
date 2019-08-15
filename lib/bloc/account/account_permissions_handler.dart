@@ -11,15 +11,10 @@ class AccountPermissionsHandler {
   static const String PERMISSION_DIALOG_SHOWN_KEY = "PERMISSION_DIALOG_SHOWN_KEY";
 
   final _optimizationWhitelistRequestController = new StreamController<void>.broadcast();
-  Stream<void> get optimizationWhitelistRequestStream => _optimizationWhitelistRequestController.stream;
-  Sink<void> get optimizationWhitelistRequestSink => _optimizationWhitelistRequestController.sink;
-
   final _optimizationWhitelistExplainController = new BehaviorSubject<bool>();
-  Stream<bool> get optimizationWhitelistExplainStream => _optimizationWhitelistExplainController.stream;  
-
   Permissions _permissionsService;
-  Future<SharedPreferences> _preferences;
 
+  Future<SharedPreferences> _preferences;
   AccountPermissionsHandler(){
     var injector = ServiceInjector();
     _permissionsService = injector.permissions;
@@ -31,6 +26,16 @@ class AccountPermissionsHandler {
     //     });
     //   });
     // });    
+  }  
+
+  Stream<bool> get optimizationWhitelistExplainStream => _optimizationWhitelistExplainController.stream;
+  Sink<void> get optimizationWhitelistRequestSink => _optimizationWhitelistRequestController.sink;
+
+  Stream<void> get optimizationWhitelistRequestStream => _optimizationWhitelistRequestController.stream;
+
+  dispose(){
+    _optimizationWhitelistExplainController.close();
+    _optimizationWhitelistRequestController.close();
   }
 
   void triggerOptimizeWhitelistExplenation() async {
@@ -39,10 +44,5 @@ class AccountPermissionsHandler {
     if (!optimized && preferences.get(PERMISSION_DIALOG_SHOWN_KEY) != true) {
       _optimizationWhitelistExplainController.sink.add(true);
     }
-  }
-
-  dispose(){
-    _optimizationWhitelistExplainController.close();
-    _optimizationWhitelistRequestController.close();
   }
 }

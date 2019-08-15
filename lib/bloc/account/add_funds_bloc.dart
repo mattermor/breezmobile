@@ -7,10 +7,7 @@ import 'package:breez/services/injector.dart';
 
 class AddFundsBloc {
   final _addFundRequestController = new StreamController<void>();
-  Sink<void> get addFundRequestSink => _addFundRequestController.sink;
-
   final _addFundResponseController = new StreamController<AddFundResponse>();
-  Stream<AddFundResponse> get addFundResponseStream => _addFundResponseController.stream;
 
   AddFundsBloc(String userID){
     BreezBridge breezLib = new ServiceInjector().breezBridge;
@@ -22,6 +19,9 @@ class AddFundsBloc {
       })
       .onDone(_dispose);
   }
+  Sink<void> get addFundRequestSink => _addFundRequestController.sink;
+
+  Stream<AddFundResponse> get addFundResponseStream => _addFundResponseController.stream;
 
   _dispose(){
     _addFundRequestController.close();

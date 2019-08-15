@@ -23,16 +23,16 @@ class _CalendarDialogState extends State<CalendarDialog> {
   DateTime _startDate;
 
   @override
+  Widget build(BuildContext context) {
+    return pickDate();
+  }
+
+  @override
   void initState() {
     super.initState();   
     _startDate = widget.firstDate;     
     _startDateController.text = DateUtils.formatYearMonthDay(widget.firstDate);
     _endDateController.text = DateUtils.formatYearMonthDay(_endDate);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return pickDate();
   }
 
   Widget pickDate() {
@@ -79,27 +79,13 @@ class _CalendarDialogState extends State<CalendarDialog> {
     }
   }
 
-  Widget _selectDateButton(String label, TextEditingController textEditingController, bool isStartBtn) {
-    return FlatButton(
-      child: Container(
-        child: TextFormField(
-          decoration: InputDecoration(
-            labelText: label,
-            labelStyle: theme.alertStyle,
-          ),
-          controller: textEditingController,
-          enabled: false,
-          style: theme.alertStyle,
-        ),
-        width: 84.0,
-        padding: EdgeInsets.zero,
-      ),
-      onPressed: () {
-        setState(() {
-          _selectDate(context, isStartBtn);
-        });
-      },
-    );
+  _clearFilter() {
+    setState(() {
+      _startDate = widget.firstDate;
+      _endDate = DateTime.now();
+      _startDateController.text = "";
+      _endDateController.text = "";
+    });
   }
 
   Future<Null> _selectDate(BuildContext context, bool isStartBtn) async {
@@ -131,12 +117,26 @@ class _CalendarDialogState extends State<CalendarDialog> {
     }
   }
 
-  _clearFilter() {
-    setState(() {
-      _startDate = widget.firstDate;
-      _endDate = DateTime.now();
-      _startDateController.text = "";
-      _endDateController.text = "";
-    });
+  Widget _selectDateButton(String label, TextEditingController textEditingController, bool isStartBtn) {
+    return FlatButton(
+      child: Container(
+        child: TextFormField(
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: theme.alertStyle,
+          ),
+          controller: textEditingController,
+          enabled: false,
+          style: theme.alertStyle,
+        ),
+        width: 84.0,
+        padding: EdgeInsets.zero,
+      ),
+      onPressed: () {
+        setState(() {
+          _selectDate(context, isStartBtn);
+        });
+      },
+    );
   }
 }

@@ -9,16 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
-class _CustomerData {
-  String fullName = '';
-  String email = '';
-  String address = '';
-  String city = '';
-  String state = '';
-  String zip = '';
-  String country = '';
-}
-
 class OrderCardPage extends StatefulWidget {
   final bool showSkip;
   OrderCardPage({Key key, this.showSkip}) : super(key: key);
@@ -56,286 +46,6 @@ class OrderCardPageState extends State<OrderCardPage> {
   _CustomerData _data = new _CustomerData();
 
   BreezServer _breezServer;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-    _breezServer = new ServiceInjector().breezServer;
-    _stateController.addListener(_onChangeState);
-    _countryController.addListener(_onChangeCountry);
-    _zipController.addListener(_onChangeZip);
-
-    _cityFocusNode.addListener(_onFocusCityStateRow);
-    _stateFocusNode.addListener(_onFocusCityStateRow);
-    _countryFocusNode.addListener(_onFocusCountryZipRow);
-    _zipFocusNode.addListener(_onFocusCountryZipRow);
-  }
-
-  void _scroll(double value) {
-    setState(() {
-      _scrollController.animateTo(
-        value,
-        curve: Curves.easeOut,
-        duration: const Duration(milliseconds: 300),
-      );
-    });
-  }
-
-  void _onFocusCityStateRow() {
-    if (_cityFocusNode.hasFocus || _stateFocusNode.hasFocus) {
-      _scroll(40.0);
-    }
-  }
-
-  void _onFocusCountryZipRow() {
-    if (_countryFocusNode.hasFocus || _zipFocusNode.hasFocus) {
-      _scroll(115.0);
-    }
-  }
-
-  void _onChangeState() {
-    String inputText = _stateController.text;
-    if (inputText.length > 0) {
-      _statesShow.clear();
-      for (int i = 0; i < _states.length; i++) {
-        if (_states[i].length >= inputText.length &&
-            _states[i].toLowerCase().startsWith(inputText.toLowerCase())) {
-          _statesShow.add(_states[i]);
-        }
-      }
-
-      if (_statesShow.length > 0 &&
-          !_statesShow.contains(inputText) &&
-          _stateFocusNode.hasFocus) {
-        _statesShow.sort();
-        setState(() {
-          _autoValidateState = false;
-          _showStatesList = true;
-          _scroll(40.0);
-        });
-      } else {
-        setState(() {
-          _autoValidateState = true;
-          _showStatesList = false;
-        });
-      }
-    } else {
-      setState(() {
-        _autoValidateState = false;
-        _showStatesList = false;
-      });
-    }
-  }
-
-  void _onChangeCountry() {
-    String inputText = _countryController.text;
-    if (inputText.length > 0) {
-      _countriesJSON.forEach(_iterateMapEntryGetCountryShort);
-      _changeStatesList();
-
-      _countriesShow.clear();
-      _countriesJSON.forEach(_iterateMapEntryGetCountriesShow);
-
-      if (_countriesShow.length > 0 &&
-          !_countriesShow.contains(inputText) &&
-          _countryFocusNode.hasFocus) {
-        _countriesShow.sort();
-        setState(() {
-          _autoValidateCountry = false;
-          _showCountriesList = true;
-          _scroll(115.0);
-        });
-      } else {
-        setState(() {
-          _autoValidateCountry = true;
-          _showCountriesList = false;
-        });
-      }
-    } else {
-      _states.clear();
-      _countriesShow.clear();
-
-      setState(() {
-        _autoValidateCountry = false;
-        _showCountriesList = false;
-      });
-    }
-  }
-
-  void _onChangeZip() {
-    setState(() {
-      _autoValidateZip =
-      (_zipController.text.length > 0 && !_zipFocusNode.hasFocus);
-    });
-  }
-
-  void _iterateMapEntryGetCountriesShow(key, value) {
-    String inputText = _countryController.text;
-    if (value.length >= inputText.length &&
-        value.toLowerCase().startsWith(inputText.toLowerCase())) {
-      _countriesShow.add(value);
-    }
-  }
-
-  void _iterateMapEntryGetCountryShort(key, value) {
-    if (value.toString().toLowerCase() ==
-        _countryController.text.toLowerCase()) {
-      _userCountryShort = key;
-    }
-  }
-
-  void _loadData() async {
-    _specialCountriesShort.add("US");
-    _specialCountriesShort.add("CA");
-    final response = await http.get(
-        'http://api.ipstack.com/check?access_key=025a14ce39e8588578966edfe7e7d70a&output=json&fields=country_code');
-    if (response.statusCode == 200) {
-      Map data = json.decode(response.body);
-      _userCountryShort = data["country_code"];
-    } else {
-      Locale myLocale = Localizations.localeOf(context);
-      _userCountryShort = myLocale.countryCode;
-    }
-    await _loadCountries();
-    await _loadStates();
-    _changeStatesList();
-  }
-
-  Future _loadCountries() async {
-    String jsonCountries =
-    await rootBundle.loadString('src/json/countries.json');
-    _countriesJSON = json.decode(jsonCountries);
-    _countryController.text = _countriesJSON[_userCountryShort];
-  }
-
-  Future _loadStates() async {
-    String jsonStates = await rootBundle.loadString('src/json/states.json');
-    _statesJSON = json.decode(jsonStates);
-  }
-
-  void _changeStatesList() {
-    _states.clear();
-    if (_statesJSON.isNotEmpty) {
-      _states = (_statesJSON["states"] as List)
-          .where((state) => state["country"] == _userCountryShort)
-          .map<String>((state) => state["english"] ?? state["name"])
-          .toList();
-    }
-  }
-
-  bool _checkStates(String value) {
-    for (int i = 0; i < _states.length; i++) {
-      if (_states[i].toLowerCase() == value.toLowerCase()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool _checkCountry(String value) {
-    return _countriesJSON.values.firstWhere(
-            (val) => val.toLowerCase() == _countryController.text.toLowerCase(),
-        orElse: () => null) !=
-        null;
-  }
-
-  bool _validateEmail(String value) {
-    return RegExp(r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?").hasMatch(value);
-  }
-
-  bool _validateZip(String value) {
-    return RegExp(r"^(?!0{3})[0-9]{3,10}$").hasMatch(value);
-  }
-
-  Widget _getFutureWidgetStates() {
-    List<InkWell> list = new List();
-    int number = _statesShow.length > 2 ? 3 : _statesShow.length;
-    for (int i = 0; i < number; i++) {
-      list.add(new InkWell(
-        child: new Container(
-            padding: new EdgeInsets.only(left: 10.0),
-            alignment: Alignment.centerLeft,
-            height: 35.0,
-            child: new Text(_statesShow[i],
-                overflow: TextOverflow.ellipsis,
-                style: theme.autoCompleteStyle)),
-        onTap: () {
-          _stateController.text = _statesShow[i];
-        },
-      ));
-    }
-
-    return new Container(
-        height: list.length * 35.0,
-        width: MediaQuery.of(context).size.width,
-        child: new ListView(children: list));
-  }
-
-  Widget _getFutureWidgetCountries() {
-    List<InkWell> list = new List();
-    int number = _countriesShow.length > 2 ? 3 : _countriesShow.length;
-    for (int i = 0; i < number; i++) {
-      list.add(new InkWell(
-        child: new Container(
-            padding: new EdgeInsets.only(left: 10.0),
-            alignment: Alignment.centerLeft,
-            height: 35.0,
-            child: new Text(_countriesShow[i],
-                overflow: TextOverflow.ellipsis,
-                style: theme.autoCompleteStyle)),
-        onTap: () {
-          _countryController.text = _countriesShow[i];
-        },
-      ));
-    }
-
-    return new Container(
-        height: list.length * 35.0,
-        width: MediaQuery.of(context).size.width,
-        child: new ListView(children: list));
-  }
-
-  List<Widget> _showSkipButton(showSkip) {
-    if (showSkip) {
-      return <Widget>[
-        new InkWell(
-            child: new Container(
-                margin: new EdgeInsets.only(right: 16.5),
-                alignment: Alignment.center,
-                child: new Text("SKIP", style: theme.skipStyle)),
-            onTap: () {
-              Navigator.of(context).pushNamed('/home');
-            })
-      ];
-    } else {
-      return <Widget>[];
-    }
-  }
-
-  void _showAlertDialog() {
-    AlertDialog dialog = new AlertDialog(
-      content: new Text(
-          "Name and address are required for sending you a Breez card. Any information provided will be deleted from our systems after card has been sent. You may skip this step and continue using Breez without a card.",
-          style: theme.alertStyle),
-      actions: <Widget>[
-        new FlatButton(
-            onPressed: () => Navigator.pop(context),
-            child: new Text("OK", style: theme.buttonStyle))
-      ],
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
-    );
-    showDialog(context: context,  builder: (_) => dialog);
-  }
-
-  Widget _showLeadingButton(showSkip) {
-    if (!showSkip) {
-      return backBtn.BackButton();
-    } else {
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -634,4 +344,294 @@ class OrderCardPageState extends State<OrderCardPage> {
           )),
     );
   }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+    _breezServer = new ServiceInjector().breezServer;
+    _stateController.addListener(_onChangeState);
+    _countryController.addListener(_onChangeCountry);
+    _zipController.addListener(_onChangeZip);
+
+    _cityFocusNode.addListener(_onFocusCityStateRow);
+    _stateFocusNode.addListener(_onFocusCityStateRow);
+    _countryFocusNode.addListener(_onFocusCountryZipRow);
+    _zipFocusNode.addListener(_onFocusCountryZipRow);
+  }
+
+  void _changeStatesList() {
+    _states.clear();
+    if (_statesJSON.isNotEmpty) {
+      _states = (_statesJSON["states"] as List)
+          .where((state) => state["country"] == _userCountryShort)
+          .map<String>((state) => state["english"] ?? state["name"])
+          .toList();
+    }
+  }
+
+  bool _checkCountry(String value) {
+    return _countriesJSON.values.firstWhere(
+            (val) => val.toLowerCase() == _countryController.text.toLowerCase(),
+        orElse: () => null) !=
+        null;
+  }
+
+  bool _checkStates(String value) {
+    for (int i = 0; i < _states.length; i++) {
+      if (_states[i].toLowerCase() == value.toLowerCase()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Widget _getFutureWidgetCountries() {
+    List<InkWell> list = new List();
+    int number = _countriesShow.length > 2 ? 3 : _countriesShow.length;
+    for (int i = 0; i < number; i++) {
+      list.add(new InkWell(
+        child: new Container(
+            padding: new EdgeInsets.only(left: 10.0),
+            alignment: Alignment.centerLeft,
+            height: 35.0,
+            child: new Text(_countriesShow[i],
+                overflow: TextOverflow.ellipsis,
+                style: theme.autoCompleteStyle)),
+        onTap: () {
+          _countryController.text = _countriesShow[i];
+        },
+      ));
+    }
+
+    return new Container(
+        height: list.length * 35.0,
+        width: MediaQuery.of(context).size.width,
+        child: new ListView(children: list));
+  }
+
+  Widget _getFutureWidgetStates() {
+    List<InkWell> list = new List();
+    int number = _statesShow.length > 2 ? 3 : _statesShow.length;
+    for (int i = 0; i < number; i++) {
+      list.add(new InkWell(
+        child: new Container(
+            padding: new EdgeInsets.only(left: 10.0),
+            alignment: Alignment.centerLeft,
+            height: 35.0,
+            child: new Text(_statesShow[i],
+                overflow: TextOverflow.ellipsis,
+                style: theme.autoCompleteStyle)),
+        onTap: () {
+          _stateController.text = _statesShow[i];
+        },
+      ));
+    }
+
+    return new Container(
+        height: list.length * 35.0,
+        width: MediaQuery.of(context).size.width,
+        child: new ListView(children: list));
+  }
+
+  void _iterateMapEntryGetCountriesShow(key, value) {
+    String inputText = _countryController.text;
+    if (value.length >= inputText.length &&
+        value.toLowerCase().startsWith(inputText.toLowerCase())) {
+      _countriesShow.add(value);
+    }
+  }
+
+  void _iterateMapEntryGetCountryShort(key, value) {
+    if (value.toString().toLowerCase() ==
+        _countryController.text.toLowerCase()) {
+      _userCountryShort = key;
+    }
+  }
+
+  Future _loadCountries() async {
+    String jsonCountries =
+    await rootBundle.loadString('src/json/countries.json');
+    _countriesJSON = json.decode(jsonCountries);
+    _countryController.text = _countriesJSON[_userCountryShort];
+  }
+
+  void _loadData() async {
+    _specialCountriesShort.add("US");
+    _specialCountriesShort.add("CA");
+    final response = await http.get(
+        'http://api.ipstack.com/check?access_key=025a14ce39e8588578966edfe7e7d70a&output=json&fields=country_code');
+    if (response.statusCode == 200) {
+      Map data = json.decode(response.body);
+      _userCountryShort = data["country_code"];
+    } else {
+      Locale myLocale = Localizations.localeOf(context);
+      _userCountryShort = myLocale.countryCode;
+    }
+    await _loadCountries();
+    await _loadStates();
+    _changeStatesList();
+  }
+
+  Future _loadStates() async {
+    String jsonStates = await rootBundle.loadString('src/json/states.json');
+    _statesJSON = json.decode(jsonStates);
+  }
+
+  void _onChangeCountry() {
+    String inputText = _countryController.text;
+    if (inputText.length > 0) {
+      _countriesJSON.forEach(_iterateMapEntryGetCountryShort);
+      _changeStatesList();
+
+      _countriesShow.clear();
+      _countriesJSON.forEach(_iterateMapEntryGetCountriesShow);
+
+      if (_countriesShow.length > 0 &&
+          !_countriesShow.contains(inputText) &&
+          _countryFocusNode.hasFocus) {
+        _countriesShow.sort();
+        setState(() {
+          _autoValidateCountry = false;
+          _showCountriesList = true;
+          _scroll(115.0);
+        });
+      } else {
+        setState(() {
+          _autoValidateCountry = true;
+          _showCountriesList = false;
+        });
+      }
+    } else {
+      _states.clear();
+      _countriesShow.clear();
+
+      setState(() {
+        _autoValidateCountry = false;
+        _showCountriesList = false;
+      });
+    }
+  }
+
+  void _onChangeState() {
+    String inputText = _stateController.text;
+    if (inputText.length > 0) {
+      _statesShow.clear();
+      for (int i = 0; i < _states.length; i++) {
+        if (_states[i].length >= inputText.length &&
+            _states[i].toLowerCase().startsWith(inputText.toLowerCase())) {
+          _statesShow.add(_states[i]);
+        }
+      }
+
+      if (_statesShow.length > 0 &&
+          !_statesShow.contains(inputText) &&
+          _stateFocusNode.hasFocus) {
+        _statesShow.sort();
+        setState(() {
+          _autoValidateState = false;
+          _showStatesList = true;
+          _scroll(40.0);
+        });
+      } else {
+        setState(() {
+          _autoValidateState = true;
+          _showStatesList = false;
+        });
+      }
+    } else {
+      setState(() {
+        _autoValidateState = false;
+        _showStatesList = false;
+      });
+    }
+  }
+
+  void _onChangeZip() {
+    setState(() {
+      _autoValidateZip =
+      (_zipController.text.length > 0 && !_zipFocusNode.hasFocus);
+    });
+  }
+
+  void _onFocusCityStateRow() {
+    if (_cityFocusNode.hasFocus || _stateFocusNode.hasFocus) {
+      _scroll(40.0);
+    }
+  }
+
+  void _onFocusCountryZipRow() {
+    if (_countryFocusNode.hasFocus || _zipFocusNode.hasFocus) {
+      _scroll(115.0);
+    }
+  }
+
+  void _scroll(double value) {
+    setState(() {
+      _scrollController.animateTo(
+        value,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 300),
+      );
+    });
+  }
+
+  void _showAlertDialog() {
+    AlertDialog dialog = new AlertDialog(
+      content: new Text(
+          "Name and address are required for sending you a Breez card. Any information provided will be deleted from our systems after card has been sent. You may skip this step and continue using Breez without a card.",
+          style: theme.alertStyle),
+      actions: <Widget>[
+        new FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: new Text("OK", style: theme.buttonStyle))
+      ],
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+    );
+    showDialog(context: context,  builder: (_) => dialog);
+  }
+
+  Widget _showLeadingButton(showSkip) {
+    if (!showSkip) {
+      return backBtn.BackButton();
+    } else {
+      return null;
+    }
+  }
+
+  List<Widget> _showSkipButton(showSkip) {
+    if (showSkip) {
+      return <Widget>[
+        new InkWell(
+            child: new Container(
+                margin: new EdgeInsets.only(right: 16.5),
+                alignment: Alignment.center,
+                child: new Text("SKIP", style: theme.skipStyle)),
+            onTap: () {
+              Navigator.of(context).pushNamed('/home');
+            })
+      ];
+    } else {
+      return <Widget>[];
+    }
+  }
+
+  bool _validateEmail(String value) {
+    return RegExp(r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?").hasMatch(value);
+  }
+
+  bool _validateZip(String value) {
+    return RegExp(r"^(?!0{3})[0-9]{3,10}$").hasMatch(value);
+  }
+}
+
+class _CustomerData {
+  String fullName = '';
+  String email = '';
+  String address = '';
+  String city = '';
+  String state = '';
+  String zip = '';
+  String country = '';
 }

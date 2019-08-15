@@ -21,14 +21,6 @@ class SwapRefundDialogState extends State<SwapRefundDialog> {
   Future _fetchFuture;
 
   @override
-  void initState() {
-    super.initState();
-    var fetchAction = FetchSwapFundStatus();
-    _fetchFuture = fetchAction.future;
-    widget.accountBloc.userActionsSink.add(fetchAction);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return AlertDialog(
         titlePadding: EdgeInsets.fromLTRB(24.0, 22.0, 0.0, 16.0),
@@ -103,5 +95,13 @@ class SwapRefundDialogState extends State<SwapRefundDialog> {
         ],
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12.0))),);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    var fetchAction = FetchSwapFundStatus();
+    _fetchFuture = fetchAction.future;
+    widget.accountBloc.userActionsSink.add(fetchAction);
   }
 }

@@ -22,13 +22,6 @@ class PinCodeWidgetState extends State<PinCodeWidget> {
   String _enteredPinCode;
   String _errorMessage;
 
-  @override
-  initState() {
-    super.initState();
-    _enteredPinCode = "";
-    _errorMessage = "";
-  }
-
   Widget build(BuildContext context) {    
     return SafeArea(
       child: Column(
@@ -60,25 +53,18 @@ class PinCodeWidgetState extends State<PinCodeWidget> {
     );
   }
 
+  @override
+  initState() {
+    super.initState();
+    _enteredPinCode = "";
+    _errorMessage = "";
+  }
+
   Image _buildBreezLogo(BuildContext context) {
     return Image.asset(
       "src/images/logo-color.png",
       width: (MediaQuery.of(context).size.width) / 3,
       color: Colors.white,
-    );
-  }
-
-  Container _buildPinCircles() {
-    return Container(
-      margin: const EdgeInsets.only(
-        left: 64,
-        right: 64,
-      ),
-      height: 48,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: _buildCircles(),
-      ),
     );
   }
 
@@ -110,6 +96,27 @@ class PinCodeWidgetState extends State<PinCodeWidget> {
             "",
             style: theme.errorStyle,
           );
+  }
+
+  Container _buildPinCircles() {
+    return Container(
+      margin: const EdgeInsets.only(
+        left: 64,
+        right: 64,
+      ),
+      height: 48,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: _buildCircles(),
+      ),
+    );
+  }
+
+  Widget _numberButton(String number) {
+    return FlatButton(
+        onPressed: () => _onNumButtonPressed(number),
+        child: new Text(number, textAlign: TextAlign.center, style: theme.numPadNumberStyle),
+      );
   }
 
   Widget _numPad(BuildContext context) {
@@ -154,13 +161,6 @@ class PinCodeWidgetState extends State<PinCodeWidget> {
         )
       ],
     );
-  }
-
-  Widget _numberButton(String number) {
-    return FlatButton(
-        onPressed: () => _onNumButtonPressed(number),
-        child: new Text(number, textAlign: TextAlign.center, style: theme.numPadNumberStyle),
-      );
   }
 
   _onNumButtonPressed(String numberText) {

@@ -134,6 +134,18 @@ Future<Null> showPaymentDetailsDialog(BuildContext context, PaymentInfo paymentI
 }
 
 
+_buildSnackBar(String item) {
+  final snackBar = new SnackBar(
+    content: new Text(
+      '$item was copied to your clipboard.',
+      style: theme.snackBarStyle,
+    ),
+    backgroundColor: theme.snackBarBackgroundColor,
+    duration: new Duration(seconds: 4),
+  );
+  return snackBar;
+}
+
 class ShareablePaymentRow extends StatelessWidget {
   final String title;
   final String sharedValue;  
@@ -208,16 +220,4 @@ class ShareablePaymentRow extends StatelessWidget {
                 );
   }
 
-}
-
-_buildSnackBar(String item) {
-  final snackBar = new SnackBar(
-    content: new Text(
-      '$item was copied to your clipboard.',
-      style: theme.snackBarStyle,
-    ),
-    backgroundColor: theme.snackBarBackgroundColor,
-    duration: new Duration(seconds: 4),
-  );
-  return snackBar;
 }

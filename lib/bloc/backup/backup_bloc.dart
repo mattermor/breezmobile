@@ -11,42 +11,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class BackupBloc {
 
+  static const String BACKUP_SETTINGS_PREFERENCES_KEY = "backup_settings";
+  static const String LAST_BACKUP_TIME_PREFERENCE_KEY = "backup_last_time";
+
   final BehaviorSubject<BackupState> _backupStateController =
       new BehaviorSubject<BackupState>();
-  Stream<BackupState> get backupStateStream => _backupStateController.stream;
-
   final StreamController<void> _promptBackupController = new StreamController<void>.broadcast();
-  Stream<void> get promptBackupStream => _promptBackupController.stream;
 
   final BehaviorSubject<BackupSettings> _backupSettingsController =
       new BehaviorSubject<BackupSettings>(seedValue: BackupSettings.start());
-  Stream<BackupSettings> get backupSettingsStream =>
-      _backupSettingsController.stream;
-  Sink<BackupSettings> get backupSettingsSink => _backupSettingsController.sink;
-
   final _backupNowController = new StreamController<bool>();
-  Sink<bool> get backupNowSink => _backupNowController.sink;
-
   final _restoreRequestController = new StreamController<RestoreRequest>();
-  Sink<RestoreRequest> get restoreRequestSink => _restoreRequestController.sink;
 
   final _multipleRestoreController =
       new StreamController<List<SnapshotInfo>>.broadcast();
-  Stream<List<SnapshotInfo>> get multipleRestoreStream =>
-      _multipleRestoreController.stream;
-
   final _restoreFinishedController = new StreamController<bool>.broadcast();
-  Stream<bool> get restoreFinishedStream => _restoreFinishedController.stream;
 
-  BreezBridge _breezLib;  
+  BreezBridge _breezLib;
   BackgroundTaskService _tasksService;
-  SharedPreferences _sharedPrefrences;    
+
+  SharedPreferences _sharedPrefrences;
   bool _backupServiceNeedLogin = false;
-  bool _enableBackupPrompt = false;  
 
-  static const String BACKUP_SETTINGS_PREFERENCES_KEY = "backup_settings";  
-  static const String LAST_BACKUP_TIME_PREFERENCE_KEY = "backup_last_time";
-
+  bool _enableBackupPrompt = false;
   BackupBloc() {
     ServiceInjector injector = new ServiceInjector();
     _breezLib = injector.breezBridge;
@@ -60,6 +47,32 @@ class BackupBloc {
       _listenRestoreRequests();
       _scheduleBackgroundTasks();
     });
+  }
+
+  Sink<bool> get backupNowSink => _backupNowController.sink;  
+  Sink<BackupSettings> get backupSettingsSink => _backupSettingsController.sink;
+  Stream<BackupSettings> get backupSettingsStream =>
+      _backupSettingsController.stream;    
+  Stream<BackupState> get backupStateStream => _backupStateController.stream;
+  Stream<List<SnapshotInfo>> get multipleRestoreStream =>
+      _multipleRestoreController.stream;  
+
+  Stream<void> get promptBackupStream => _promptBackupController.stream;  
+  Stream<bool> get restoreFinishedStream => _restoreFinishedController.stream;
+
+  Sink<RestoreRequest> get restoreRequestSink => _restoreRequestController.sink;
+
+  close() {
+    _backupNowController.close();
+    _restoreRequestController.close();
+    _multipleRestoreController.close();
+    _restoreFinishedController.close();    
+    _backupSettingsController.close();
+  }
+
+  void _backupNow() {    
+    _breezLib.signIn(_backupServiceNeedLogin)
+      .then((_) => _breezLib.requestBackup());      
   }
 
   void _initializePersistentData() {     
@@ -88,40 +101,9 @@ class BackupBloc {
           BACKUP_SETTINGS_PREFERENCES_KEY, json.encode(settings.toJson()));
     });
   }
-
-  _scheduleBackgroundTasks(){
-    var backupFinishedEvents = [
-      NotificationEvent_NotificationType.BACKUP_SUCCESS,
-      NotificationEvent_NotificationType.BACKUP_AUTH_FAILED,
-      NotificationEvent_NotificationType.BACKUP_FAILED
-    ];
-    Completer taskCompleter;
-
-    Observable(_breezLib.notificationStream)     
-    .listen((event) {
-      if (taskCompleter == null && event.type == NotificationEvent_NotificationType.BACKUP_REQUEST) {
-        taskCompleter = new Completer();        
-        _tasksService.runAsTask(taskCompleter.future, (){
-          taskCompleter?.complete();
-          taskCompleter = null;
-        });
-        return;
-      }
-
-      if (taskCompleter != null && backupFinishedEvents.contains(event.type)) {
-        taskCompleter?.complete();
-        taskCompleter = null;
-      }
-    });
-  }
-
+  
   void _listenBackupNowRequests() {
     _backupNowController.stream.listen((_) => _backupNow());
-  }
-  
-  void _backupNow() {    
-    _breezLib.signIn(_backupServiceNeedLogin)
-      .then((_) => _breezLib.requestBackup());      
   }
 
   _listenBackupPaths() { 
@@ -155,13 +137,6 @@ class BackupBloc {
     });
   }
 
-  _pushPromptIfNeeded(){
-    if (_enableBackupPrompt && _backupServiceNeedLogin) {
-      _enableBackupPrompt = false;      
-      _promptBackupController.add(null);
-    }
-  }
-
   void _listenRestoreRequests() {
     _restoreRequestController.stream.listen((request) {
       if (request == null) {
@@ -188,13 +163,45 @@ class BackupBloc {
     });  
   }
 
-  close() {
-    _backupNowController.close();
-    _restoreRequestController.close();
-    _multipleRestoreController.close();
-    _restoreFinishedController.close();    
-    _backupSettingsController.close();
+  _pushPromptIfNeeded(){
+    if (_enableBackupPrompt && _backupServiceNeedLogin) {
+      _enableBackupPrompt = false;      
+      _promptBackupController.add(null);
+    }
   }
+
+  _scheduleBackgroundTasks(){
+    var backupFinishedEvents = [
+      NotificationEvent_NotificationType.BACKUP_SUCCESS,
+      NotificationEvent_NotificationType.BACKUP_AUTH_FAILED,
+      NotificationEvent_NotificationType.BACKUP_FAILED
+    ];
+    Completer taskCompleter;
+
+    Observable(_breezLib.notificationStream)     
+    .listen((event) {
+      if (taskCompleter == null && event.type == NotificationEvent_NotificationType.BACKUP_REQUEST) {
+        taskCompleter = new Completer();        
+        _tasksService.runAsTask(taskCompleter.future, (){
+          taskCompleter?.complete();
+          taskCompleter = null;
+        });
+        return;
+      }
+
+      if (taskCompleter != null && backupFinishedEvents.contains(event.type)) {
+        taskCompleter?.complete();
+        taskCompleter = null;
+      }
+    });
+  }
+}
+
+class RestoreRequest {
+  final SnapshotInfo snapshot;
+  final String pinCode;
+
+  RestoreRequest(this.snapshot, this.pinCode);
 }
 
 class SnapshotInfo {
@@ -210,11 +217,4 @@ class SnapshotInfo {
       json["ModifiedTime"],      
       json["Encrypted"] == true,
     );
-}
-
-class RestoreRequest {
-  final SnapshotInfo snapshot;
-  final String pinCode;
-
-  RestoreRequest(this.snapshot, this.pinCode);
 }

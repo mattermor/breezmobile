@@ -9,6 +9,8 @@ class PaymentItemAvatar extends StatelessWidget {
 
   PaymentItemAvatar(this.paymentItem, {this.radius = 20.0});
 
+  bool get _shouldShowLeadingIcon => paymentItem.imageURL == null &&  paymentItem.containsPaymentInfo || paymentItem.isTransferRequest;
+
   @override
   Widget build(BuildContext context) {
     if (_shouldShowLeadingIcon) {
@@ -24,6 +26,4 @@ class PaymentItemAvatar extends StatelessWidget {
       return BreezAvatar(paymentItem.imageURL, radius: radius);
     }
   }
-
-  bool get _shouldShowLeadingIcon => paymentItem.imageURL == null &&  paymentItem.containsPaymentInfo || paymentItem.isTransferRequest;
 }

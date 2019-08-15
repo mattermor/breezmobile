@@ -40,57 +40,6 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog> with S
   bool _isInit = false;
 
   @override
-  void initState() {
-    super.initState();
-    _fiatAmountController.addListener(() => setState(() {}));
-    _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 400));
-    _colorAnimation = new ColorTween(
-      begin: Colors.black45,
-      end: theme.BreezColors.blue[500],
-    ).animate(_controller)
-      ..addListener(() {
-        setState(() {});
-      });
-    // Loop back to start and stop
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.reverse();
-      } else if (status == AnimationStatus.dismissed) {
-        _controller.stop();
-      }
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    if (!_isInit) {
-      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
-      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);  
-      FetchRates fetchRatesAction = FetchRates();      
-      _accountBloc.userActionsSink.add(fetchRatesAction);
-
-      fetchRatesAction.future.catchError((err){
-        if (this.mounted) {
-          setState((){          
-            Navigator.pop(context);
-            showFlushbar(context, message: "Failed to retrieve BTC exchange rate.");
-          });
-        }        
-      });
-      
-      _isInit = true;
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    _fiatAmountController.dispose();
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder<AccountModel>(
         stream: _accountBloc.accountStream,
@@ -204,6 +153,57 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog> with S
         });
   }
 
+  @override
+  void didChangeDependencies() {
+    if (!_isInit) {
+      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
+      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);  
+      FetchRates fetchRatesAction = FetchRates();      
+      _accountBloc.userActionsSink.add(fetchRatesAction);
+
+      fetchRatesAction.future.catchError((err){
+        if (this.mounted) {
+          setState((){          
+            Navigator.pop(context);
+            showFlushbar(context, message: "Failed to retrieve BTC exchange rate.");
+          });
+        }        
+      });
+      
+      _isInit = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    _fiatAmountController.dispose();
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fiatAmountController.addListener(() => setState(() {}));
+    _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 400));
+    _colorAnimation = new ColorTween(
+      begin: Colors.black45,
+      end: theme.BreezColors.blue[500],
+    ).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
+    // Loop back to start and stop
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _controller.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        _controller.stop();
+      }
+    });
+  }
+
   List<Widget> _buildActions(AccountModel account) {
     List<Widget> actions = [new FlatButton(onPressed: () => Navigator.pop(context), child: new Text("Cancel", style: theme.buttonStyle))];
 
@@ -221,26 +221,16 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog> with S
     return actions;
   }
 
-  _updateExchangeLabel(double exchangeRate) {
-    if (_exchangeRate != exchangeRate) {
-      // Blink exchange rate label when exchange rate changes (also switches between fiat currencies)
-      if (_exchangeRate != null && !_controller.isAnimating) {
-        _controller.forward();
-      }
-      _exchangeRate = exchangeRate;
-    }
-  }
-
-  _convertedSatoshies(AccountModel account) {
-    return _fiatAmountController.text.isNotEmpty ? account.fiatCurrency.fiatToSat(double.parse(_fiatAmountController.text ?? 0)) : 0;
-  }
-
   Widget _buildExchangeRateLabel(FiatConversion fiatConversion) {
     // Empty string widget is returned so that the dialogs height is not changed when the exchange rate is shown
     return _exchangeRate == null
         ? Text("", style: theme.smallTextStyle)
         : Text("1 BTC = $_exchangeRate ${fiatConversion.currencyData.shortName}",
             style: theme.smallTextStyle.copyWith(color: _colorAnimation.value));
+  }
+
+  _convertedSatoshies(AccountModel account) {
+    return _fiatAmountController.text.isNotEmpty ? account.fiatCurrency.fiatToSat(double.parse(_fiatAmountController.text ?? 0)) : 0;
   }
 
   _selectFiatCurrency(AccountModel accountModel, shortName) {
@@ -254,5 +244,15 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog> with S
       }
       _updateExchangeLabel(_exchangeRate);
     });
+  }
+
+  _updateExchangeLabel(double exchangeRate) {
+    if (_exchangeRate != exchangeRate) {
+      // Blink exchange rate label when exchange rate changes (also switches between fiat currencies)
+      if (_exchangeRate != null && !_controller.isAnimating) {
+        _controller.forward();
+      }
+      _exchangeRate = exchangeRate;
+    }
   }
 }

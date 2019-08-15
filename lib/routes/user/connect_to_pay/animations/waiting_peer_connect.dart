@@ -10,29 +10,6 @@ class WaitingPeerConnectWidget extends StatefulWidget {
   }
 }
 
-class _WaitingPeerConnecWidgettState extends State<WaitingPeerConnectWidget> with TickerProviderStateMixin {
-  AnimationController _animationController;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = new AnimationController(vsync: this);
-    _animationController.repeat(period: Duration(seconds: 3));
-    _animationController.addListener(() => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(painter: _ConnectingCustomPainter(_animationController));
-  }
-}
-
 class _ConnectingCustomPainter extends CustomPainter {
   final AnimationController _animationController;
   final int numberOfCircles = 10;
@@ -40,16 +17,6 @@ class _ConnectingCustomPainter extends CustomPainter {
   final int ticksPerCircle = 10;
 
   _ConnectingCustomPainter(this._animationController);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    var width = size.width, marginBetweenCircles = (width - (circleHeight * numberOfCircles)) / (numberOfCircles - 1);
-
-    drawCircle(canvas, 0, size.centerLeft(Offset(2.5, 0.0)));
-    for (var i = 1; i < numberOfCircles; ++i) {
-      drawCircle(canvas, i, size.centerLeft(Offset(i * (circleHeight + marginBetweenCircles) + circleHeight / 2, 0.0)));
-    }
-  }
 
   void drawCircle(Canvas canvas, int circleIndex, Offset start) {
     int maxCircleIndex = numberOfCircles - 1;
@@ -63,7 +30,40 @@ class _ConnectingCustomPainter extends CustomPainter {
   }
 
   @override
+  void paint(Canvas canvas, Size size) {
+    var width = size.width, marginBetweenCircles = (width - (circleHeight * numberOfCircles)) / (numberOfCircles - 1);
+
+    drawCircle(canvas, 0, size.centerLeft(Offset(2.5, 0.0)));
+    for (var i = 1; i < numberOfCircles; ++i) {
+      drawCircle(canvas, i, size.centerLeft(Offset(i * (circleHeight + marginBetweenCircles) + circleHeight / 2, 0.0)));
+    }
+  }
+
+  @override
   bool shouldRepaint(_ConnectingCustomPainter oldDelegate) {
     return true;
+  }
+}
+
+class _WaitingPeerConnecWidgettState extends State<WaitingPeerConnectWidget> with TickerProviderStateMixin {
+  AnimationController _animationController;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(painter: _ConnectingCustomPainter(_animationController));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = new AnimationController(vsync: this);
+    _animationController.repeat(period: Duration(seconds: 3));
+    _animationController.addListener(() => setState(() {}));
   }
 }

@@ -4,19 +4,11 @@ import 'package:breez/logger.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:rxdart/rxdart.dart';
 
-abstract class Notifications {
-    Future<String> getToken();
-    Stream<Map<dynamic, dynamic>> get notifications;
-}
-
-
 class FirebaseNotifications implements Notifications {
   
   FirebaseMessaging _firebaseMessaging;
 
   final StreamController<Map<dynamic, dynamic>> _notificationController = new BehaviorSubject<Map<dynamic, dynamic>>();
-  Stream<Map<dynamic, dynamic>> get notifications => _notificationController.stream;
-
   FirebaseNotifications() {    
     _firebaseMessaging = new FirebaseMessaging();
     _firebaseMessaging.configure(
@@ -24,6 +16,15 @@ class FirebaseNotifications implements Notifications {
       onResume: _onResume,
       onLaunch: _onResume
     );
+  }
+
+  Stream<Map<dynamic, dynamic>> get notifications => _notificationController.stream;
+
+  @override
+  Future<String> getToken() {
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    return _firebaseMessaging.getToken();
   }
 
   Future<dynamic> _onMessage(Map<String, dynamic> message) {
@@ -44,11 +45,10 @@ class FirebaseNotifications implements Notifications {
     return null;
   }
 
-  @override
-  Future<String> getToken() {
-    _firebaseMessaging.requestNotificationPermissions(
-        const IosNotificationSettings(sound: true, badge: true, alert: true));
-    return _firebaseMessaging.getToken();
-  }
+}
 
+
+abstract class Notifications {
+    Stream<Map<dynamic, dynamic>> get notifications;
+    Future<String> getToken();
 }

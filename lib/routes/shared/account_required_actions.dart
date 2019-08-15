@@ -37,64 +37,6 @@ class AccountRequiredActionsIndicatorState
   bool _init = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_init) {
-      _settingsSubscription = widget._backupBloc.backupSettingsStream
-          .listen((settings) => _currentSettings = settings);
-
-      _promptEnableSubscription =
-          Observable(widget._backupBloc.promptBackupStream)
-              .delay(Duration(seconds: 4))
-              .listen((_) {                
-                if (_currentSettings.promptOnError && !showingBackupDialog) {
-                  showingBackupDialog = true;
-                  popFlushbars(context);                  
-                  showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) =>
-                          new EnableBackupDialog(context, widget._backupBloc)).then((_) {
-                    showingBackupDialog = false;
-                  });
-                }
-              });   
-      _init = true; 
-    }
-  }
-
-  @override
-  void dispose() {
-    _promptEnableSubscription.cancel();
-    _settingsSubscription.cancel();
-    super.dispose();
-  }
-
-  Widget _buildLoader(BackupState backupState, AccountModel account){
-    Widget Function(BuildContext) dialogBuilder;
-
-    if (backupState?.inProgress == true) {
-      dialogBuilder = (_) => buildBackupInProgressDialog(context, widget._backupBloc.backupStateStream);      
-    } else if (account?.transferringOnChainDeposit == true) {
-      dialogBuilder = (_) => buildTransferFundsInProgressDialog(context, widget._accountBloc.accountStream);      
-    }
-
-    if (dialogBuilder != null) {
-      return WarningAction(
-        (){
-          showDialog(
-            context: context,                              
-            builder: dialogBuilder
-          );
-        },
-        iconWidget: Rotator(child: Image(image: AssetImage("src/icon/sync.png"), color: Color.fromRGBO(0, 120, 253, 1.0))),
-      );
-    }
-
-    return null;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder<AccountSettings>(
         stream: widget._accountBloc.accountSettingsStream,
@@ -155,6 +97,64 @@ class AccountRequiredActionsIndicatorState
               });
         });
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_init) {
+      _settingsSubscription = widget._backupBloc.backupSettingsStream
+          .listen((settings) => _currentSettings = settings);
+
+      _promptEnableSubscription =
+          Observable(widget._backupBloc.promptBackupStream)
+              .delay(Duration(seconds: 4))
+              .listen((_) {                
+                if (_currentSettings.promptOnError && !showingBackupDialog) {
+                  showingBackupDialog = true;
+                  popFlushbars(context);                  
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) =>
+                          new EnableBackupDialog(context, widget._backupBloc)).then((_) {
+                    showingBackupDialog = false;
+                  });
+                }
+              });   
+      _init = true; 
+    }
+  }
+
+  @override
+  void dispose() {
+    _promptEnableSubscription.cancel();
+    _settingsSubscription.cancel();
+    super.dispose();
+  }
+
+  Widget _buildLoader(BackupState backupState, AccountModel account){
+    Widget Function(BuildContext) dialogBuilder;
+
+    if (backupState?.inProgress == true) {
+      dialogBuilder = (_) => buildBackupInProgressDialog(context, widget._backupBloc.backupStateStream);      
+    } else if (account?.transferringOnChainDeposit == true) {
+      dialogBuilder = (_) => buildTransferFundsInProgressDialog(context, widget._accountBloc.accountStream);      
+    }
+
+    if (dialogBuilder != null) {
+      return WarningAction(
+        (){
+          showDialog(
+            context: context,                              
+            builder: dialogBuilder
+          );
+        },
+        iconWidget: Rotator(child: Image(image: AssetImage("src/icon/sync.png"), color: Color.fromRGBO(0, 120, 253, 1.0))),
+      );
+    }
+
+    return null;
+  }
 }
 
 class WarningAction extends StatefulWidget {
@@ -174,25 +174,6 @@ class WarningActionState extends State<WarningAction> with SingleTickerProviderS
   Animation<double> _animation;
   AnimationController _animationController;
 
-  @override 
-  void initState() {  
-    super.initState();
-    _animationController = new AnimationController(vsync: this, duration: Duration(seconds: 1));
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-        _animationController); //use Tween animation here, to animate between the values of 1.0 & 2.5.
-    _animation.addListener(() {
-      //here, a listener that rebuilds our widget tree when animation.value chnages
-      setState(() {});
-    });
-    _animationController.forward();
-  }
-
-  @override 
-  void dispose() {
-    _animationController.dispose();  
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -208,5 +189,24 @@ class WarningActionState extends State<WarningAction> with SingleTickerProviderS
       tooltip: 'Backup',
       onPressed: this.widget.onTap,
     );
+  }
+
+  @override 
+  void dispose() {
+    _animationController.dispose();  
+    super.dispose();
+  }
+
+  @override 
+  void initState() {  
+    super.initState();
+    _animationController = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+        _animationController); //use Tween animation here, to animate between the values of 1.0 & 2.5.
+    _animation.addListener(() {
+      //here, a listener that rebuilds our widget tree when animation.value chnages
+      setState(() {});
+    });
+    _animationController.forward();
   }
 }

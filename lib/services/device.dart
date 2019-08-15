@@ -6,23 +6,18 @@ import 'package:rxdart/rxdart.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum NotificationType { RESUME, PAUSE }
-
 class Device {
   static const EventChannel _notificationsChannel =
       const EventChannel('com.breez.client/lifecycle_events_notifications');
   static const MethodChannel _breezShareChannel =
       const MethodChannel('com.breez.client/share_breez');
 
+  static const String LAST_CLIPPING_PREFERENCES_KEY = "lastClipping";
   final StreamController _eventsController =
       new StreamController<NotificationType>.broadcast();
-  Stream<NotificationType> get eventStream => _eventsController.stream;
 
   final _deviceClipboardController = new BehaviorSubject<String>();
-  Stream get deviceClipboardStream => _deviceClipboardController.stream;
-
   String _lastClipping = "";
-  static const String LAST_CLIPPING_PREFERENCES_KEY = "lastClipping";
 
   Device() {
     var sharedPrefrences = SharedPreferences.getInstance();
@@ -43,13 +38,9 @@ class Device {
       }
     });
   }
+  Stream get deviceClipboardStream => _deviceClipboardController.stream;
 
-  Future shareText(String text) {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return _breezShareChannel.invokeMethod("share", {"text": text});
-    }
-    return ShareExtend.share(text, "text");
-  }
+  Stream<NotificationType> get eventStream => _eventsController.stream;
 
   fetchClipboard(SharedPreferences preferences){
     Clipboard.getData("text/plain").then((clipboardData) {
@@ -64,4 +55,13 @@ class Device {
       }
     });
   }
+
+  Future shareText(String text) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return _breezShareChannel.invokeMethod("share", {"text": text});
+    }
+    return ShareExtend.share(text, "text");
+  }
 }
+
+enum NotificationType { RESUME, PAUSE }

@@ -24,6 +24,18 @@ class PendingShareIndicatorState extends State<PendingShareIndicator> with Ticke
   Animation<double> _rotate;
 
   @override
+  Widget build(BuildContext context) {
+    return CustomPaint(painter: _ConnectedCustomPainter(_scale1, _scale2, _rotate));
+  }
+
+  @override
+  void dispose() {
+    _scaleAnimationController.dispose();
+    _rotateAnimationController.dispose();
+    super.dispose();    
+  }
+
+  @override
   void initState() {
     super.initState();
     _scaleAnimationController = new AnimationController(vsync: this, duration: animationDuration);    
@@ -58,18 +70,6 @@ class PendingShareIndicatorState extends State<PendingShareIndicator> with Ticke
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scaleAnimationController.dispose();
-    _rotateAnimationController.dispose();
-    super.dispose();    
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(painter: _ConnectedCustomPainter(_scale1, _scale2, _rotate));
   }
 }
 

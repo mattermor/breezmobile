@@ -29,6 +29,11 @@ class _KeyboardActionsWrapper extends StatefulWidget {
 
 class _KeyboardActionsWrapperState extends State<_KeyboardActionsWrapper> {
 
+  @override 
+  Widget build(BuildContext context) {    
+    return widget.child;
+  }
+
   @override
   void initState() {
     // Configure keyboard actions
@@ -52,10 +57,5 @@ class _KeyboardActionsWrapperState extends State<_KeyboardActionsWrapper> {
           )
         )
       ]);
-  }
-
-  @override 
-  Widget build(BuildContext context) {    
-    return widget.child;
   }
 }

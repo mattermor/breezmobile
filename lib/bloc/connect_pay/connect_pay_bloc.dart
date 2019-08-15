@@ -26,15 +26,12 @@ class ConnectPayBloc {
   BreezServer _breezServer = ServiceInjector().breezServer;  
   RemoteSession _currentSession;
   final StreamController _sessionInvitesController = new BehaviorSubject<SessionLinkModel>();
-  Stream<SessionLinkModel> get sessionInvites => _sessionInvitesController.stream;
-
   final BehaviorSubject<String> _pendingCTPLinkController = new BehaviorSubject<String>();
-  Stream<String> get pendingCTPLinkStream => _pendingCTPLinkController.stream;
 
   Stream<BreezUserModel> _userStream;
   BreezUserModel _currentUser;
-  AccountModel _currentAccount;  
 
+  AccountModel _currentAccount;
   ConnectPayBloc(Stream<BreezUserModel> userStream, Stream<AccountModel> accountStream) {
     _userStream = userStream;
     userStream.listen((user) => _currentUser = user);
@@ -43,49 +40,14 @@ class ConnectPayBloc {
     _monitorSessionNotifications();
     _monitorPendingCTPLinks();
   }
+  RemoteSession get currentSession => _currentSession;  
 
-  void onAccountChanged(AccountModel acc) async {
-    _currentAccount = acc; 
-    if (_currentAccount.active && !_pendingCTPLinkController.isClosed) {
-      await _userStream.where((u) => u.locked == false).first;
-      String pendingLink = _pendingCTPLinkController.value;
-      if (pendingLink != null) {
-        SessionLinkModel sessionLink = ServiceInjector().deepLinks.parseSessionInviteLink(pendingLink);        
-        _sessionInvitesController.add(sessionLink);
-      }
-      _pendingCTPLinkController.close();
-    }
-  }
+  Stream<String> get pendingCTPLinkStream => _pendingCTPLinkController.stream;
 
-  _monitorPendingCTPLinks() async {
-    var preferences = await ServiceInjector().sharedPreferences;
-    _pendingCTPLinkController.stream
-      .listen((link) async{        
-        preferences.setString(PENDING_CTP_LINK, link);
-      })
-      .onDone(() => preferences.remove(PENDING_CTP_LINK));  
-  }
+  Stream<SessionLinkModel> get sessionInvites => _sessionInvitesController.stream;
 
   PayerRemoteSession createPayerRemoteSession() {
     return new PayerRemoteSession(_currentUser);
-  }
-
-  Future startSession(PayerRemoteSession currentSession) {    
-    log.info("starting a remote payment sessino as payer...");  
-    //clean current session on terminate
-    currentSession.terminationStream.first.then((_) {
-      if (_currentSession == currentSession) {
-        _currentSession = null;
-      }
-    });
-    _currentSession = currentSession;
-    return _breezServer.joinSession(true, _currentUser.name, _currentUser.token).then((newSessionReply) async {
-      log.info("succesfullly joined to a remote session");      
-      CreateRatchetSessionReply session = await _breezLib.createRatchetSession(newSessionReply.sessionID, newSessionReply.expiry);     
-      log.info("succesfully created an encrypted session");      
-      SessionLinkModel payerLink = new SessionLinkModel(session.sessionID, session.secret, session.pubKey);
-      currentSession.start(payerLink);
-    });    
   }
 
   Future<RemoteSession> joinSessionByLink(SessionLinkModel sessionLink) async{    
@@ -135,7 +97,45 @@ class ConnectPayBloc {
     return _currentSession = currentSession..start(sessionLink);    
   }
 
-  RemoteSession get currentSession => _currentSession;
+  void onAccountChanged(AccountModel acc) async {
+    _currentAccount = acc; 
+    if (_currentAccount.active && !_pendingCTPLinkController.isClosed) {
+      await _userStream.where((u) => u.locked == false).first;
+      String pendingLink = _pendingCTPLinkController.value;
+      if (pendingLink != null) {
+        SessionLinkModel sessionLink = ServiceInjector().deepLinks.parseSessionInviteLink(pendingLink);        
+        _sessionInvitesController.add(sessionLink);
+      }
+      _pendingCTPLinkController.close();
+    }
+  }
+
+  Future startSession(PayerRemoteSession currentSession) {    
+    log.info("starting a remote payment sessino as payer...");  
+    //clean current session on terminate
+    currentSession.terminationStream.first.then((_) {
+      if (_currentSession == currentSession) {
+        _currentSession = null;
+      }
+    });
+    _currentSession = currentSession;
+    return _breezServer.joinSession(true, _currentUser.name, _currentUser.token).then((newSessionReply) async {
+      log.info("succesfullly joined to a remote session");      
+      CreateRatchetSessionReply session = await _breezLib.createRatchetSession(newSessionReply.sessionID, newSessionReply.expiry);     
+      log.info("succesfully created an encrypted session");      
+      SessionLinkModel payerLink = new SessionLinkModel(session.sessionID, session.secret, session.pubKey);
+      currentSession.start(payerLink);
+    });    
+  }
+
+  _monitorPendingCTPLinks() async {
+    var preferences = await ServiceInjector().sharedPreferences;
+    _pendingCTPLinkController.stream
+      .listen((link) async{        
+        preferences.setString(PENDING_CTP_LINK, link);
+      })
+      .onDone(() => preferences.remove(PENDING_CTP_LINK));  
+  }
 
   _monitorSessionInvites() async {
     var preferenes = await ServiceInjector().sharedPreferences;
@@ -190,10 +190,10 @@ abstract class RemoteSession {
   
   RemoteSession(this._currentUser);
 
-  String get sessionID;
   BreezUserModel get currentUser => _currentUser;
   Stream<PaymentSessionState> get paymentSessionStateStream;
   Stream<PaymentSessionError> get sessionErrors;
+  String get sessionID;
   Future start(SessionLinkModel sessionLink);
   Future terminate({bool permanent = false});
 }

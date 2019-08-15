@@ -8,75 +8,12 @@ class NFCService {
   StreamController<String> _breezIdStreamController = new StreamController<String>();
 
   StreamController<bool> _cardActivationController = new StreamController<bool>();
-  Stream<bool> get cardActivationStream => _cardActivationController.stream.asBroadcastStream();
-
   StreamController<String> _bolt11BeamController;
+
   StreamController<String> _p2pBeamController;
-
   StreamController<String> _bolt11StreamController = new StreamController<String>.broadcast();
+
   StreamController<String> _blankInvoiceController = new StreamController<String>();
-
-  void startCardActivation(String breezId) {
-    _platform.invokeMethod("startCardActivation", {"breezId": breezId});
-  }
-
-  Future<bool> checkNFCSettings() async {
-    final bool result = await _platform.invokeMethod('checkNFCSettings');
-    return result;
-  }
-
-  void openSettings() {
-    _platform.invokeMethod('openNFCSettings');
-  }
-
-  stopCardActivation() async {
-    _platform.invokeMethod("stopCardActivation").then((success) {
-      if (success) {
-        //_cardActivationController.close();
-      } else {
-        _cardActivationController.addError(new Error());
-      }
-    });
-  }
-
-  Stream<String> startBolt11Beam(String bolt11) {
-    _bolt11BeamController = new StreamController<String>();
-    _platform.invokeMethod("startBolt11Beam", {"bolt11": bolt11});
-    return _bolt11BeamController.stream;
-  }
-
-  Stream<String> startP2PBeam() {
-    _p2pBeamController = new StreamController<String>();
-    _p2pBeamController.onCancel = () {
-      stopP2PBeam();
-    };
-    _platform.invokeMethod("startP2PBeam");
-    return _p2pBeamController.stream;
-  }
-
-  void stopP2PBeam() {
-    _p2pBeamController.close();
-    _platform.invokeMethod("stopBeam");
-  }
-
-  Stream<String> receivedBreezIds() {
-    return _breezIdStreamController.stream;
-  }
-
-  Stream<String> receivedBolt11s() {
-    return _bolt11StreamController.stream;
-  }
-
-  Stream<String> receivedBlankInvoices() {
-    return _blankInvoiceController.stream;
-  }
-
-  void idReceived(String breezId) {
-    if (breezId == null) _breezIdStreamController.close();
-    _breezIdStreamController.add(breezId);
-  }
-
-
   NFCService() {
     _platform.setMethodCallHandler((MethodCall call) {
       if (call.method == 'receivedBreezId') {
@@ -105,5 +42,68 @@ class NFCService {
         _bolt11StreamController.add(call.arguments);
       }
     });
+  }
+
+  Stream<bool> get cardActivationStream => _cardActivationController.stream.asBroadcastStream();
+
+  Future<bool> checkNFCSettings() async {
+    final bool result = await _platform.invokeMethod('checkNFCSettings');
+    return result;
+  }
+
+  void idReceived(String breezId) {
+    if (breezId == null) _breezIdStreamController.close();
+    _breezIdStreamController.add(breezId);
+  }
+
+  void openSettings() {
+    _platform.invokeMethod('openNFCSettings');
+  }
+
+  Stream<String> receivedBlankInvoices() {
+    return _blankInvoiceController.stream;
+  }
+
+  Stream<String> receivedBolt11s() {
+    return _bolt11StreamController.stream;
+  }
+
+  Stream<String> receivedBreezIds() {
+    return _breezIdStreamController.stream;
+  }
+
+  Stream<String> startBolt11Beam(String bolt11) {
+    _bolt11BeamController = new StreamController<String>();
+    _platform.invokeMethod("startBolt11Beam", {"bolt11": bolt11});
+    return _bolt11BeamController.stream;
+  }
+
+  void startCardActivation(String breezId) {
+    _platform.invokeMethod("startCardActivation", {"breezId": breezId});
+  }
+
+  Stream<String> startP2PBeam() {
+    _p2pBeamController = new StreamController<String>();
+    _p2pBeamController.onCancel = () {
+      stopP2PBeam();
+    };
+    _platform.invokeMethod("startP2PBeam");
+    return _p2pBeamController.stream;
+  }
+
+  stopCardActivation() async {
+    _platform.invokeMethod("stopCardActivation").then((success) {
+      if (success) {
+        //_cardActivationController.close();
+      } else {
+        _cardActivationController.addError(new Error());
+      }
+    });
+  }
+
+
+  void stopP2PBeam() {
+    _p2pBeamController.close();
+    _platform.invokeMethod("stopBeam");
   }
 }

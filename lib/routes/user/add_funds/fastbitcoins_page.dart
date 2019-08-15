@@ -40,54 +40,6 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
   bool _isInit = false;
 
   @override
-  void didChangeDependencies() {
-    if (!_isInit) {
-      _fastBitcoinsBloc = AppBlocsProvider.of<FastbitcoinsBloc>(context);
-      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
-      _isInit = true;
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    _validatedRequestsSubscription?.cancel();
-    _redeemedRequestsSubscription?.cancel();
-    super.dispose();
-  }
-
-  bool _validateEmail(String value) {
-    return RegExp(
-            r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-        .hasMatch(value);
-  }
-
-  Future _scanBarcode() async {
-    try {
-      FocusScope.of(context).requestFocus(FocusNode());
-      String barcode = await BarcodeScanner.scan();
-      String _voucherCode = barcode.substring(barcode.lastIndexOf("/") + 1);
-      setState(() {
-        _codeController.text = _voucherCode;
-        _scannerErrorMessage = "";
-      });
-    } on PlatformException catch (e) {
-      if (e.code == BarcodeScanner.CameraAccessDenied) {
-        setState(() {
-          this._scannerErrorMessage =
-          'Please grant Breez camera permission to scan QR codes.';
-        });
-      } else {
-        setState(() => this._scannerErrorMessage = '');
-      }
-    } on FormatException {
-      setState(() => this._scannerErrorMessage = '');
-    } catch (e) {
-      setState(() => this._scannerErrorMessage = '');
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
@@ -284,6 +236,54 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
           )),
     );
   }
+
+  @override
+  void didChangeDependencies() {
+    if (!_isInit) {
+      _fastBitcoinsBloc = AppBlocsProvider.of<FastbitcoinsBloc>(context);
+      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
+      _isInit = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    _validatedRequestsSubscription?.cancel();
+    _redeemedRequestsSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future _scanBarcode() async {
+    try {
+      FocusScope.of(context).requestFocus(FocusNode());
+      String barcode = await BarcodeScanner.scan();
+      String _voucherCode = barcode.substring(barcode.lastIndexOf("/") + 1);
+      setState(() {
+        _codeController.text = _voucherCode;
+        _scannerErrorMessage = "";
+      });
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          this._scannerErrorMessage =
+          'Please grant Breez camera permission to scan QR codes.';
+        });
+      } else {
+        setState(() => this._scannerErrorMessage = '');
+      }
+    } on FormatException {
+      setState(() => this._scannerErrorMessage = '');
+    } catch (e) {
+      setState(() => this._scannerErrorMessage = '');
+    }
+  }
+
+  bool _validateEmail(String value) {
+    return RegExp(
+            r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+        .hasMatch(value);
+  }
 }
 
 class RedeemVoucherRoute extends StatefulWidget {
@@ -304,6 +304,21 @@ class RedeemVoucherRouteState extends State<RedeemVoucherRoute> {
   bool _loading = true;
   StreamSubscription<ValidateResponseModel> _validateSubscription;
   StreamSubscription<RedeemResponseModel> _redeemSubscription;  
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return FullScreenLoader();
+    }
+    return SizedBox();
+  }
+
+  @override
+  void dispose() {
+    _validateSubscription.cancel();
+    _redeemSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -356,23 +371,25 @@ class RedeemVoucherRouteState extends State<RedeemVoucherRoute> {
     });
   }
 
-  @override
-  void dispose() {
-    _validateSubscription.cancel();
-    _redeemSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_loading) {
-      return FullScreenLoader();
-    }
-    return SizedBox();
-  }
-
   void popToForm() {
     Navigator.popUntil(context, ModalRoute.withName("/fastbitcoins"));
+  }
+
+  void showKYCRequiredMessage() {
+    promptError(
+        context,
+        "Redeem Voucher",
+        RichText(
+            text: TextSpan(children: <TextSpan>[
+          TextSpan(
+              text: "This voucher can be redeemed only in ",
+              style: theme.dialogBlackStye),
+          _LinkTextSpan(
+              text: "fastbitcoins.com ",
+              url: "https://fastbitcoins.com",
+              style: theme.blueLinkStyle),
+          TextSpan(text: "site.", style: theme.dialogBlackStye)
+        ]))).whenComplete(() => popToForm());
   }
 
   void showLoading(bool enabled) {
@@ -393,23 +410,6 @@ class RedeemVoucherRouteState extends State<RedeemVoucherRoute> {
         validateRes.quotationSecret);
     redeemRequest.validateResponse = validateRes;
     widget._fbBloc.redeemRequestSink.add(redeemRequest);
-  }
-
-  void showKYCRequiredMessage() {
-    promptError(
-        context,
-        "Redeem Voucher",
-        RichText(
-            text: TextSpan(children: <TextSpan>[
-          TextSpan(
-              text: "This voucher can be redeemed only in ",
-              style: theme.dialogBlackStye),
-          _LinkTextSpan(
-              text: "fastbitcoins.com ",
-              url: "https://fastbitcoins.com",
-              style: theme.blueLinkStyle),
-          TextSpan(text: "site.", style: theme.dialogBlackStye)
-        ]))).whenComplete(() => popToForm());
   }
 }
 

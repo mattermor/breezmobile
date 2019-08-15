@@ -40,31 +40,6 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
   final BackgroundTaskService _bgService = ServiceInjector().backgroundTaskService;
   KeyboardDoneAction _doneAction;
 
-  @override void didChangeDependencies(){        
-    InvoiceBloc invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
-    if (!_isInit) {      
-      _paidInvoicesSubscription = invoiceBloc.paidInvoicesStream.listen((paid) {            
-            Navigator.popUntil(context, ModalRoute.withName("/create_invoice"));  
-            Navigator.pop(context, "Payment was successfuly received!");            
-      });
-      _isInit = true;
-    }
-    super.didChangeDependencies();
-  }
-
-  @override 
-  void initState() {
-    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _paidInvoicesSubscription?.cancel();
-    _doneAction.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final String _title = "Create an Invoice";
@@ -214,6 +189,31 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
         },
       ),
     );
+  }
+
+  @override void didChangeDependencies(){        
+    InvoiceBloc invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
+    if (!_isInit) {      
+      _paidInvoicesSubscription = invoiceBloc.paidInvoicesStream.listen((paid) {            
+            Navigator.popUntil(context, ModalRoute.withName("/create_invoice"));  
+            Navigator.pop(context, "Payment was successfuly received!");            
+      });
+      _isInit = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    _paidInvoicesSubscription?.cancel();
+    _doneAction.dispose();
+    super.dispose();
+  }
+
+  @override 
+  void initState() {
+    _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
+    super.initState();
   }
 
   Widget _buildReceivableBTC(AccountModel acc) {

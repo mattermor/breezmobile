@@ -18,6 +18,20 @@ class _RotatorState extends State<Rotator> with SingleTickerProviderStateMixin {
 
   _RotatorState();
 
+  @override
+  Widget build(BuildContext context) {    
+    return RotationTransition(
+      turns: _animation,
+      child: widget.child,
+    );
+  }
+
+  @override 
+  void dispose() {
+    _animationController.dispose();    
+    super.dispose();
+  }
+
   @override void initState() {    
     super.initState();
     _animationController = new AnimationController(vsync: this, duration: Duration(seconds: 1));
@@ -34,19 +48,5 @@ class _RotatorState extends State<Rotator> with SingleTickerProviderStateMixin {
       }
     });
     _animationController.forward();
-  }
-
-  @override 
-  void dispose() {
-    _animationController.dispose();    
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {    
-    return RotationTransition(
-      turns: _animation,
-      child: widget.child,
-    );
   }
 }

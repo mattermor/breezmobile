@@ -32,25 +32,6 @@ class AddFundsState extends State<AddFundsPage> {
   StreamSubscription<AccountModel> _accountSubscription;
 
   @override
-  initState() {
-    super.initState();
-    _addFundsBloc = new AddFundsBloc(widget._user.userID);
-    _accountSubscription = widget._accountBloc.accountStream.listen((acc) {
-      if (!acc.bootstraping) {
-        _addFundsBloc.addFundRequestSink.add(null);
-        _accountSubscription.cancel();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _addFundsBloc.addFundRequestSink.close();
-    _accountSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     AccountBloc accountBloc = AppBlocsProvider.of<AccountBloc>(context);
     return new StreamBuilder(
@@ -87,6 +68,13 @@ class AddFundsState extends State<AddFundsPage> {
                 );
               });
         });
+  }
+
+  @override
+  void dispose() {
+    _addFundsBloc.addFundRequestSink.close();
+    _accountSubscription.cancel();
+    super.dispose();
   }
 
   Widget getBody(BuildContext context, AccountModel account,
@@ -174,32 +162,16 @@ class AddFundsState extends State<AddFundsPage> {
     ]);
   }
 
-  Widget _buildRedeemVoucherButton() {
-    return new GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed("/fastbitcoins"),
-        child: Container(
-          decoration: BoxDecoration(
-              color: theme.fastbitcoins.iconBgColor,
-              border: Border.all(
-                  color: Colors.white, style: BorderStyle.solid, width: 1.0),
-              borderRadius: BorderRadius.circular(14.0)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Image(
-                image: AssetImage("src/icon/vendors/fastbitcoins_logo.png"),
-                height: 24.0,
-                fit: BoxFit.scaleDown,
-                color: theme.fastbitcoins.iconFgColor,
-              ),
-              Padding(padding: EdgeInsets.only(right: 4.0)),
-              Text(
-                'REDEEM FASTBITCOINS VOUCHER',
-                style: theme.fastbitcoinsTextStyle,
-              )
-            ],
-          ),
-        ));
+  @override
+  initState() {
+    super.initState();
+    _addFundsBloc = new AddFundsBloc(widget._user.userID);
+    _accountSubscription = widget._accountBloc.accountStream.listen((acc) {
+      if (!acc.bootstraping) {
+        _addFundsBloc.addFundRequestSink.add(null);
+        _accountSubscription.cancel();
+      }
+    });
   }
 
   Widget _buildBottomBar(AddFundResponse response, AccountModel account,
@@ -228,5 +200,33 @@ class AddFundsState extends State<AddFundsPage> {
                       width: 256.0,
                       child: _buildRedeemVoucherButton())
                 ]));
+  }
+
+  Widget _buildRedeemVoucherButton() {
+    return new GestureDetector(
+        onTap: () => Navigator.of(context).pushNamed("/fastbitcoins"),
+        child: Container(
+          decoration: BoxDecoration(
+              color: theme.fastbitcoins.iconBgColor,
+              border: Border.all(
+                  color: Colors.white, style: BorderStyle.solid, width: 1.0),
+              borderRadius: BorderRadius.circular(14.0)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image(
+                image: AssetImage("src/icon/vendors/fastbitcoins_logo.png"),
+                height: 24.0,
+                fit: BoxFit.scaleDown,
+                color: theme.fastbitcoins.iconFgColor,
+              ),
+              Padding(padding: EdgeInsets.only(right: 4.0)),
+              Text(
+                'REDEEM FASTBITCOINS VOUCHER',
+                style: theme.fastbitcoinsTextStyle,
+              )
+            ],
+          ),
+        ));
   }
 }

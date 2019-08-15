@@ -4,6 +4,32 @@ import 'package:breez/theme_data.dart' as theme;
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 
+class ConfirmationItem extends StatelessWidget {
+  final String title;
+  final String details;
+
+  const ConfirmationItem({Key key, this.title, this.details}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48.0,
+      child: ListTile(
+        title: Text(
+          title,
+          style: theme.paymentDetailsTitleStyle,
+          textAlign: TextAlign.left,
+        ),
+        trailing: Text(
+          details,
+          style: theme.paymentDetailsSubtitleStyle,
+          textAlign: TextAlign.left,
+        ),
+      ),
+    );
+  }
+}
+
 class FastBitcoinsConfirmWidget extends StatelessWidget {
   final ValidateRequestModel request;
   final ValidateResponseModel response;
@@ -35,32 +61,6 @@ class FastBitcoinsConfirmWidget extends StatelessWidget {
               details: '${response.commissionTotal.toStringAsFixed(2)} ${request.currency}'),
           ConfirmationItem(title: "Bitcoins received", details: btcReceived),
         ],
-      ),
-    );
-  }
-}
-
-class ConfirmationItem extends StatelessWidget {
-  final String title;
-  final String details;
-
-  const ConfirmationItem({Key key, this.title, this.details}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48.0,
-      child: ListTile(
-        title: Text(
-          title,
-          style: theme.paymentDetailsTitleStyle,
-          textAlign: TextAlign.left,
-        ),
-        trailing: Text(
-          details,
-          style: theme.paymentDetailsSubtitleStyle,
-          textAlign: TextAlign.left,
-        ),
       ),
     );
   }

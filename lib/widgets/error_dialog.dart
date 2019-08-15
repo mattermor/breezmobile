@@ -4,6 +4,50 @@ import 'package:breez/theme_data.dart' as theme;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+Future promptAreYouSure(BuildContext context, String title, Widget body,
+    {contentPadding = const EdgeInsets.only(top: 32.0, left: 32.0, right: 32.0),
+    bool wideTitle = false,
+    String okText = "YES",
+    String cancelText = "NO",
+    TextStyle textStyle = const TextStyle(color: Colors.white)}) {
+  
+  Widget titleWidget = title == null ? null : Text(title, style: theme.alertTitleStyle);
+  if (titleWidget != null && wideTitle) {
+    titleWidget = Container(
+      child: titleWidget,
+      width: MediaQuery.of(context).size.width,
+    );
+  }
+  return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          contentPadding: contentPadding,          
+          title: titleWidget,
+          content: new SingleChildScrollView(
+            child: body,
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text(cancelText, style: theme.buttonStyle),              
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            new FlatButton(
+              child: new Text(okText, style: theme.buttonStyle),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12.0))),
+        );
+      });
+}
+
 Future<Null> promptError(BuildContext context, String title, Widget body,
     {String okText = "OK",
     String optionText,
@@ -61,50 +105,6 @@ Future<Null> promptError(BuildContext context, String title, Widget body,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12.0))),
           ),
-        );
-      });
-}
-
-Future promptAreYouSure(BuildContext context, String title, Widget body,
-    {contentPadding = const EdgeInsets.only(top: 32.0, left: 32.0, right: 32.0),
-    bool wideTitle = false,
-    String okText = "YES",
-    String cancelText = "NO",
-    TextStyle textStyle = const TextStyle(color: Colors.white)}) {
-  
-  Widget titleWidget = title == null ? null : Text(title, style: theme.alertTitleStyle);
-  if (titleWidget != null && wideTitle) {
-    titleWidget = Container(
-      child: titleWidget,
-      width: MediaQuery.of(context).size.width,
-    );
-  }
-  return showDialog<bool>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return new AlertDialog(
-          contentPadding: contentPadding,          
-          title: titleWidget,
-          content: new SingleChildScrollView(
-            child: body,
-          ),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text(cancelText, style: theme.buttonStyle),              
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            ),
-            new FlatButton(
-              child: new Text(okText, style: theme.buttonStyle),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12.0))),
         );
       });
 }
