@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:breez/bloc/account/account_actions.dart';
 import 'package:breez/bloc/account/account_bloc.dart';
@@ -14,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:image/image.dart' as DartImage;
 
-import 'form_keyboard_actions.dart';
 import 'keyboard_done_action.dart';
 
 class PaymentRequestInfoDialog extends StatefulWidget {

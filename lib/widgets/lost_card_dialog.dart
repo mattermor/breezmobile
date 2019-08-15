@@ -1,8 +1,7 @@
-import 'dart:async';
+import 'package:breez/theme_data.dart' as theme;
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flushbar/flushbar.dart';
-import 'package:breez/theme_data.dart' as theme;
 
 Flushbar _lostCardFlush;
 

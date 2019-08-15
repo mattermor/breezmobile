@@ -1,11 +1,11 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:breez/bloc/account/account_model.dart';
+import 'package:breez/routes/user/home/payment_item_avatar.dart';
+import 'package:breez/theme_data.dart' as theme;
+import 'package:breez/utils/date.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:breez/bloc/account/account_model.dart';
-import 'package:breez/routes/user/home/payment_item_avatar.dart';
-import 'package:breez/utils/date.dart';
-import 'package:breez/theme_data.dart' as theme;
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:share_extend/share_extend.dart';
 
 Future<Null> showPaymentDetailsDialog(BuildContext context, PaymentInfo paymentInfo) {

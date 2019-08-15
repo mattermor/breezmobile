@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:breez/theme_data.dart' as theme;
+import 'package:flutter/material.dart';
 
 class SessionInstructions extends StatelessWidget {
   final Widget _child;

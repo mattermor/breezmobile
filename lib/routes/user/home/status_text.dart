@@ -1,6 +1,5 @@
 import 'package:breez/widgets/loading_animated_text.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 class StatusText extends StatefulWidget {
   final String _statusMessage;

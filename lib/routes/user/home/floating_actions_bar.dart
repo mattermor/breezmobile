@@ -1,9 +1,7 @@
 import 'package:breez/bloc/account/account_model.dart';
-import 'package:breez/routes/user/withdraw_funds/withdraw_funds_page.dart';
+import 'package:breez/theme_data.dart' as theme;
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:breez/theme_data.dart' as theme;
-import 'dart:math';
 
 class FloatingActionsBar extends StatelessWidget {
   static const double SHIRINKED_BUTTON_SIZE = 56.0;

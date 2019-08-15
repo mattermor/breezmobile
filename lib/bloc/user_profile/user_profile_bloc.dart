@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:breez/bloc/async_action.dart';
-import 'package:breez/bloc/user_profile/user_actions.dart';
 import 'package:breez/bloc/user_profile/breez_user_model.dart';
 import 'package:breez/bloc/user_profile/currency.dart';
 import 'package:breez/bloc/user_profile/default_profile_generator.dart';
 import 'package:breez/bloc/user_profile/security_model.dart';
+import 'package:breez/bloc/user_profile/user_actions.dart';
 import 'package:breez/logger.dart';
 import 'package:breez/services/breez_server/server.dart';
 import 'package:breez/services/breezlib/breez_bridge.dart';

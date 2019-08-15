@@ -1,9 +1,10 @@
 import 'dart:async';
+
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:breez/services/breezlib/breez_bridge.dart';
 import 'package:breez/services/injector.dart';
-import 'package:flutter/material.dart';
 import 'package:breez/theme_data.dart' as theme;
+import 'package:flutter/material.dart';
 
 class RefundForm extends StatefulWidget {
   final void Function(String address) _onRefund;

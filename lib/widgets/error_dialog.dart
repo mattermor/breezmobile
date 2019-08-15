@@ -1,7 +1,8 @@
 import 'dart:async';
+
+import 'package:breez/theme_data.dart' as theme;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:breez/theme_data.dart' as theme;
 
 Future<Null> promptError(BuildContext context, String title, Widget body,
     {String okText = "OK",

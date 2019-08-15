@@ -1,6 +1,6 @@
 import 'package:breez/bloc/account/account_model.dart';
-import 'package:flutter/material.dart';
 import 'package:breez/theme_data.dart' as theme;
+import 'package:flutter/material.dart';
 
 class StatusIndicator extends StatelessWidget {
   final AccountModel _accountModel;

@@ -1,12 +1,13 @@
 import 'dart:async';
+
 import 'package:breez/bloc/blocs_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:breez/theme_data.dart' as theme;
-import 'package:breez/widgets/breez_avatar.dart';
 import 'package:breez/bloc/user_profile/breez_user_model.dart';
 import 'package:breez/bloc/user_profile/user_profile_bloc.dart';
+import 'package:breez/theme_data.dart' as theme;
+import 'package:breez/widgets/breez_avatar.dart';
 import 'package:breez/widgets/breez_avatar_dialog.dart';
 import 'package:breez/widgets/breez_drawer_header.dart';
+import 'package:flutter/material.dart';
 
 class DrawerItemConfig {
   final String name;

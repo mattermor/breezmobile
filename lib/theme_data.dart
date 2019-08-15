@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 
 final ThemeData breezThemeData = new ThemeData(
   brightness: Brightness.light,

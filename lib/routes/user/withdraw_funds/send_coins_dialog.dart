@@ -1,20 +1,20 @@
 import 'dart:async';
+
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:breez/bloc/account/account_bloc.dart';
 import 'package:breez/bloc/account/account_model.dart';
 import 'package:breez/bloc/user_profile/currency.dart';
+import 'package:breez/services/breezlib/breez_bridge.dart';
 import 'package:breez/services/injector.dart';
+import 'package:breez/theme_data.dart' as theme;
+import 'package:breez/widgets/amount_form_field.dart';
 import 'package:breez/widgets/error_dialog.dart';
 import 'package:breez/widgets/flushbar.dart';
-import 'package:breez/widgets/form_keyboard_actions.dart';
 import 'package:breez/widgets/keyboard_done_action.dart';
 import 'package:breez/widgets/static_loader.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:breez/theme_data.dart' as theme;
-import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
-import 'package:breez/widgets/amount_form_field.dart';
-import 'package:breez/services/breezlib/breez_bridge.dart';
 
 class SendWalletFundsDialog extends StatefulWidget {
   final AccountBloc _accountBloc;

@@ -1,5 +1,6 @@
 
 import 'dart:async';
+
 import 'package:breez/bloc/account/account_model.dart';
 import 'package:breez/services/breezlib/breez_bridge.dart';
 import 'package:breez/services/injector.dart';

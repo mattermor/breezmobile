@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:breez/theme_data.dart' as theme;
+import 'package:flutter/material.dart';
 
 class BetaWarningDialog extends StatefulWidget {
   @override

@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:breez/bloc/backup/backup_model.dart';
 import 'package:breez/services/background_task.dart';
-import 'package:breez/services/injector.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:breez/services/breezlib/breez_bridge.dart';
 import 'package:breez/services/breezlib/data/rpc.pb.dart';
+import 'package:breez/services/injector.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BackupBloc {
