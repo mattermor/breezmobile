@@ -24,8 +24,7 @@ class NFCService {
         log.info("Received a blank invoice: " + call.arguments);
         if (call.arguments == 'NOT_AVAILABLE') {
           _blankInvoiceController.addError("User not ready to receieve payments!");
-        }
-        else {
+        } else {
           _blankInvoiceController.add(call.arguments);
         }
       }
@@ -100,7 +99,6 @@ class NFCService {
       }
     });
   }
-
 
   void stopP2PBeam() {
     _p2pBeamController.close();

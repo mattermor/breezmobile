@@ -30,11 +30,9 @@ class POSInvoice extends StatefulWidget {
 class POSInvoiceState extends State<POSInvoice> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  
   TextEditingController _amountController = new TextEditingController();
   TextEditingController _chargeAmountController = new TextEditingController();
-  TextEditingController _invoiceDescriptionController =
-      new TextEditingController();
+  TextEditingController _invoiceDescriptionController = new TextEditingController();
 
   POSProfileModel _posProfile;
   Currency _currency = Currency.BTC;
@@ -67,14 +65,10 @@ class POSInvoiceState extends State<POSInvoice> {
           textAlign: TextAlign.center,
           style: theme.alertTitleStyle,
         ),
-        content: new Text("This will clear the current transaction.",
-            style: theme.alertStyle),
-        contentPadding:
-            EdgeInsets.only(left: 24.0, right: 24.0, bottom: 12.0, top: 24.0),
+        content: new Text("This will clear the current transaction.", style: theme.alertStyle),
+        contentPadding: EdgeInsets.only(left: 24.0, right: 24.0, bottom: 12.0, top: 24.0),
         actions: <Widget>[
-          new FlatButton(
-              onPressed: () => Navigator.pop(context),
-              child: new Text("Cancel", style: theme.buttonStyle)),
+          new FlatButton(onPressed: () => Navigator.pop(context), child: new Text("Cancel", style: theme.buttonStyle)),
           new FlatButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -82,8 +76,7 @@ class POSInvoiceState extends State<POSInvoice> {
               },
               child: new Text("Clear", style: theme.buttonStyle))
         ],
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12.0))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
       );
       showDialog(context: context, builder: (_) => dialog);
     }
@@ -117,25 +110,22 @@ class POSInvoiceState extends State<POSInvoice> {
                                 builder: (context, snapshot) {
                                   AccountModel acc = snapshot.data;
                                   AccountSettings settings = settingSnapshot.data;
-                                  if (settings?.showConnectProgress == true || acc?.isInitialBootstrap == true ) {
+                                  if (settings?.showConnectProgress == true || acc?.isInitialBootstrap == true) {
                                     return new StatusIndicator(snapshot.data);
                                   }
                                   return SizedBox();
                                 });
                           }),
                       new Padding(
-                        padding:
-                            EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0),
+                        padding: EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0),
                         child: new ConstrainedBox(
-                          constraints:
-                              const BoxConstraints(minWidth: double.infinity),
+                          constraints: const BoxConstraints(minWidth: double.infinity),
                           child: IgnorePointer(
                             ignoring: _isButtonDisabled,
                             child: new RaisedButton(
                               padding: EdgeInsets.only(top: 14.0, bottom: 14.0),
                               child: new Text(
-                                "Charge ${_chargeAmountController.text}"
-                                    .toUpperCase(),
+                                "Charge ${_chargeAmountController.text}".toUpperCase(),
                                 maxLines: 1,
                                 textAlign: TextAlign.center,
                                 style: theme.invoiceChargeAmountStyle,
@@ -148,8 +138,7 @@ class POSInvoiceState extends State<POSInvoice> {
                       new Container(
                         height: 50.0,
                         child: new Padding(
-                          padding: EdgeInsets.only(
-                              left: 28.0, right: 28.0, top: 8.0),
+                          padding: EdgeInsets.only(left: 28.0, right: 28.0, top: 8.0),
                           child: new TextField(
                             focusNode: _focusNode,
                             textInputAction: TextInputAction.done,
@@ -202,8 +191,7 @@ class POSInvoiceState extends State<POSInvoice> {
                                   onChanged: (value) => changeCurrency(value),
                                   value: _currency.displayName,
                                   style: theme.invoiceAmountStyle,
-                                  items:
-                                      Currency.currencies.map((Currency value) {
+                                  items: Currency.currencies.map((Currency value) {
                                     return new DropdownMenuItem<String>(
                                       value: value.displayName,
                                       child: new Text(
@@ -236,8 +224,7 @@ class POSInvoiceState extends State<POSInvoice> {
   changeCurrency(value) {
     setState(() {
       _currency = Currency.fromSymbol(value);
-      _userProfileBloc.currencySink
-          .add(Currency.currencies[Currency.currencies.indexOf(_currency)]);
+      _userProfileBloc.currencySink.add(Currency.currencies[Currency.currencies.indexOf(_currency)]);
     });
   }
 
@@ -245,12 +232,8 @@ class POSInvoiceState extends State<POSInvoice> {
     setState(() {
       _currentAmount = 0;
       _totalAmount = 0;
-      _amountController.text = _currency.format((Int64(_currentAmount)),
-          fixedDecimals: true, includeSymbol: false);
-      _chargeAmountController.text = _currency.format(
-          (Int64(_totalAmount + _currentAmount)),
-          fixedDecimals: true,
-          includeSymbol: true);
+      _amountController.text = _currency.format((Int64(_currentAmount)), fixedDecimals: true, includeSymbol: false);
+      _chargeAmountController.text = _currency.format((Int64(_totalAmount + _currentAmount)), fixedDecimals: true, includeSymbol: true);
       _invoiceDescriptionController.text = "";
     });
   }
@@ -259,21 +242,21 @@ class POSInvoiceState extends State<POSInvoice> {
     _accountSubscription?.cancel();
     _posProfileSubscription?.cancel();
     _invoiceReadyNotificationsSubscription?.cancel();
-    _invoiceNotificationsSubscription?.cancel();    
+    _invoiceNotificationsSubscription?.cancel();
   }
 
   @override
-  void didChangeDependencies() {    
+  void didChangeDependencies() {
     if (!_isInit) {
       _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
       _invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
       _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
-      _posProfileBloc = AppBlocsProvider.of<POSProfileBloc>(context);      
-      registerListeners();      
-      _isInit = true;  
-    } 
+      _posProfileBloc = AppBlocsProvider.of<POSProfileBloc>(context);
+      registerListeners();
+      _isInit = true;
+    }
     itemHeight = (MediaQuery.of(context).size.height - kToolbarHeight - 16) / 4;
-    itemWidth = (MediaQuery.of(context).size.width) / 2; 
+    itemWidth = (MediaQuery.of(context).size.width) / 2;
     super.didChangeDependencies();
   }
 
@@ -287,33 +270,25 @@ class POSInvoiceState extends State<POSInvoice> {
   onAddition() {
     setState(() {
       _totalAmount += _currentAmount;
-      _chargeAmountController.text = _currency.format((Int64(_totalAmount)),
-          fixedDecimals: true, includeSymbol: true);
+      _chargeAmountController.text = _currency.format((Int64(_totalAmount)), fixedDecimals: true, includeSymbol: true);
       _currentAmount = 0;
-      _amountController.text = _currency.format((Int64(_currentAmount)),
-          fixedDecimals: true, includeSymbol: false);
+      _amountController.text = _currency.format((Int64(_currentAmount)), fixedDecimals: true, includeSymbol: false);
     });
   }
 
   onClear() {
     setState(() {
       _currentAmount = 0;
-      _amountController.text = _currency.format((Int64(_currentAmount)),
-          fixedDecimals: true, includeSymbol: false);
-      _chargeAmountController.text = _currency.format(
-          (Int64(_totalAmount + _currentAmount)),
-          fixedDecimals: true,
-          includeSymbol: true);
+      _amountController.text = _currency.format((Int64(_currentAmount)), fixedDecimals: true, includeSymbol: false);
+      _chargeAmountController.text = _currency.format((Int64(_totalAmount + _currentAmount)), fixedDecimals: true, includeSymbol: true);
     });
   }
 
   onInvoiceSubmitted() {
     if (_posProfile.invoiceString == null || _posProfile.logo == null) {
       String errorMessage = "Please";
-      if (_posProfile.invoiceString == null)
-        errorMessage += " enter your business name";
-      if (_posProfile.logo == null && _posProfile.invoiceString == null)
-        errorMessage += " and ";
+      if (_posProfile.invoiceString == null) errorMessage += " enter your business name";
+      if (_posProfile.logo == null && _posProfile.invoiceString == null) errorMessage += " and ";
       if (_posProfile.logo == null) errorMessage += " select a business logo";
       return showDialog<Null>(
           context: context,
@@ -326,8 +301,7 @@ class POSInvoiceState extends State<POSInvoice> {
               ),
               contentPadding: EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 8.0),
               content: new SingleChildScrollView(
-                child: new Text("$errorMessage in the Settings screen.",
-                    style: theme.alertStyle),
+                child: new Text("$errorMessage in the Settings screen.", style: theme.alertStyle),
               ),
               actions: <Widget>[
                 new FlatButton(
@@ -338,8 +312,7 @@ class POSInvoiceState extends State<POSInvoice> {
                   },
                 ),
               ],
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12.0))),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
             );
           });
     } else {
@@ -356,15 +329,10 @@ class POSInvoiceState extends State<POSInvoice> {
             Text(
                 "Maximum payment size you can receive is ${_currency.format(_maxAllowedToReceive, includeSymbol: true)}. Please enter a smaller value.",
                 style: theme.alertStyle));
-      } else if (_totalAmount < _maxPaymentAmount.toInt() ||
-          _totalAmount < _maxPaymentAmount.toInt()) {
-        _invoiceBloc.newInvoiceRequestSink.add(
-            new InvoiceRequestModel(
-                _posProfile.invoiceString,
-                _invoiceDescriptionController.text,
-                _posProfile.logo,
-                Int64(_totalAmount),
-                expiry: Int64(int.parse(cancellationTimeoutValue))));
+      } else if (_totalAmount < _maxPaymentAmount.toInt() || _totalAmount < _maxPaymentAmount.toInt()) {
+        _invoiceBloc.newInvoiceRequestSink.add(new InvoiceRequestModel(
+            _posProfile.invoiceString, _invoiceDescriptionController.text, _posProfile.logo, Int64(_totalAmount),
+            expiry: Int64(int.parse(cancellationTimeoutValue))));
       } else {
         promptError(
             context,
@@ -379,16 +347,12 @@ class POSInvoiceState extends State<POSInvoice> {
   onNumButtonPressed(String numberText) {
     setState(() {
       _currentAmount = (_currentAmount * 10) + int.parse(numberText);
-      _amountController.text = _currency.format((Int64(_currentAmount)),
-          fixedDecimals: true, includeSymbol: false);
-      _chargeAmountController.text = _currency.format(
-          (Int64(_totalAmount + _currentAmount)),
-          fixedDecimals: true,
-          includeSymbol: true);
+      _amountController.text = _currency.format((Int64(_currentAmount)), fixedDecimals: true, includeSymbol: false);
+      _chargeAmountController.text = _currency.format((Int64(_totalAmount + _currentAmount)), fixedDecimals: true, includeSymbol: true);
     });
   }
 
-  void registerListeners() {    
+  void registerListeners() {
     _focusNode = new FocusNode();
     _focusNode.addListener(_onOnFocusNodeEvent);
     _invoiceDescriptionController.text = "";
@@ -397,22 +361,15 @@ class POSInvoiceState extends State<POSInvoice> {
         _currency = acc.currency;
         _maxPaymentAmount = acc.maxPaymentAmount;
         _maxAllowedToReceive = acc.maxAllowedToReceive;
-        _amountController.text = _currency.format((Int64(_currentAmount)),
-            fixedDecimals: true, includeSymbol: false);
-        _chargeAmountController.text = _currency.format(
-            (Int64(_totalAmount + _currentAmount)),
-            fixedDecimals: true,
-            includeSymbol: true);
+        _amountController.text = _currency.format((Int64(_currentAmount)), fixedDecimals: true, includeSymbol: false);
+        _chargeAmountController.text = _currency.format((Int64(_totalAmount + _currentAmount)), fixedDecimals: true, includeSymbol: true);
       });
     });
-    _posProfileSubscription =
-        _posProfileBloc.posProfileStream.listen((posProfile) {
+    _posProfileSubscription = _posProfileBloc.posProfileStream.listen((posProfile) {
       _posProfile = posProfile;
-      cancellationTimeoutValue =
-          _posProfile.cancellationTimeoutValue.toStringAsFixed(0);
+      cancellationTimeoutValue = _posProfile.cancellationTimeoutValue.toStringAsFixed(0);
     });
-    _invoiceReadyNotificationsSubscription =
-        _invoiceBloc.readyInvoicesStream.listen((invoiceReady) {
+    _invoiceReadyNotificationsSubscription = _invoiceBloc.readyInvoicesStream.listen((invoiceReady) {
       // show the simple dialog with 3 states
       if (invoiceReady != null) {
         showDialog<bool>(
@@ -424,34 +381,26 @@ class POSInvoiceState extends State<POSInvoice> {
           setState(() {
             _currentAmount = 0;
             _totalAmount = 0;
-            _amountController.text = _currency.format((Int64(_currentAmount)),
-                fixedDecimals: true, includeSymbol: false);
-            _chargeAmountController.text = _currency.format(
-                (Int64(_totalAmount + _currentAmount)),
-                fixedDecimals: true,
-                includeSymbol: true);
+            _amountController.text = _currency.format((Int64(_currentAmount)), fixedDecimals: true, includeSymbol: false);
+            _chargeAmountController.text =
+                _currency.format((Int64(_totalAmount + _currentAmount)), fixedDecimals: true, includeSymbol: true);
             _invoiceDescriptionController.text = "";
           });
         });
       }
-      },
-      onError: (err) => _scaffoldKey.currentState.showSnackBar(
-          new SnackBar(
-              duration: new Duration(seconds: 10),
-              content: new Text(err.toString()))));
+    },
+        onError: (err) =>
+            _scaffoldKey.currentState.showSnackBar(new SnackBar(duration: new Duration(seconds: 10), content: new Text(err.toString()))));
   }
 
   Container _numberButton(String number) {
     return Container(
-        decoration: new BoxDecoration(
-            border: new Border.all(color: Colors.white, width: 0.5)),
+        decoration: new BoxDecoration(border: new Border.all(color: Colors.white, width: 0.5)),
         child: IgnorePointer(
             ignoring: _isButtonDisabled,
             child: new FlatButton(
                 onPressed: () => onNumButtonPressed(number),
-                child: new Text(number,
-                    textAlign: TextAlign.center,
-                    style: theme.numPadNumberStyle))));
+                child: new Text(number, textAlign: TextAlign.center, style: theme.numPadNumberStyle))));
   }
 
   Widget _numPad() {
@@ -459,24 +408,16 @@ class POSInvoiceState extends State<POSInvoice> {
         crossAxisCount: 3,
         childAspectRatio: (itemWidth / itemHeight),
         padding: EdgeInsets.zero,
-        children: List<int>.generate(9, (i) => i)
-            .map((index) => _numberButton((index + 1).toString()))
-            .followedBy([
+        children: List<int>.generate(9, (i) => i).map((index) => _numberButton((index + 1).toString())).followedBy([
           Container(
-              decoration: new BoxDecoration(
-                  border: new Border.all(color: Colors.white, width: 0.5)),
+              decoration: new BoxDecoration(border: new Border.all(color: Colors.white, width: 0.5)),
               child: new GestureDetector(
                   onLongPress: approveClear,
-                  child: new FlatButton(
-                      onPressed: onClear,
-                      child: new Text("C", style: theme.numPadNumberStyle)))),
+                  child: new FlatButton(onPressed: onClear, child: new Text("C", style: theme.numPadNumberStyle)))),
           _numberButton("0"),
           Container(
-              decoration: new BoxDecoration(
-                  border: new Border.all(color: Colors.white, width: 0.5)),
-              child: new FlatButton(
-                  onPressed: onAddition,
-                  child: new Text("+", style: theme.numPadAdditionStyle))),
+              decoration: new BoxDecoration(border: new Border.all(color: Colors.white, width: 0.5)),
+              child: new FlatButton(onPressed: onAddition, child: new Text("+", style: theme.numPadAdditionStyle))),
         ]).toList());
   }
 

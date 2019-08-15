@@ -9,13 +9,9 @@ import 'package:breez/widgets/breez_avatar_dialog.dart';
 import 'package:breez/widgets/breez_drawer_header.dart';
 import 'package:flutter/material.dart';
 
-Widget _actionTile(
-    DrawerItemConfig action, BuildContext context, Function onItemSelected,
-    [bool subTile]) {
+Widget _actionTile(DrawerItemConfig action, BuildContext context, Function onItemSelected, [bool subTile]) {
   return new Padding(
-    padding: subTile != null
-        ? EdgeInsets.only(left: 36.0, right: 8.0)
-        : EdgeInsets.only(left: 8.0, right: 8.0),
+    padding: subTile != null ? EdgeInsets.only(left: 36.0, right: 8.0) : EdgeInsets.only(left: 8.0, right: 8.0),
     child: new ListTile(
       leading: ImageIcon(
         AssetImage(action.icon),
@@ -59,26 +55,30 @@ Widget _breezDrawerHeader(UserProfileBloc user, bool drawAvatar) {
                     new Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        new Padding(padding: EdgeInsets.only(top: 8.0), child:
-                        new Text(
-                          snapshot.data.name ?? "No Name",
-                          style: theme.navigationDrawerHandleStyle,
-                        ),),
+                        new Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: new Text(
+                            snapshot.data.name ?? "No Name",
+                            style: theme.navigationDrawerHandleStyle,
+                          ),
+                        ),
                         new Spacer(),
-                        new Padding(padding: EdgeInsets.only(top: 4.0,), child:
-                        new RawMaterialButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.of(context).pushNamed("/marketplace");
-                          },
-                          child: ImageIcon(
-                              AssetImage("src/icon/ic_market.png"),
-                              color: Colors.white, size: 24.0),
-                          padding: const EdgeInsets.all(12.0),
-                          fillColor: theme.marketplaceButtonColor,
-                          shape: new CircleBorder(),
-                          elevation: 0.0,
-                        ),),
+                        new Padding(
+                          padding: EdgeInsets.only(
+                            top: 4.0,
+                          ),
+                          child: new RawMaterialButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.of(context).pushNamed("/marketplace");
+                            },
+                            child: ImageIcon(AssetImage("src/icon/ic_market.png"), color: Colors.white, size: 24.0),
+                            padding: const EdgeInsets.all(12.0),
+                            fillColor: theme.marketplaceButtonColor,
+                            shape: new CircleBorder(),
+                            elevation: 0.0,
+                          ),
+                        ),
                       ],
                     ),
                   ]),
@@ -111,12 +111,11 @@ class DrawerItemConfigGroup {
 class NavigationDrawer extends StatelessWidget {
   final bool _avatar;
   final List<DrawerItemConfigGroup> _drawerGroupedItems;
-  final void Function(String screenName) _onItemSelected;  
+  final void Function(String screenName) _onItemSelected;
 
   final ScrollController _scrollController = ScrollController();
 
-  NavigationDrawer(this._avatar, this._drawerGroupedItems,
-      this._onItemSelected);
+  NavigationDrawer(this._avatar, this._drawerGroupedItems, this._onItemSelected);
 
   @override
   Widget build(BuildContext context) {
@@ -124,8 +123,7 @@ class NavigationDrawer extends StatelessWidget {
 
     List<Widget> children = List<Widget>();
     _drawerGroupedItems.forEach((gropuItems) {
-      children.addAll(_createDrawerGroupWidgets(gropuItems, context,
-          withDivider: children.length > 0));
+      children.addAll(_createDrawerGroupWidgets(gropuItems, context, withDivider: children.length > 0));
     });
 
     children.insert(0, _breezDrawerHeader(userProfileBloc, _avatar));
@@ -138,19 +136,12 @@ class NavigationDrawer extends StatelessWidget {
             children: children));
   }
 
-  List<Widget> _createDrawerGroupWidgets(
-      DrawerItemConfigGroup group, BuildContext context,
-      {bool withDivider = false}) {
-    List<Widget> groupItems = group.items
-        .map((action) => _actionTile(action, context, action.onItemSelected ?? _onItemSelected))
-        .toList();
+  List<Widget> _createDrawerGroupWidgets(DrawerItemConfigGroup group, BuildContext context, {bool withDivider = false}) {
+    List<Widget> groupItems = group.items.map((action) => _actionTile(action, context, action.onItemSelected ?? _onItemSelected)).toList();
     if (group.groupTitle != null && groupItems.length > 0) {
       groupItems = List<Widget>()
         ..add(_ExpansionTile(
-            items: groupItems,
-            title: group.groupTitle,
-            icon: AssetImage(group.groupAssetImage),
-            controller: _scrollController));
+            items: groupItems, title: group.groupTitle, icon: AssetImage(group.groupAssetImage), controller: _scrollController));
     }
 
     if (groupItems.length > 0 && withDivider) {
@@ -166,13 +157,11 @@ class _ExpansionTile extends StatelessWidget {
   final AssetImage icon;
   final ScrollController controller;
 
-  const _ExpansionTile({Key key, this.items, this.title, this.icon, this.controller})
-      : super(key: key);
+  const _ExpansionTile({Key key, this.items, this.title, this.icon, this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final _expansionTileTheme =
-        Theme.of(context).copyWith(dividerColor: Theme.of(context).canvasColor);
+    final _expansionTileTheme = Theme.of(context).copyWith(dividerColor: Theme.of(context).canvasColor);
     return Theme(
         data: _expansionTileTheme,
         child: ExpansionTile(
@@ -193,9 +182,11 @@ class _ExpansionTile extends StatelessWidget {
           ),
           children: items.map((item) => Padding(padding: EdgeInsets.only(left: 28.0), child: item)).toList(),
           onExpansionChanged: (isExpanded) {
-            if (isExpanded) Timer(Duration(milliseconds: 200), () =>
-                controller.animateTo(
-                    controller.position.maxScrollExtent + 28.0, duration: Duration(milliseconds: 400), curve: Curves.ease));
+            if (isExpanded)
+              Timer(
+                  Duration(milliseconds: 200),
+                  () => controller.animateTo(controller.position.maxScrollExtent + 28.0,
+                      duration: Duration(milliseconds: 400), curve: Curves.ease));
             // 28 = bottom padding of list + intrinsic bottom padding
           },
         ));
@@ -205,7 +196,6 @@ class _ExpansionTile extends StatelessWidget {
 class _ListDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(left: 8.0, right: 8.0), child: Divider());
+    return Padding(padding: EdgeInsets.only(left: 8.0, right: 8.0), child: Divider());
   }
 }

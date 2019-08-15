@@ -15,7 +15,7 @@ class AccountPermissionsHandler {
   Permissions _permissionsService;
 
   Future<SharedPreferences> _preferences;
-  AccountPermissionsHandler(){
+  AccountPermissionsHandler() {
     var injector = ServiceInjector();
     _permissionsService = injector.permissions;
     _preferences = injector.sharedPreferences;
@@ -25,15 +25,15 @@ class AccountPermissionsHandler {
     //       p.setBool(PERMISSION_DIALOG_SHOWN_KEY, true);
     //     });
     //   });
-    // });    
-  }  
+    // });
+  }
 
   Stream<bool> get optimizationWhitelistExplainStream => _optimizationWhitelistExplainController.stream;
   Sink<void> get optimizationWhitelistRequestSink => _optimizationWhitelistRequestController.sink;
 
   Stream<void> get optimizationWhitelistRequestStream => _optimizationWhitelistRequestController.stream;
 
-  dispose(){
+  dispose() {
     _optimizationWhitelistExplainController.close();
     _optimizationWhitelistRequestController.close();
   }

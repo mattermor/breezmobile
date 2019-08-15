@@ -18,11 +18,7 @@ class AvatarPicker extends StatelessWidget {
   DartImage.Image _transparentImage;
 
   AvatarPicker(this.imagePath, this.onImageSelected,
-      {key,
-      this.radius = 100.0,
-      this.scaledWidth = -1,
-      this.renderLoading = false,
-      this.renderedWidth = 100})
+      {key, this.radius = 100.0, this.scaledWidth = -1, this.renderLoading = false, this.renderedWidth = 100})
       : super(key: key) {
     _transparentImage = DartImage.Image(scaledWidth, scaledWidth);
   }
@@ -43,23 +39,16 @@ class AvatarPicker extends StatelessWidget {
   List<int> scaleAndFormatPNG(List<int> imageBytes) {
     DartImage.Image image = DartImage.decodeImage(imageBytes);
     DartImage.Image resized = DartImage.copyResize(image,
-        width: image.width < image.height ? -1 : scaledWidth,
-        height: image.width < image.height ? scaledWidth : -1);
+        width: image.width < image.height ? -1 : scaledWidth, height: image.width < image.height ? scaledWidth : -1);
     DartImage.Image centered = DartImage.copyInto(_transparentImage, resized,
-        dstX: ((scaledWidth - resized.width) / 2).round(),
-        dstY: ((scaledWidth - resized.height) / 2).round());
-    log.info(
-        'trimmed.width ${centered.width} trimmed.height ${centered.height}');
+        dstX: ((scaledWidth - resized.width) / 2).round(), dstY: ((scaledWidth - resized.height) / 2).round());
+    log.info('trimmed.width ${centered.width} trimmed.height ${centered.height}');
     return DartImage.encodePng(centered);
   }
 
   _getPickerWidget() {
-    Color _overlayColor = imagePath == null
-        ? Color.fromRGBO(5, 93, 235, 0.8)
-        : Color.fromRGBO(51, 69, 96, 0.4);
-    var _posAvatar = imagePath == null
-        ? AssetImage("src/images/avatarbg.png")
-        : new FileImage(new File(imagePath));
+    Color _overlayColor = imagePath == null ? Color.fromRGBO(5, 93, 235, 0.8) : Color.fromRGBO(51, 69, 96, 0.4);
+    var _posAvatar = imagePath == null ? AssetImage("src/images/avatarbg.png") : new FileImage(new File(imagePath));
 
     return new Container(
         child: new Column(
@@ -75,11 +64,7 @@ class AvatarPicker extends StatelessWidget {
             ),
             Text(
               imagePath == null ? "Set Photo" : "Change Photo",
-              style: TextStyle(
-                  fontSize: 10.0,
-                  color: Color.fromRGBO(255, 255, 255, 0.88),
-                  letterSpacing: 0.0,
-                  fontFamily: "IBMPlexSans"),
+              style: TextStyle(fontSize: 10.0, color: Color.fromRGBO(255, 255, 255, 0.88), letterSpacing: 0.0, fontFamily: "IBMPlexSans"),
             ),
           ],
         ),
@@ -87,27 +72,20 @@ class AvatarPicker extends StatelessWidget {
         height: renderedWidth.roundToDouble(),
         decoration: new BoxDecoration(
             shape: BoxShape.circle,
-            border: imagePath == null
-                ? Border.all(
-                    color: Colors.white, width: 2.0, style: BorderStyle.solid)
-                : null,
+            border: imagePath == null ? Border.all(color: Colors.white, width: 2.0, style: BorderStyle.solid) : null,
             image: new DecorationImage(
-                colorFilter: ColorFilter.mode(_overlayColor, BlendMode.srcATop),
-                image: _posAvatar,
-                fit: BoxFit.cover)));
+                colorFilter: ColorFilter.mode(_overlayColor, BlendMode.srcATop), image: _posAvatar, fit: BoxFit.cover)));
   }
 
   Future _pickImage(BuildContext context) async {
     return ImagePicker.pickImage(source: ImageSource.gallery).then((file) {
-      ImageCropper.cropImage(sourcePath: file.path, ratioX: 1.0, ratioY: 1.0)
-          .then((file) {
+      ImageCropper.cropImage(sourcePath: file.path, ratioX: 1.0, ratioY: 1.0).then((file) {
         if (file != null) {
           file
               .readAsBytes()
               .then(scaleAndFormatPNG)
               .then(onImageSelected)
-              .catchError((e) => promptError(
-                  context, "Failed to Select Image", Text(e.toString())));
+              .catchError((e) => promptError(context, "Failed to Select Image", Text(e.toString())));
         }
       });
     }).catchError((err) {

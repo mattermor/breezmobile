@@ -12,35 +12,32 @@ import 'package:flutter/material.dart';
 class GetRefundPage extends StatelessWidget {
   static const String TITLE = "Get Refund";
 
-  broadcastAndWait(BuildContext context, String fromAddress, toAddress){
+  broadcastAndWait(BuildContext context, String fromAddress, toAddress) {
     AccountBloc accountBloc = AppBlocsProvider.of<AccountBloc>(context);
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => WaitBroadcastDialog(accountBloc, fromAddress, toAddress));
+    showDialog(context: context, barrierDismissible: false, builder: (_) => WaitBroadcastDialog(accountBloc, fromAddress, toAddress));
   }
 
   @override
   Widget build(BuildContext context) {
     AccountBloc accountBloc = AppBlocsProvider.of<AccountBloc>(context);
     return new Scaffold(
-      appBar: new AppBar(
-          iconTheme: theme.appBarIconTheme,
-          textTheme: theme.appBarTextTheme,
-          backgroundColor: theme.BreezColors.blue[500],
-          leading: backBtn.BackButton(),
-          title: new Text(TITLE, style: theme.appBarTextStyle),
-          elevation: 0.0),
-      body: StreamBuilder<AccountModel>(
-        stream: accountBloc.accountStream,
-        builder: (context, accSnapshot) {
+        appBar: new AppBar(
+            iconTheme: theme.appBarIconTheme,
+            textTheme: theme.appBarTextTheme,
+            backgroundColor: theme.BreezColors.blue[500],
+            leading: backBtn.BackButton(),
+            title: new Text(TITLE, style: theme.appBarTextStyle),
+            elevation: 0.0),
+        body: StreamBuilder<AccountModel>(
+            stream: accountBloc.accountStream,
+            builder: (context, accSnapshot) {
               if (!accSnapshot.hasData || !accSnapshot.hasData) {
                 return Loader();
               }
               if (accSnapshot.hasError) {
                 return Text(accSnapshot.error.toString());
               }
-              var account = accSnapshot.data;             
+              var account = accSnapshot.data;
               return ListView(
                   children: account.swapFundsStatus.maturedRefundableAddresses.map((item) {
                 return Padding(
@@ -50,45 +47,32 @@ class GetRefundPage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
                         Expanded(flex: 5, child: Text(item.address)),
-                        Expanded(
-                            flex: 3,
-                            child: Text(
-                                account.currency.format(item.confirmedAmount),
-                                textAlign: TextAlign.right))
+                        Expanded(flex: 3, child: Text(account.currency.format(item.confirmedAmount), textAlign: TextAlign.right))
                       ],
                     ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: SizedBox(
-                                height: 36.0,
-                                width: 145.0,
-                                child: SubmitButton(
-                                    item.lastRefundTxID.isNotEmpty ? "BROADCASTED" : "REFUND",
-                                    item.lastRefundTxID.isNotEmpty
-                                        ? null
-                                        : () => onRefund(context, item))),
-                          )
-                        ]),
-                    new Divider(
-                        height: 0.0,
-                        color: Color.fromRGBO(255, 255, 255, 0.52))
+                    Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: SizedBox(
+                            height: 36.0,
+                            width: 145.0,
+                            child: SubmitButton(item.lastRefundTxID.isNotEmpty ? "BROADCASTED" : "REFUND",
+                                item.lastRefundTxID.isNotEmpty ? null : () => onRefund(context, item))),
+                      )
+                    ]),
+                    new Divider(height: 0.0, color: Color.fromRGBO(255, 255, 255, 0.52))
                   ]),
                 );
               }).toList());
-            })
-    );
+            }));
   }
 
-  onRefund(BuildContext context, RefundableAddress item) {    
+  onRefund(BuildContext context, RefundableAddress item) {
     showDialog(
         context: context,
         builder: (ctx) => RefundForm((address) {
-          Navigator.of(context).pop();        
-          broadcastAndWait(context, item.address, address);
-        }));
+              Navigator.of(context).pop();
+              broadcastAndWait(context, item.address, address);
+            }));
   }
 }

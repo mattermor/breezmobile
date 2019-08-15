@@ -75,21 +75,22 @@ class UserApp extends StatelessWidget {
               switch (settings.name) {
                 case '/lockscreen':
                   return new FadeInRoute(
-                      builder: (_) => new AppLockScreen(user.securityModel, onUnlock: (){
-                        _navigatorKey.currentState.pop();                        
-                        userProfileBloc.userSink.add(user.copyWith(locked: false));
-                      },),
-                      settings: settings
-                  );
+                      builder: (_) => new AppLockScreen(
+                            user.securityModel,
+                            onUnlock: () {
+                              _navigatorKey.currentState.pop();
+                              userProfileBloc.userSink.add(user.copyWith(locked: false));
+                            },
+                          ),
+                      settings: settings);
                 case '/home':
                   return new FadeInRoute(
-                    builder: (_) => new Home(accountBloc,invoiceBloc,userProfileBloc,connectPayBloc,backupBloc),
+                    builder: (_) => new Home(accountBloc, invoiceBloc, userProfileBloc, connectPayBloc, backupBloc),
                     settings: settings,
                   );
                 case '/intro':
                   return new FadeInRoute(
-                    builder: (_) => new InitialWalkthroughPage(
-                        userProfileBloc, backupBloc, false),
+                    builder: (_) => new InitialWalkthroughPage(userProfileBloc, backupBloc, false),
                     settings: settings,
                   );
                 case '/order_card':
@@ -115,8 +116,7 @@ class UserApp extends StatelessWidget {
                 case '/send_coins':
                   return new MaterialPageRoute(
                     fullscreenDialog: true,
-                    builder: (_) =>
-                        new SendWalletFundsDialog(accountBloc),
+                    builder: (_) => new SendWalletFundsDialog(accountBloc),
                     settings: settings,
                   );
                 case '/get_refund':
@@ -176,8 +176,7 @@ class UserApp extends StatelessWidget {
                   );
                 case '/fastbitcoins':
                   return new FadeInRoute(
-                    builder: (_) =>
-                    new FastbitcoinsPage(),
+                    builder: (_) => new FastbitcoinsPage(),
                     settings: settings,
                   );
               }

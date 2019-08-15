@@ -11,10 +11,10 @@ import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
   BreezLogger();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   initializeDateFormatting(Platform.localeName, null);
   AppBlocs blocs = AppBlocs();
-  runApp(AppBlocsProvider(child: UserApp(), appBlocs: blocs));  
+  runApp(AppBlocsProvider(child: UserApp(), appBlocs: blocs));
 }
+
 AppBlocs blocs = AppBlocs();

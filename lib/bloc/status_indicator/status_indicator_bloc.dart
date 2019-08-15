@@ -13,8 +13,7 @@ class StatusIndicatorBloc {
   StatusIndicatorBloc() {
     _listenStatusUpdates();
   }
-  Stream<String> get statusIndicatorUpdatesStream =>
-      _statusIndicatorUpdatesController.stream.asBroadcastStream();
+  Stream<String> get statusIndicatorUpdatesStream => _statusIndicatorUpdatesController.stream.asBroadcastStream();
 
   Sink<StatusUpdateModel> get statusUpdateSink => _statusUpdateController.sink;
 

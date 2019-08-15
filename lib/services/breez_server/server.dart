@@ -11,30 +11,23 @@ import "package:ini/ini.dart";
 //proto command:
 //protoc --dart_out=grpc:lib/services/breez_server/generated/ -Ilib/services/breez_server/protobuf/ lib/services/breez_server/protobuf/breez.proto
 class BreezServer {
-  static final defaultCallOptions =
-      new CallOptions(timeout: Duration(seconds: 10));
+  static final defaultCallOptions = new CallOptions(timeout: Duration(seconds: 10));
 
   ClientChannel _channel;
 
-  Future<JoinCTPSessionResponse> joinSession(
-      bool payer, String userName, String notificationToken,
-      {String sessionID}) async {
+  Future<JoinCTPSessionResponse> joinSession(bool payer, String userName, String notificationToken, {String sessionID}) async {
     await _ensureValidChannel();
     var ctpClient = new CTPClient(_channel, options: defaultCallOptions);
     return await ctpClient.joinCTPSession(new JoinCTPSessionRequest()
-      ..partyType = payer
-          ? JoinCTPSessionRequest_PartyType.PAYER
-          : JoinCTPSessionRequest_PartyType.PAYEE
+      ..partyType = payer ? JoinCTPSessionRequest_PartyType.PAYER : JoinCTPSessionRequest_PartyType.PAYEE
       ..partyName = userName
       ..notificationToken = notificationToken
       ..sessionID = sessionID ?? "");
   }
 
-  Future<OrderReply> orderCard(String fullName, String email, String address,
-      String city, String state, String zip, String country) async {
+  Future<OrderReply> orderCard(String fullName, String email, String address, String city, String state, String zip, String country) async {
     await _ensureValidChannel();
-    var cardOrderClient =
-        new CardOrdererClient(_channel, options: defaultCallOptions);
+    var cardOrderClient = new CardOrdererClient(_channel, options: defaultCallOptions);
     var response = await cardOrderClient.order(new OrderRequest()
       ..fullName = fullName
       ..email = email
@@ -45,23 +38,19 @@ class BreezServer {
       ..country = country);
 
     return response;
-  }  
+  }
 
   Future<String> registerDevice(String id) async {
     await _ensureValidChannel();
-    var invoicerClient =
-        new InvoicerClient(_channel, options: defaultCallOptions);
-    var response = await invoicerClient
-        .registerDevice(new RegisterRequest()..deviceID = id);
+    var invoicerClient = new InvoicerClient(_channel, options: defaultCallOptions);
+    var response = await invoicerClient.registerDevice(new RegisterRequest()..deviceID = id);
     log.info('registerDevice response: $response');
     return response.breezID;
   }
 
-  Future<String> sendInvoice(
-      String breezId, String bolt11, String payee, Int64 amount) async {
+  Future<String> sendInvoice(String breezId, String bolt11, String payee, Int64 amount) async {
     await _ensureValidChannel();
-    var invoicerClient =
-        new InvoicerClient(_channel, options: defaultCallOptions);
+    var invoicerClient = new InvoicerClient(_channel, options: defaultCallOptions);
     var response = await invoicerClient.sendInvoice(new PaymentRequest()
       ..breezID = breezId
       ..invoice = bolt11
@@ -74,33 +63,26 @@ class BreezServer {
   Future<TerminateCTPSessionResponse> terminateSession(String sessionID) async {
     await _ensureValidChannel();
     var ctpClient = new CTPClient(_channel, options: defaultCallOptions);
-    return await ctpClient.terminateCTPSession(
-        TerminateCTPSessionRequest()..sessionID = sessionID);
+    return await ctpClient.terminateCTPSession(TerminateCTPSessionRequest()..sessionID = sessionID);
   }
 
   Future<String> uploadLogo(List<int> logo) async {
     await _ensureValidChannel();
-    var posClient = new PosClient(_channel,
-        options: CallOptions(timeout: Duration(seconds: 30)));
-    return posClient
-        .uploadLogo(new UploadFileRequest()..content = logo)
-        .then((reply) => reply.url);
+    var posClient = new PosClient(_channel, options: CallOptions(timeout: Duration(seconds: 30)));
+    return posClient.uploadLogo(new UploadFileRequest()..content = logo).then((reply) => reply.url);
   }
 
   Future<ClientChannel> _createChannel() async {
     var cert = await rootBundle.load('cert/letsencrypt.cert');
     String configString = await rootBundle.loadString('conf/breez.conf');
     Config config = Config.fromString(configString);
-    var hostdetails =
-        config.get("Application Options", "breezserver").split(':');
+    var hostdetails = config.get("Application Options", "breezserver").split(':');
     if (hostdetails.length < 2) {
       hostdetails.add("443");
     }
     return new ClientChannel(hostdetails[0],
         port: int.parse(hostdetails[1]),
-        options: ChannelOptions(
-            credentials: ChannelCredentials.secure(
-                certificates: cert.buffer.asUint8List())));
+        options: ChannelOptions(credentials: ChannelCredentials.secure(certificates: cert.buffer.asUint8List())));
   }
 
   Future _ensureValidChannel() async {
@@ -109,8 +91,7 @@ class BreezServer {
       return;
     }
 
-    var infoClient = new InformationClient(_channel,
-        options: CallOptions(timeout: Duration(seconds: 2)));
+    var infoClient = new InformationClient(_channel, options: CallOptions(timeout: Duration(seconds: 2)));
     try {
       await infoClient.ping(new PingRequest());
     } catch (e) {

@@ -14,8 +14,8 @@ Bloc stands for Business Logic Component.
 */
 class AppBlocs {
   final UserProfileBloc userProfileBloc;
-  final AccountBloc accountBloc;  
-  final POSProfileBloc posProfileBloc;    
+  final AccountBloc accountBloc;
+  final POSProfileBloc posProfileBloc;
   final InvoiceBloc invoicesBloc;
   final ConnectPayBloc connectPayBloc;
   final StatusIndicatorBloc statusIndicatorBloc;
@@ -29,31 +29,21 @@ class AppBlocs {
     StatusIndicatorBloc statusIndicatorBloc = _registerBloc(StatusIndicatorBloc(), blocsByType);
     UserProfileBloc userProfileBloc = _registerBloc(UserProfileBloc(), blocsByType);
     AccountBloc accountBloc = _registerBloc(AccountBloc(userProfileBloc.userStream), blocsByType);
-    POSProfileBloc posProfileBloc = _registerBloc(POSProfileBloc(), blocsByType);    
+    POSProfileBloc posProfileBloc = _registerBloc(POSProfileBloc(), blocsByType);
     InvoiceBloc invoicesBloc = _registerBloc(InvoiceBloc(userProfileBloc), blocsByType);
     ConnectPayBloc connectPayBloc = _registerBloc(ConnectPayBloc(userProfileBloc.userStream, accountBloc.accountStream), blocsByType);
     BackupBloc backupBloc = _registerBloc(BackupBloc(), blocsByType);
     MarketplaceBloc marketplaceBloc = _registerBloc(MarketplaceBloc(), blocsByType);
     FastbitcoinsBloc fastbitcoinsBloc = _registerBloc(FastbitcoinsBloc(production: true), blocsByType);
 
-    return AppBlocs._(      
-      userProfileBloc,
-      accountBloc,      
-      posProfileBloc,       
-      invoicesBloc,
-      connectPayBloc,
-      statusIndicatorBloc,
-      backupBloc,
-      marketplaceBloc,
-      fastbitcoinsBloc,
-      blocsByType
-    );
+    return AppBlocs._(userProfileBloc, accountBloc, posProfileBloc, invoicesBloc, connectPayBloc, statusIndicatorBloc, backupBloc,
+        marketplaceBloc, fastbitcoinsBloc, blocsByType);
   }
 
-  AppBlocs._(    
-    this.userProfileBloc, 
-    this.accountBloc,     
-    this.posProfileBloc,         
+  AppBlocs._(
+    this.userProfileBloc,
+    this.accountBloc,
+    this.posProfileBloc,
     this.invoicesBloc,
     this.connectPayBloc,
     this.statusIndicatorBloc,
@@ -65,7 +55,7 @@ class AppBlocs {
 
   T getBloc<T>() {
     return _blocsByType[T];
-  }  
+  }
 
   static T _registerBloc<T>(T bloc, Map<Type, Object> blocs) {
     blocs[bloc.runtimeType] = bloc;

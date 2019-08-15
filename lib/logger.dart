@@ -17,13 +17,13 @@ Future<File> get _logFile async {
   return File(logPath);
 }
 
-Future shareFile(String filePath){
-  return ShareExtend.share(filePath, "file");  
+Future shareFile(String filePath) {
+  return ShareExtend.share(filePath, "file");
 }
 
 void shareLog() {
   _logFile.then((file) {
-    ShareExtend.share(file.path, "file");    
+    ShareExtend.share(file.path, "file");
   });
 }
 
@@ -32,7 +32,7 @@ class BreezLogger {
     BreezBridge breezBridge = ServiceInjector().breezBridge;
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((LogRecord rec) {
-      breezBridge.log(rec.message, rec.level.name);      
+      breezBridge.log(rec.message, rec.level.name);
     });
   }
 }

@@ -10,7 +10,7 @@ import 'package:breez/widgets/static_loader.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 
-class PayNearbyPage extends StatefulWidget {  
+class PayNearbyPage extends StatefulWidget {
   PayNearbyPage();
 
   @override
@@ -107,7 +107,7 @@ class PayNearbyPageState extends State<PayNearbyPage> {
                     )
                   ],
                 ),
-              ),            
+              ),
             );
           },
         ),
@@ -115,13 +115,13 @@ class PayNearbyPageState extends State<PayNearbyPage> {
     );
   }
 
-  @override 
+  @override
   void dispose() {
     _doneAction.dispose();
     super.dispose();
   }
 
-  @override 
+  @override
   void initState() {
     _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
     super.initState();

@@ -16,20 +16,20 @@ class ChangeSyncUIState extends AsyncAction {
 
 class FetchRates extends AsyncAction {}
 
-class FetchSwapFundStatus extends AsyncAction{}
+class FetchSwapFundStatus extends AsyncAction {}
 
 class ResetNetwork extends AsyncAction {}
 
 class RestartDaemon extends AsyncAction {}
 
-class SendPayment extends AsyncAction{
+class SendPayment extends AsyncAction {
   final PayRequest paymentRequest;
 
   SendPayment(this.paymentRequest);
 }
 
 class SendPaymentFailureReport extends AsyncAction {
-  final String traceReport;  
+  final String traceReport;
 
-  SendPaymentFailureReport(this.traceReport);  
+  SendPaymentFailureReport(this.traceReport);
 }

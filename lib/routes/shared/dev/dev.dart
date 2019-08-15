@@ -70,7 +70,7 @@ class DevViewState extends State<DevView> {
     BackupBloc backupBloc = AppBlocsProvider.of<BackupBloc>(context);
     return StreamBuilder<BackupState>(
       stream: backupBloc.backupStateStream,
-      builder: (ctx, backupSnapshot) =>  StreamBuilder(
+      builder: (ctx, backupSnapshot) => StreamBuilder(
           stream: accBloc.accountStream,
           builder: (accCtx, accSnapshot) {
             AccountModel account = accSnapshot.data;
@@ -89,9 +89,7 @@ class DevViewState extends State<DevView> {
                         PopupMenuButton<Choice>(
                           onSelected: widget._select,
                           itemBuilder: (BuildContext context) {
-                            return getChoices(
-                                    accBloc, settingsSnapshot.data, account)
-                                .map((Choice choice) {
+                            return getChoices(accBloc, settingsSnapshot.data, account).map((Choice choice) {
                               return PopupMenuItem<Choice>(
                                 value: choice,
                                 child: Text(choice.title),
@@ -105,10 +103,7 @@ class DevViewState extends State<DevView> {
                         style: theme.appBarTextStyle,
                       ),
                     ),
-                    body: new Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max, 
-                      children: <Widget>[                      
+                    body: new Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.only(left: 10.0),
                         child: new Row(
@@ -117,9 +112,7 @@ class DevViewState extends State<DevView> {
                                 child: new TextField(
                               focusNode: _cliEntryFocusNode,
                               controller: _cliInputController,
-                              decoration: InputDecoration(
-                                  hintText:
-                                      'Enter a command or use the links below'),
+                              decoration: InputDecoration(hintText: 'Enter a command or use the links below'),
                               onSubmitted: (command) {
                                 _sendCommand(command);
                               },
@@ -151,41 +144,30 @@ class DevViewState extends State<DevView> {
                           child: new Container(
                             padding: new EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
                             child: new Container(
-                              padding: _showDefaultCommands
-                                  ? new EdgeInsets.all(0.0)
-                                  : new EdgeInsets.all(2.0),
+                              padding: _showDefaultCommands ? new EdgeInsets.all(0.0) : new EdgeInsets.all(2.0),
                               decoration: new BoxDecoration(
-                                  border: _showDefaultCommands
-                                      ? null
-                                      : new Border.all(
-                                          width: 1.0, color: Color(0x80FFFFFF))),
+                                  border: _showDefaultCommands ? null : new Border.all(width: 1.0, color: Color(0x80FFFFFF))),
                               child: new Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: <Widget>[
                                   _showDefaultCommands
                                       ? new Container()
                                       : new Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
+                                          mainAxisAlignment: MainAxisAlignment.end,
                                           children: <Widget>[
                                             new IconButton(
                                               icon: new Icon(Icons.content_copy),
                                               tooltip: 'Copy to Clipboard',
                                               iconSize: 19.0,
                                               onPressed: () {
-                                                Clipboard.setData(
-                                                    new ClipboardData(
-                                                        text: _cliText));
-                                                _scaffoldKey.currentState
-                                                    .showSnackBar(new SnackBar(
+                                                Clipboard.setData(new ClipboardData(text: _cliText));
+                                                _scaffoldKey.currentState.showSnackBar(new SnackBar(
                                                   content: new Text(
                                                     'Copied to clipboard.',
                                                     style: theme.snackBarStyle,
                                                   ),
-                                                  backgroundColor: theme
-                                                      .snackBarBackgroundColor,
-                                                  duration:
-                                                      new Duration(seconds: 2),
+                                                  backgroundColor: theme.snackBarBackgroundColor,
+                                                  duration: new Duration(seconds: 2),
                                                 ));
                                               },
                                             ),
@@ -205,11 +187,7 @@ class DevViewState extends State<DevView> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: new Row(
                                       children: <Widget>[
-                                        new Expanded(
-                                            child: new RichText(
-                                                text: new TextSpan(
-                                                    style: _cliTextStyle,
-                                                    children: _richCliText)))
+                                        new Expanded(child: new RichText(text: new TextSpan(style: _cliTextStyle, children: _richCliText)))
                                       ],
                                     ),
                                   )))
@@ -219,11 +197,11 @@ class DevViewState extends State<DevView> {
                           )),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 20.0, left: 20.0, top: 20.0),
-                        child: backupSnapshot.data != null && backupSnapshot.data.lastBackupTime.millisecondsSinceEpoch > 0 ? 
-                          Text("Last backup: ${DateUtils.formatYearMonthDayHourMinute(backupSnapshot.data.lastBackupTime)}",
-                            textAlign: TextAlign.left) :
-                          SizedBox(),
-                      ),                      
+                        child: backupSnapshot.data != null && backupSnapshot.data.lastBackupTime.millisecondsSinceEpoch > 0
+                            ? Text("Last backup: ${DateUtils.formatYearMonthDayHourMinute(backupSnapshot.data.lastBackupTime)}",
+                                textAlign: TextAlign.left)
+                            : SizedBox(),
+                      ),
                     ]),
                   );
                 });
@@ -231,44 +209,29 @@ class DevViewState extends State<DevView> {
     );
   }
 
-  List<Choice> getChoices(
-      AccountBloc accBloc, AccountSettings settings, AccountModel account) {
+  List<Choice> getChoices(AccountBloc accBloc, AccountSettings settings, AccountModel account) {
     List<Choice> choices = new List<Choice>();
     choices.addAll([
       Choice(title: 'Share Logs', icon: Icons.share, function: shareLog),
+      Choice(title: 'Show Initial Screen', icon: Icons.phone_android, function: _gotoInitialScreen),
       Choice(
-          title: 'Show Initial Screen',
-          icon: Icons.phone_android,
-          function: _gotoInitialScreen),      
-      Choice(
-          title:
-              '${settings.showConnectProgress ? "Hide" : "Show"} Connect Progress',
+          title: '${settings.showConnectProgress ? "Hide" : "Show"} Connect Progress',
           icon: Icons.phone_android,
           function: () {
             toggleConnectProgress(accBloc, settings);
           }),
-      Choice(
-          title: 'Describe Graph',
-          icon: Icons.phone_android,
-          function: _describeGraph),      
+      Choice(title: 'Describe Graph', icon: Icons.phone_android, function: _describeGraph),
     ]);
 
     if (Platform.isAndroid) {
-      choices.add(Choice(
-          title: 'Battery Optimization',
-          icon: Icons.phone_android,
-          function: _showOptimizationsSettings));
+      choices.add(Choice(title: 'Battery Optimization', icon: Icons.phone_android, function: _showOptimizationsSettings));
     }
     if (settings.ignoreWalletBalance) {
-      choices.add(Choice(
-          title: "Show Excess Funds",
-          icon: Icons.phone_android,
-          function: () => _setShowExcessFunds(accBloc, settings)));
+      choices.add(Choice(title: "Show Excess Funds", icon: Icons.phone_android, function: () => _setShowExcessFunds(accBloc, settings)));
     }
     if (settings.failePaymentBehavior != BugReportBehavior.PROMPT) {
       choices.add(Choice(
-          title:
-              'Reset Payment Report',
+          title: 'Reset Payment Report',
           icon: Icons.phone_android,
           function: () {
             _resetBugReportBehavior(accBloc, settings);
@@ -277,14 +240,12 @@ class DevViewState extends State<DevView> {
 
     if (!account.enableInProgress && account.id.isNotEmpty) {
       choices.add(Choice(
-          title: account.enabled
-              ? "Disable Automatic Channel"
-              : "Enable Automatic Channel",
+          title: account.enabled ? "Disable Automatic Channel" : "Enable Automatic Channel",
           icon: Icons.phone_android,
           function: () {
             accBloc.accountEnableSink.add(!account.enabled);
           }));
-    }   
+    }
 
     return choices;
   }
@@ -296,8 +257,7 @@ class DevViewState extends State<DevView> {
   }
 
   void toggleConnectProgress(AccountBloc bloc, AccountSettings settings) {
-    bloc.accountSettingsSink.add(
-        settings.copyWith(showConnectProgress: !settings.showConnectProgress));
+    bloc.accountSettingsSink.add(settings.copyWith(showConnectProgress: !settings.showConnectProgress));
   }
 
   void _describeGraph() async {
@@ -305,10 +265,7 @@ class DevViewState extends State<DevView> {
     tempDir = await tempDir.createTemp("graph");
     bool userCancelled = false;
     String filePath = '${tempDir.path}/graph.json';
-    Navigator.push(
-            context,
-            createLoaderRoute(context,
-                message: "Generating graph data...", opacity: 0.8))
+    Navigator.push(context, createLoaderRoute(context, message: "Generating graph data...", opacity: 0.8))
         .whenComplete(() => userCancelled = true);
 
     widget._breezBridge.sendCommand("describegraph $filePath").then((_) {
@@ -320,7 +277,7 @@ class DevViewState extends State<DevView> {
       if (!userCancelled) {
         return shareFile("${tempDir.path}/graph.zip");
       }
-    }).whenComplete(() {    
+    }).whenComplete(() {
       if (!userCancelled) {
         Navigator.pop(context);
       }
@@ -330,13 +287,11 @@ class DevViewState extends State<DevView> {
   void _gotoInitialScreen() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('isFirstRun', true);
-    Navigator.of(_scaffoldKey.currentState.context)
-        .pushReplacementNamed("/splash");
+    Navigator.of(_scaffoldKey.currentState.context).pushReplacementNamed("/splash");
   }
 
   void _resetBugReportBehavior(AccountBloc bloc, AccountSettings settings) {
-    bloc.accountSettingsSink
-        .add(settings.copyWith(failePaymentBehavior: BugReportBehavior.PROMPT));
+    bloc.accountSettingsSink.add(settings.copyWith(failePaymentBehavior: BugReportBehavior.PROMPT));
   }
 
   void _sendCommand(String command) {
@@ -363,8 +318,7 @@ class DevViewState extends State<DevView> {
   }
 
   void _setShowExcessFunds(AccountBloc bloc, AccountSettings settings, {bool ignore = false}) {
-    bloc.accountSettingsSink
-        .add(settings.copyWith(ignoreWalletBalance: ignore));
+    bloc.accountSettingsSink.add(settings.copyWith(ignoreWalletBalance: ignore));
   }
 
   void _showOptimizationsSettings() async {
@@ -380,7 +334,6 @@ class LinkTextSpan extends TextSpan {
             recognizer: new TapGestureRecognizer()
               ..onTap = () {
                 _cliInputController.text = command + " ";
-                FocusScope.of(_scaffoldKey.currentState.context)
-                    .requestFocus(_cliEntryFocusNode);
+                FocusScope.of(_scaffoldKey.currentState.context).requestFocus(_cliEntryFocusNode);
               });
 }

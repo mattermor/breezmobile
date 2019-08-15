@@ -35,7 +35,7 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog> with S
   AccountBloc _accountBloc;
   UserProfileBloc _userProfileBloc;
 
-  double _exchangeRate;  
+  double _exchangeRate;
 
   bool _isInit = false;
 
@@ -157,19 +157,19 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog> with S
   void didChangeDependencies() {
     if (!_isInit) {
       _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
-      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);  
-      FetchRates fetchRatesAction = FetchRates();      
+      _userProfileBloc = AppBlocsProvider.of<UserProfileBloc>(context);
+      FetchRates fetchRatesAction = FetchRates();
       _accountBloc.userActionsSink.add(fetchRatesAction);
 
-      fetchRatesAction.future.catchError((err){
+      fetchRatesAction.future.catchError((err) {
         if (this.mounted) {
-          setState((){          
+          setState(() {
             Navigator.pop(context);
             showFlushbar(context, message: "Failed to retrieve BTC exchange rate.");
           });
-        }        
+        }
       });
-      
+
       _isInit = true;
     }
     super.didChangeDependencies();

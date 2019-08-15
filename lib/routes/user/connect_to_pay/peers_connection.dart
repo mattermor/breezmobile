@@ -17,16 +17,15 @@ class PeersConnection extends StatelessWidget {
     sessionConnection.ConnectionState connectionState = sessionConnection.ConnectionState.IDLE;
     if (!_sessionState.payeeData.status.online && !_sessionState.payerData.status.online) {
       connectionState = sessionConnection.ConnectionState.IDLE;
-    } else if (!_sessionState.payeeData.status.online || !_sessionState.payerData.status.online){
+    } else if (!_sessionState.payeeData.status.online || !_sessionState.payerData.status.online) {
       connectionState = sessionConnection.ConnectionState.WAITING_PEER_CONNECT;
-    }
-    else if (_isPayerWaiting() || _isPayeeWaiting()) {
-      connectionState = sessionConnection.ConnectionState.WAITING_ACTION;    
+    } else if (_isPayerWaiting() || _isPayeeWaiting()) {
+      connectionState = sessionConnection.ConnectionState.WAITING_ACTION;
     } else if (_sessionState.payerData.status.online && _sessionState.payeeData.status.online) {
       connectionState = sessionConnection.ConnectionState.CONNECTED;
     } else if (_sessionState.invitationSent) {
       connectionState = sessionConnection.ConnectionState.WAITING_PEER_CONNECT;
-    }    
+    }
     double peerContainerSize = 110.0;
     double nameContainerSize = 20.0;
     double peerAvatarWidth = 60.0;
@@ -37,8 +36,12 @@ class PeersConnection extends StatelessWidget {
           constraints: BoxConstraints.expand(height: peerContainerSize + nameContainerSize),
           child: Stack(
             fit: StackFit.expand,
-            children: <Widget>[              
-              Positioned(left: connectionLineMargin, right: connectionLineMargin, top: peerContainerSize / 2, child: ConnectionStatus(connectionState, PaymentSessionState.connectionEmulationDuration)),
+            children: <Widget>[
+              Positioned(
+                  left: connectionLineMargin,
+                  right: connectionLineMargin,
+                  top: peerContainerSize / 2,
+                  child: ConnectionStatus(connectionState, PaymentSessionState.connectionEmulationDuration)),
               Positioned(
                   right: 0.0,
                   top: 0.0,
@@ -62,30 +65,30 @@ class PeersConnection extends StatelessWidget {
               Positioned(
                 top: nameMargin,
                 right: 0.0,
-                child: AlignMiddle(
-                    width: peerContainerSize, child: buildPayeeWidget()),
+                child: AlignMiddle(width: peerContainerSize, child: buildPayeeWidget()),
               )
             ],
           ))
     ]);
   }
 
-  Widget buildPayeeWidget(){
+  Widget buildPayeeWidget() {
     if (_sessionState.payeeData.userName != null) {
-      return _UserNameWidget(_sessionState.payeeData.userName);      
+      return _UserNameWidget(_sessionState.payeeData.userName);
     }
 
     if (!_sessionState.invitationSent) {
       return SizedBox();
     }
-    return _UserNameWidget("Unknown");  
+    return _UserNameWidget("Unknown");
   }
 
-  bool _isPayeeWaiting(){
-    return !_sessionState.payer && (_sessionState.payerData.amount == null || _sessionState.payeeData.paymentRequest != null && !_sessionState.paymentFulfilled);
+  bool _isPayeeWaiting() {
+    return !_sessionState.payer &&
+        (_sessionState.payerData.amount == null || _sessionState.payeeData.paymentRequest != null && !_sessionState.paymentFulfilled);
   }
 
-  bool _isPayerWaiting(){
+  bool _isPayerWaiting() {
     return _sessionState.payer && _sessionState.payerData.amount != null && _sessionState.payeeData.paymentRequest == null;
   }
 }

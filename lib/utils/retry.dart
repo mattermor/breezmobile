@@ -1,7 +1,6 @@
 import "dart:async";
 
-Future<dynamic> retry(Future<dynamic> f(),
-    {int tryLimit: 6, Duration interval}) async {
+Future<dynamic> retry(Future<dynamic> f(), {int tryLimit: 6, Duration interval}) async {
   if (interval == null) interval = new Duration(seconds: 10);
 
   for (int t = 0; t < tryLimit; t++) {

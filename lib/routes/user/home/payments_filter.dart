@@ -6,7 +6,6 @@ import 'package:breez/widgets/fixed_sliver_delegate.dart';
 import 'package:flutter/material.dart';
 
 class PaymentFilterSliver extends StatefulWidget {
-
   final ScrollController _controller;
   final double _minSize;
   final double _maxSize;
@@ -27,25 +26,26 @@ class PaymentFilterSliverState extends State<PaymentFilterSliver> {
   Widget build(BuildContext context) {
     double scrollOffset = widget._controller.position.pixels;
     _hasNoFilter = (widget._paymentsModel.filter.paymentType.contains(PaymentType.SENT) &&
-        widget._paymentsModel.filter.paymentType.contains(PaymentType.DEPOSIT) &&
-        widget._paymentsModel.filter.paymentType.contains(PaymentType.WITHDRAWAL) &&
-        widget._paymentsModel.filter.paymentType.contains(PaymentType.RECEIVED)) && (widget._paymentsModel.filter.startDate == null || widget._paymentsModel.filter.endDate == null);
+            widget._paymentsModel.filter.paymentType.contains(PaymentType.DEPOSIT) &&
+            widget._paymentsModel.filter.paymentType.contains(PaymentType.WITHDRAWAL) &&
+            widget._paymentsModel.filter.paymentType.contains(PaymentType.RECEIVED)) &&
+        (widget._paymentsModel.filter.startDate == null || widget._paymentsModel.filter.endDate == null);
     return SliverPersistentHeader(
-        pinned: true,
-        delegate: new FixedSliverDelegate(!_hasNoFilter ? widget._maxSize : (scrollOffset).clamp(widget._minSize, widget._maxSize),
-            builder: (context, shrinkedHeight, overlapContent) {
-          return Container(
-              decoration: BoxDecoration(color: theme.BreezColors.blue[500]),
-              height: widget._maxSize,
-              child: AnimatedOpacity(
-                  duration: Duration(milliseconds: 100),
-                  opacity: !_hasNoFilter ? 1.0 : (scrollOffset - widget._maxSize / 2).clamp(0.0, 1.0),
-                  child: PaymentsFilter(widget._accountBloc, widget._paymentsModel)));
-        }),
-      );
+      pinned: true,
+      delegate: new FixedSliverDelegate(!_hasNoFilter ? widget._maxSize : (scrollOffset).clamp(widget._minSize, widget._maxSize),
+          builder: (context, shrinkedHeight, overlapContent) {
+        return Container(
+            decoration: BoxDecoration(color: theme.BreezColors.blue[500]),
+            height: widget._maxSize,
+            child: AnimatedOpacity(
+                duration: Duration(milliseconds: 100),
+                opacity: !_hasNoFilter ? 1.0 : (scrollOffset - widget._maxSize / 2).clamp(0.0, 1.0),
+                child: PaymentsFilter(widget._accountBloc, widget._paymentsModel)));
+      }),
+    );
   }
 
-  @override 
+  @override
   void dispose() {
     widget._controller.removeListener(onScroll);
     super.dispose();
@@ -57,8 +57,8 @@ class PaymentFilterSliverState extends State<PaymentFilterSliver> {
     widget._controller.addListener(onScroll);
   }
 
-  void onScroll(){
-    setState((){});
+  void onScroll() {
+    setState(() {});
   }
 }
 
@@ -89,21 +89,15 @@ class PaymentsFilterState extends State<PaymentsFilter> {
             color: Colors.white,
             size: 24.0,
           ),
-          onPressed: () =>
-          widget._paymentsModel.firstDate != null ?
-          showDialog(
-            context: context,
-            builder: (_) =>
-                CalendarDialog(context, widget._paymentsModel.firstDate),
-          ).then((result) {
-            widget._accountBloc.paymentFilterSink.add(
-                widget._paymentsModel.filter.copyWith(
-                    filter: _getFilterType(_filter),
-                    startDate: result[0],
-                    endDate: result[1]));
-          })
-              : Scaffold.of(context).showSnackBar(new SnackBar(
-              content: new Text("Please wait while Breez is loading transactions."))),
+          onPressed: () => widget._paymentsModel.firstDate != null
+              ? showDialog(
+                  context: context,
+                  builder: (_) => CalendarDialog(context, widget._paymentsModel.firstDate),
+                ).then((result) {
+                  widget._accountBloc.paymentFilterSink.add(
+                      widget._paymentsModel.filter.copyWith(filter: _getFilterType(_filter), startDate: result[0], endDate: result[1]));
+                })
+              : Scaffold.of(context).showSnackBar(new SnackBar(content: new Text("Please wait while Breez is loading transactions."))),
         ),
       ),
     );
@@ -140,7 +134,7 @@ class PaymentsFilterState extends State<PaymentsFilter> {
     _filter = "All Activities";
   }
 
-  _getFilterType(String _filter){
+  _getFilterType(String _filter) {
     if (_filter == "Sent") {
       return [PaymentType.SENT, PaymentType.WITHDRAWAL];
     } else if (_filter == "Received") {

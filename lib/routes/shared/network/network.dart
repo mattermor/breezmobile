@@ -29,83 +29,79 @@ class NetworkPageState extends State<NetworkPage> {
   Widget build(BuildContext context) {
     String _title = "Network";
     return ButtonTheme(
-        height: 28.0,
-        child: new Scaffold(
-          appBar: new AppBar(
-              iconTheme: theme.appBarIconTheme,
-              textTheme: theme.appBarTextTheme,
-              backgroundColor: theme.BreezColors.blue[500],
-              automaticallyImplyLeading: false,
-              leading: backBtn.BackButton(),
-              title: new Text(
-                _title,
-                style: theme.appBarTextStyle,
-              ),
-              elevation: 0.0),
-          body: new Padding(
-              padding: new EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-              child: Form(
-                  key: _formKey,
-                  child: new ListView(
-                      scrollDirection: Axis.vertical,
-                      controller: _scrollController,
+      height: 28.0,
+      child: new Scaffold(
+        appBar: new AppBar(
+            iconTheme: theme.appBarIconTheme,
+            textTheme: theme.appBarTextTheme,
+            backgroundColor: theme.BreezColors.blue[500],
+            automaticallyImplyLeading: false,
+            leading: backBtn.BackButton(),
+            title: new Text(
+              _title,
+              style: theme.appBarTextStyle,
+            ),
+            elevation: 0.0),
+        body: new Padding(
+            padding: new EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+            child: Form(
+                key: _formKey,
+                child: new ListView(scrollDirection: Axis.vertical, controller: _scrollController, children: <Widget>[
+                  new Column(children: <Widget>[
+                    new Container(
+                      padding: new EdgeInsets.only(top: 8.0),
+                      child: new TextFormField(
+                        decoration: new InputDecoration(labelText: "Bitcoin Node (BIP 157)"),
+                        style: theme.FieldTextStyle.textStyle,
+                        onSaved: (String value) {
+                          this._data.peer = value;
+                        },
+                        validator: (val) => null,
+                        controller: _peerController,
+                      ),
+                    ),
+                    SizedBox(height: 12.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        new Column(children: <Widget>[
-                          new Container(
-                            padding: new EdgeInsets.only(top: 8.0),
-                            child: new TextFormField(                              
-                              decoration: new InputDecoration(
-                                  labelText: "Bitcoin Node (BIP 157)"),
-                              style: theme.FieldTextStyle.textStyle,
-                              onSaved: (String value) {
-                                this._data.peer = value;
-                              },
-                              validator: (val) => null,
-                              controller: _peerController,                              
-                            ),
+                        OutlineButton(
+                          borderSide: BorderSide(color: Colors.white),
+                          child: new Text(
+                            "Reset",
                           ),
-                          SizedBox(height: 12.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              OutlineButton(
-                                borderSide: BorderSide(color: Colors.white),
-                                child: new Text(
-                                  "Reset",
-                                ),
-                                onPressed: ()async {
-                                  await _reset();
-                                  _promptForRestart();
-                                },
-                              ),
-                              SizedBox(width: 12.0),
-                              OutlineButton(
-                                borderSide: BorderSide(color: Colors.white),
-                                child: new Text(
-                                  "Save",
-                                ),
-                                onPressed: () async {
-                                  if (_formKey.currentState.validate()) {
-                                    _formKey.currentState.save();
-                                    if (this._data.peer.isNotEmpty) {
-                                      await _breezLib.setPeers([this._data.peer]);
-                                    } else {
-                                      await _reset();
-                                    }
-                                    await _promptForRestart();
-                                  }
-                                },
-                              )
-                            ],
-                          )
-                        ])
-                      ]))),
-        ),
-      );    
+                          onPressed: () async {
+                            await _reset();
+                            _promptForRestart();
+                          },
+                        ),
+                        SizedBox(width: 12.0),
+                        OutlineButton(
+                          borderSide: BorderSide(color: Colors.white),
+                          child: new Text(
+                            "Save",
+                          ),
+                          onPressed: () async {
+                            if (_formKey.currentState.validate()) {
+                              _formKey.currentState.save();
+                              if (this._data.peer.isNotEmpty) {
+                                await _breezLib.setPeers([this._data.peer]);
+                              } else {
+                                await _reset();
+                              }
+                              await _promptForRestart();
+                            }
+                          },
+                        )
+                      ],
+                    )
+                  ])
+                ]))),
+      ),
+    );
   }
 
-  @override 
-  void dispose() {    
+  @override
+  void dispose() {
     _peerController.removeListener(_onChangePeer);
     super.dispose();
   }
@@ -113,7 +109,7 @@ class NetworkPageState extends State<NetworkPage> {
   @override
   void initState() {
     super.initState();
-    _breezLib = new ServiceInjector().breezBridge;    
+    _breezLib = new ServiceInjector().breezBridge;
     _loadData();
     _peerController.addListener(_onChangePeer);
   }
@@ -131,7 +127,7 @@ class NetworkPageState extends State<NetworkPage> {
     setState(() {
       _data.peer = peer;
       _data.isDefault = peers.isDefault;
-    });   
+    });
     _peerController.text = peer;
   }
 
@@ -143,8 +139,8 @@ class NetworkPageState extends State<NetworkPage> {
   }
 
   Future<bool> _promptForRestart() {
-    return promptAreYouSure(context, null,
-            Text("Please restart Breez to switch to the new Bitcoin Node configuration.", style: theme.alertStyle),
+    return promptAreYouSure(
+            context, null, Text("Please restart Breez to switch to the new Bitcoin Node configuration.", style: theme.alertStyle),
             cancelText: "Cancel", okText: "Exit Breez")
         .then((shouldExit) {
       if (shouldExit) {

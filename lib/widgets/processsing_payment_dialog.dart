@@ -22,7 +22,8 @@ class ProcessingPaymentDialog extends StatefulWidget {
   final Function(PaymentRequestState state) _onStateChange;
   final double _initialDialogSize;
 
-  ProcessingPaymentDialog(this.context, this.accountBloc, this.firstPaymentItemKey, this.scrollController, this._initialDialogSize, this._onStateChange);
+  ProcessingPaymentDialog(
+      this.context, this.accountBloc, this.firstPaymentItemKey, this.scrollController, this._initialDialogSize, this._onStateChange);
 
   @override
   ProcessingPaymentDialogState createState() {
@@ -41,7 +42,7 @@ class ProcessingPaymentDialogState extends State<ProcessingPaymentDialog> with S
   StreamSubscription<AccountSettings> _accountSettingsSubscription;
   StreamSubscription<CompletedPayment> _sentPaymentResultSubscription;
 
-  bool _isInit = false;  
+  bool _isInit = false;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +72,7 @@ class ProcessingPaymentDialogState extends State<ProcessingPaymentDialog> with S
   }
 
   void didChangeDependencies() {
-    if (!_isInit) {      
+    if (!_isInit) {
       controller = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
       colorAnimation = new ColorTween(
         begin: theme.BreezColors.blue[500],
@@ -83,7 +84,7 @@ class ProcessingPaymentDialogState extends State<ProcessingPaymentDialog> with S
       borderAnimation = Tween<double>(begin: 0.0, end: 12.0).animate(CurvedAnimation(parent: controller, curve: Curves.ease));
       opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: controller, curve: Curves.ease));
       _initializeTransitionAnimation();
-      controller.value = 1.0;      
+      controller.value = 1.0;
       controller.addStatusListener((status) {
         if (status == AnimationStatus.dismissed) {
           widget._onStateChange(PaymentRequestState.PAYMENT_COMPLETED);
@@ -191,9 +192,9 @@ class ProcessingPaymentDialogState extends State<ProcessingPaymentDialog> with S
   _onPaymentError(AccountSettings accountSettings, PaymentError error) async {
     bool prompt = accountSettings.failePaymentBehavior == BugReportBehavior.PROMPT;
     bool send = accountSettings.failePaymentBehavior == BugReportBehavior.SEND_REPORT;
-        
-    widget._onStateChange(PaymentRequestState.PAYMENT_COMPLETED);    
-    showFlushbar(context, message: "Failed to send payment: ${error.toString().split("\n").first}");    
+
+    widget._onStateChange(PaymentRequestState.PAYMENT_COMPLETED);
+    showFlushbar(context, message: "Failed to send payment: ${error.toString().split("\n").first}");
     if (!error.validationError) {
       if (prompt) {
         send = await showDialog(

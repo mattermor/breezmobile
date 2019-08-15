@@ -11,7 +11,7 @@ import 'package:breez/widgets/back_button.dart' as backBtn;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class PayNearbyComplete extends StatefulWidget {  
+class PayNearbyComplete extends StatefulWidget {
   PayNearbyComplete();
 
   @override
@@ -23,8 +23,7 @@ class PayNearbyComplete extends StatefulWidget {
 class PayNearbyCompleteState extends State<PayNearbyComplete> with WidgetsBindingObserver {
   static ServiceInjector _injector = new ServiceInjector();
   final String _title = "Pay Someone Nearby";
-  final String _instructions =
-      "To complete the payment,\nplease hold the payee's device close to yours\nas illustrated below:";
+  final String _instructions = "To complete the payment,\nplease hold the payee's device close to yours\nas illustrated below:";
   NFCService _nfc = _injector.nfc;
 
   InvoiceBloc _invoiceBloc;
@@ -90,17 +89,15 @@ class PayNearbyCompleteState extends State<PayNearbyComplete> with WidgetsBindin
     if (state == AppLifecycleState.resumed) {
       _blankInvoiceSubscription = _nfc.startP2PBeam().listen((blankInvoice) {},
           onError: (err) =>
-              _scaffoldKey.currentState.showSnackBar(new SnackBar(
-                  duration: new Duration(seconds: 3),
-                  content: new Text(err.toString()))));
+              _scaffoldKey.currentState.showSnackBar(new SnackBar(duration: new Duration(seconds: 3), content: new Text(err.toString()))));
     }
   }
 
   @override
-  void didChangeDependencies() {        
+  void didChangeDependencies() {
     if (!_isInit) {
       _invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
-      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);    
+      _accountBloc = AppBlocsProvider.of<AccountBloc>(context);
       startNFCStream();
       registerFulfilledPayments();
       _isInit = true;
@@ -127,41 +124,34 @@ class PayNearbyCompleteState extends State<PayNearbyComplete> with WidgetsBindin
           _showAlertDialog();
         });
       }
-    });        
+    });
   }
 
-  void registerFulfilledPayments(){    
-    _paidInvoicesSubscription = _invoiceBloc.paidInvoicesStream
-      .listen((paid) {
-        Navigator.of(context).pop('Payment was sent successfuly!');
-      },
-      onError: (err) => _scaffoldKey.currentState.showSnackBar(new SnackBar(
-          duration: new Duration(seconds: 3),
-          content: new Text("Failed to send payment: " + err.toString()))));
-    
-    _sentPaymentResultSubscription = _accountBloc.completedPaymentsStream
-      .listen((fulfilledPayment) {
-        _scaffoldKey.currentState.showSnackBar(new SnackBar(
-            duration: new Duration(seconds: 3),
-            content: new Text('Payment was sent successfuly!')));
-        Navigator.of(this.context).pop();
-      });
+  void registerFulfilledPayments() {
+    _paidInvoicesSubscription = _invoiceBloc.paidInvoicesStream.listen((paid) {
+      Navigator.of(context).pop('Payment was sent successfuly!');
+    },
+        onError: (err) => _scaffoldKey.currentState.showSnackBar(
+            new SnackBar(duration: new Duration(seconds: 3), content: new Text("Failed to send payment: " + err.toString()))));
+
+    _sentPaymentResultSubscription = _accountBloc.completedPaymentsStream.listen((fulfilledPayment) {
+      _scaffoldKey.currentState
+          .showSnackBar(new SnackBar(duration: new Duration(seconds: 3), content: new Text('Payment was sent successfuly!')));
+      Navigator.of(this.context).pop();
+    });
   }
 
-  void startNFCStream(){    
-    _blankInvoiceSubscription = _nfc.startP2PBeam()
-      .listen((blankInvoice) {
-        // In the future perhaps show some information about the user we are paying to?
-      },
-      onError: (err) => _scaffoldKey.currentState.showSnackBar(new SnackBar(
-          duration: new Duration(seconds: 3),
-          content: new Text(err.toString()))));
+  void startNFCStream() {
+    _blankInvoiceSubscription = _nfc.startP2PBeam().listen((blankInvoice) {
+      // In the future perhaps show some information about the user we are paying to?
+    },
+        onError: (err) =>
+            _scaffoldKey.currentState.showSnackBar(new SnackBar(duration: new Duration(seconds: 3), content: new Text(err.toString()))));
   }
 
   void _showAlertDialog() {
     AlertDialog dialog = new AlertDialog(
-      content: new Text("Breez requires NFC to be enabled in your device in order to pay someone nearby.",
-          style: theme.alertStyle),
+      content: new Text("Breez requires NFC to be enabled in your device in order to pay someone nearby.", style: theme.alertStyle),
       actions: <Widget>[
         new FlatButton(onPressed: () => Navigator.pop(context), child: new Text("CANCEL", style: theme.buttonStyle)),
         new FlatButton(

@@ -13,12 +13,11 @@ class StatusText extends StatefulWidget {
   }
 }
 
-class _StatusTextState extends State<StatusText> { 
-
+class _StatusTextState extends State<StatusText> {
   @override
   Widget build(BuildContext context) {
     return widget._statusMessage == null
         ? Text("Start using Breez by adding funds to your balance or by receiving payments from other users.", textAlign: TextAlign.center)
-        : (widget.loading ? LoadingAnimatedText(widget._statusMessage) : Text(widget._statusMessage, textAlign: TextAlign.center));        
+        : (widget.loading ? LoadingAnimatedText(widget._statusMessage) : Text(widget._statusMessage, textAlign: TextAlign.center));
   }
 }

@@ -6,7 +6,7 @@ class InvoiceRequestModel {
   final String description;
   final String logo;
   final Int64 amount;
-  final Int64 expiry;  
+  final Int64 expiry;
 
   InvoiceRequestModel(this.payeeName, this.description, this.logo, this.amount, {this.expiry});
 }
@@ -15,7 +15,7 @@ class PaymentRequestModel {
   final InvoiceMemo _invoice;
   final String _rawPayReq;
 
-  PaymentRequestModel(this._invoice, this._rawPayReq); 
+  PaymentRequestModel(this._invoice, this._rawPayReq);
 
   Int64 get amount => _invoice.amount;
   String get description => _invoice.description;

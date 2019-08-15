@@ -9,7 +9,8 @@ class BackupSettings {
   BackupSettings copyWith({bool promptOnError}) {
     return BackupSettings(promptOnError ?? this.promptOnError);
   }
-  Map<String, dynamic> toJson(){
+
+  Map<String, dynamic> toJson() {
     return {"promptOnError": promptOnError};
   }
 }

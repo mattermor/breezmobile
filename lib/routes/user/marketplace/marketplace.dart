@@ -29,8 +29,7 @@ class MarketplacePageState extends State<MarketplacePage> {
           List<VendorModel> vendorsModel = snapshot.data;
 
           if (vendorsModel == null) {
-            return _buildScaffold(Center(
-                child: Text("There are no available vendors at the moment.")));
+            return _buildScaffold(Center(child: Text("There are no available vendors at the moment.")));
           }
 
           return _buildScaffold(_buildVendors(vendorsModel));

@@ -13,24 +13,17 @@ class PosHome extends StatefulWidget {
   final AccountBloc accountBloc;
   final BackupBloc backupBloc;
 
-  final List<DrawerItemConfig> _screens =
-      new List<DrawerItemConfig>.unmodifiable([]);
+  final List<DrawerItemConfig> _screens = new List<DrawerItemConfig>.unmodifiable([]);
 
-  final List<DrawerItemConfig> _majorActions =
-      new List<DrawerItemConfig>.unmodifiable([
-    new DrawerItemConfig(
-        "/transactions", "Transactions", "src/icon/transactions.png"),
-    new DrawerItemConfig(
-        "/withdraw_funds", "Remove Funds", "src/icon/withdraw_funds.png"),
+  final List<DrawerItemConfig> _majorActions = new List<DrawerItemConfig>.unmodifiable([
+    new DrawerItemConfig("/transactions", "Transactions", "src/icon/transactions.png"),
+    new DrawerItemConfig("/withdraw_funds", "Remove Funds", "src/icon/withdraw_funds.png"),
     new DrawerItemConfig("/settings", "Settings", "src/icon/settings.png")
   ]);
 
-  final List<DrawerItemConfig> _minorActions =
-      new List<DrawerItemConfig>.unmodifiable([
-    new DrawerItemConfig(
-        "/network", "Network", "src/icon/network.png"),
-    new DrawerItemConfig(
-        "/developers", "Developers", "src/icon/developers.png"),
+  final List<DrawerItemConfig> _minorActions = new List<DrawerItemConfig>.unmodifiable([
+    new DrawerItemConfig("/network", "Network", "src/icon/network.png"),
+    new DrawerItemConfig("/developers", "Developers", "src/icon/developers.png"),
   ]);
 
   PosHome(this.accountBloc, this.backupBloc);
@@ -52,8 +45,7 @@ class PosHomeState extends State<PosHome> {
           actions: <Widget>[
             Padding(
               padding: const EdgeInsets.all(14.0),
-              child: AccountRequiredActionsIndicator(
-                  widget.backupBloc, widget.accountBloc),
+              child: AccountRequiredActionsIndicator(widget.backupBloc, widget.accountBloc),
             ),
           ],
           leading: new IconButton(

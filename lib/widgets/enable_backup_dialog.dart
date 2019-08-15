@@ -41,7 +41,7 @@ class EnableBackupDialogState extends State<EnableBackupDialog> {
                   return Container();
                 }
                 return Column(
-                  mainAxisSize: MainAxisSize.min,                  
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Padding(
@@ -55,21 +55,20 @@ class EnableBackupDialogState extends State<EnableBackupDialog> {
                       padding: const EdgeInsets.only(top: 16.0),
                       child: Row(
                         children: <Widget>[
-                          Checkbox(                            
+                          Checkbox(
                               activeColor: theme.BreezColors.blue[500],
                               value: !snapshot.data.promptOnError,
                               onChanged: (v) {
                                 var currentSettings = snapshot.data;
-                                widget.backupBloc.backupSettingsSink.add(
-                                    currentSettings.copyWith(promptOnError: !v));
+                                widget.backupBloc.backupSettingsSink.add(currentSettings.copyWith(promptOnError: !v));
                               }),
-                              Text(
+                          Text(
                             "Don't prompt again",
                             style: theme.paymentRequestSubtitleStyle,
                           )
                         ],
                       ),
-                    ),                    
+                    ),
                   ],
                 );
               }),
@@ -86,8 +85,7 @@ class EnableBackupDialogState extends State<EnableBackupDialog> {
               child: new Text("BACKUP NOW", style: theme.buttonStyle),
             ),
           ],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
         ));
   }
 }

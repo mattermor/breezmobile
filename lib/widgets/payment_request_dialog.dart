@@ -41,10 +41,11 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
     return WillPopScope(onWillPop: _onWillPop, child: showPaymentRequestDialog());
   }
 
-  @override void didChangeDependencies() {    
+  @override
+  void didChangeDependencies() {
     super.didChangeDependencies();
     if (_currentRoute == null) {
-      _currentRoute = ModalRoute.of(context);      
+      _currentRoute = ModalRoute.of(context);
     }
   }
 
@@ -66,11 +67,14 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
   // Do not pop dialog if there's a payment being processed
   Widget showPaymentRequestDialog() {
     if (_state == PaymentRequestState.PROCESSING_PAYMENT) {
-      return ProcessingPaymentDialog(widget.context, widget.accountBloc, widget.firstPaymentItemKey, widget.scrollController, _initialDialogSize, _onStateChange);
+      return ProcessingPaymentDialog(
+          widget.context, widget.accountBloc, widget.firstPaymentItemKey, widget.scrollController, _initialDialogSize, _onStateChange);
     } else if (_state == PaymentRequestState.WAITING_FOR_CONFIRMATION) {
-      return PaymentConfirmationDialog(widget.accountBloc, widget.invoice, _initialDialogSize, _amountToPay, _amountToPayStr, (state) => _onStateChange(state));
+      return PaymentConfirmationDialog(
+          widget.accountBloc, widget.invoice, _initialDialogSize, _amountToPay, _amountToPayStr, (state) => _onStateChange(state));
     } else {
-      return PaymentRequestInfoDialog(widget.context, widget.accountBloc, widget.invoice, (state) => _onStateChange(state), (height) => _setDialogHeight(height), (map) => _setAmountToPay(map));
+      return PaymentRequestInfoDialog(widget.context, widget.accountBloc, widget.invoice, (state) => _onStateChange(state),
+          (height) => _setDialogHeight(height), (map) => _setAmountToPay(map));
     }
   }
 

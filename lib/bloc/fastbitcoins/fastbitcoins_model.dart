@@ -19,11 +19,9 @@ class RedeemRequestModel {
   @JsonKey(name: 'lightning_invoice')
   String lightningInvoice;
 
-  RedeemRequestModel(this.emailAddress, this.code, this.value, this.currency,
-      this.quotationId, this.quotationSecret);
+  RedeemRequestModel(this.emailAddress, this.code, this.value, this.currency, this.quotationId, this.quotationSecret);
 
-  factory RedeemRequestModel.fromJson(Map<String, dynamic> json) =>
-      _$RedeemRequestModelFromJson(json);
+  factory RedeemRequestModel.fromJson(Map<String, dynamic> json) => _$RedeemRequestModelFromJson(json);
   Map<String, dynamic> toJson() => _$RedeemRequestModelToJson(this);
 }
 
@@ -36,8 +34,7 @@ class RedeemResponseModel {
 
   RedeemResponseModel(this.error, this.errorMessage);
 
-  factory RedeemResponseModel.fromJson(Map<String, dynamic> json) =>
-      _$RedeemResponseModelFromJson(json);
+  factory RedeemResponseModel.fromJson(Map<String, dynamic> json) => _$RedeemResponseModelFromJson(json);
   Map<String, dynamic> toJson() => _$RedeemResponseModelToJson(this);
 }
 
@@ -51,8 +48,7 @@ class ValidateRequestModel {
 
   ValidateRequestModel(this.emailAddress, this.code, this.value, this.currency);
 
-  factory ValidateRequestModel.fromJson(Map<String, dynamic> json) =>
-      _$ValidateRequestModelFromJson(json);
+  factory ValidateRequestModel.fromJson(Map<String, dynamic> json) => _$ValidateRequestModelFromJson(json);
   Map<String, dynamic> toJson() => _$ValidateRequestModelToJson(this);
 }
 
@@ -79,19 +75,8 @@ class ValidateResponseModel {
   @JsonKey(name: 'satoshi_amount')
   final int satoshiAmount;
 
-  ValidateResponseModel(
-      this.error,
-      this.errorMessage,
-      this.kycRequired,
-      this.quotationId,
-      this.quotationSecret,
-      this.quotationExpiry,
-      this.value,
-      this.exchangeRate,
-      this.commissionTotal,
-      this.bitcoinAmount,
-      this.satoshiAmount);
-  factory ValidateResponseModel.fromJson(Map<String, dynamic> json) =>
-      _$ValidateResponseModelFromJson(json);
+  ValidateResponseModel(this.error, this.errorMessage, this.kycRequired, this.quotationId, this.quotationSecret, this.quotationExpiry,
+      this.value, this.exchangeRate, this.commissionTotal, this.bitcoinAmount, this.satoshiAmount);
+  factory ValidateResponseModel.fromJson(Map<String, dynamic> json) => _$ValidateResponseModelFromJson(json);
   Map<String, dynamic> toJson() => _$ValidateResponseModelToJson(this);
 }

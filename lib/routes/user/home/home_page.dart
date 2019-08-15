@@ -39,43 +39,27 @@ class Home extends StatefulWidget {
   final ConnectPayBloc ctpBloc;
   final BackupBloc backupBloc;
 
-  final List<DrawerItemConfig> _screens =
-      new List<DrawerItemConfig>.unmodifiable(
-          [new DrawerItemConfig("breezHome", "Breez", "")]);
+  final List<DrawerItemConfig> _screens = new List<DrawerItemConfig>.unmodifiable([new DrawerItemConfig("breezHome", "Breez", "")]);
 
-  final List<DrawerItemConfig> _majorActionsFunds =
-      new List<DrawerItemConfig>.unmodifiable([
+  final List<DrawerItemConfig> _majorActionsFunds = new List<DrawerItemConfig>.unmodifiable([
     new DrawerItemConfig("/add_funds", "Add Funds", "src/icon/add_funds.png"),
-    new DrawerItemConfig(
-        "/withdraw_funds", "Remove Funds", "src/icon/withdraw_funds.png"),
-       new DrawerItemConfig(
-         "/get_refund", "Get Refund", "src/icon/withdraw_funds.png"),
+    new DrawerItemConfig("/withdraw_funds", "Remove Funds", "src/icon/withdraw_funds.png"),
+    new DrawerItemConfig("/get_refund", "Get Refund", "src/icon/withdraw_funds.png"),
   ]);
 
   final List<DrawerItemConfig> _majorActionsPay =
-      new List<DrawerItemConfig>.unmodifiable([
-    new DrawerItemConfig(
-        "/connect_to_pay", "Connect to Pay", "src/icon/connect_to_pay.png")
+      new List<DrawerItemConfig>.unmodifiable([new DrawerItemConfig("/connect_to_pay", "Connect to Pay", "src/icon/connect_to_pay.png")]);
+
+  final List<DrawerItemConfig> _minorActionsCard = new List<DrawerItemConfig>.unmodifiable([
+    new DrawerItemConfig("/order_card", "Order", "src/icon/order_card.png"),
+    new DrawerItemConfig("/activate_card", "Activate", "src/icon/activate_card.png"),
+    new DrawerItemConfig("/lost_card", "Lost or Stolen", "src/icon/lost_card.png"),
   ]);
 
-  final List<DrawerItemConfig> _minorActionsCard =
-      new List<DrawerItemConfig>.unmodifiable([
-    new DrawerItemConfig(
-        "/order_card", "Order", "src/icon/order_card.png"),
-    new DrawerItemConfig(
-        "/activate_card", "Activate", "src/icon/activate_card.png"),
-    new DrawerItemConfig(
-        "/lost_card", "Lost or Stolen", "src/icon/lost_card.png"),
-  ]);
-
-  final List<DrawerItemConfig> _minorActionsAdvanced =
-      new List<DrawerItemConfig>.unmodifiable([
-    new DrawerItemConfig(
-        "/network", "Network", "src/icon/network.png"),
-    new DrawerItemConfig(
-        "/security", "Security PIN", "src/icon/security.png"),
-    new DrawerItemConfig(
-        "/developers", "Developers", "src/icon/developers.png"),
+  final List<DrawerItemConfig> _minorActionsAdvanced = new List<DrawerItemConfig>.unmodifiable([
+    new DrawerItemConfig("/network", "Network", "src/icon/network.png"),
+    new DrawerItemConfig("/security", "Security PIN", "src/icon/security.png"),
+    new DrawerItemConfig("/developers", "Developers", "src/icon/developers.png"),
   ]);
 
   final Map<String, Widget> _screenBuilders = {"breezHome": new AccountPage(firstPaymentItemKey, scrollController)};
@@ -95,7 +79,7 @@ class HomeState extends State<Home> {
 
   DrawerItemConfig get activeScreen {
     return widget._screens.firstWhere((screen) => screen.name == _activeScreen);
-  }  
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +87,7 @@ class HomeState extends State<Home> {
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       decoration: new BoxDecoration(
-        color: theme.BreezColors.blue[500],        
+        color: theme.BreezColors.blue[500],
       ),
       child: FadeInWidget(
         child: new Scaffold(
@@ -114,7 +98,8 @@ class HomeState extends State<Home> {
                 Padding(
                   padding: const EdgeInsets.all(14.0),
                   child: AccountRequiredActionsIndicator(widget.backupBloc, widget.accountBloc),
-                ),],
+                ),
+              ],
               leading: new IconButton(
                   icon: ImageIcon(
                     AssetImage("src/icon/hamburger.png"),
@@ -138,7 +123,8 @@ class HomeState extends State<Home> {
                   DrawerItemConfigGroup(_filterItems(widget._majorActionsPay)),
                   _buildMinorActionsInvoice(context),
                   DrawerItemConfigGroup(_filterItems(widget._minorActionsCard), groupTitle: "Card", groupAssetImage: "src/icon/card.png"),
-                  DrawerItemConfigGroup(_filterItems(widget._minorActionsAdvanced), groupTitle: "Advanced", groupAssetImage: "src/icon/advanced.png"),
+                  DrawerItemConfigGroup(_filterItems(widget._minorActionsAdvanced),
+                      groupTitle: "Advanced", groupAssetImage: "src/icon/advanced.png"),
                 ],
                 _onNavigationItemSelected),
             body: widget._screenBuilders[_activeScreen]),
@@ -154,27 +140,27 @@ class HomeState extends State<Home> {
 
   @override
   void initState() {
-    super.initState();    
+    super.initState();
     _registerNotificationHandlers();
     listenNoConnection(context, widget.accountBloc);
     _listenBackupConflicts();
     _listenWhiltelistPermissionsRequest();
     _hiddenRountes.add("/get_refund");
-    widget.accountBloc.accountStream.listen((acc){
-      setState(() {        
+    widget.accountBloc.accountStream.listen((acc) {
+      setState(() {
         if (acc != null && acc.swapFundsStatus.maturedRefundableAddresses.length > 0) {
           _hiddenRountes.remove("/get_refund");
         } else {
           _hiddenRountes.add("/get_refund");
-        }     
-      });      
+        }
+      });
     });
 
     widget.accountBloc.accountStream.listen((acc) {
       var activeAccountRoutes = ["/connect_to_pay", "/pay_invoice", "/create_invoice"];
       Function addOrRemove = acc.active ? _hiddenRountes.remove : _hiddenRountes.add;
       setState(() {
-        activeAccountRoutes.forEach((r) => addOrRemove(r));      
+        activeAccountRoutes.forEach((r) => addOrRemove(r));
       });
     });
   }
@@ -196,27 +182,36 @@ class HomeState extends State<Home> {
     return DrawerItemConfigGroup(_filterItems(minorActionsInvoice));
   }
 
-  List<DrawerItemConfig> _filterItems(List<DrawerItemConfig> items){
-    return items.where( (c) => !_hiddenRountes.contains(c.name)).toList();
+  List<DrawerItemConfig> _filterItems(List<DrawerItemConfig> items) {
+    return items.where((c) => !_hiddenRountes.contains(c.name)).toList();
   }
 
-  void _listenBackupConflicts(){
+  void _listenBackupConflicts() {
     widget.accountBloc.nodeConflictStream.listen((_) async {
       Navigator.popUntil(context, (route) {
-          return route.settings.name == "/home" || route.settings.name == "/";
-        }
-      );
-      await promptError(context, "Configuration Error", Text("Breez detected another device is running with the same configuration (probably due to restore). Breez cannot run the same configuration on more than one device. Please reinstall Breez if you wish to continue using Breez on this device.", style: theme.alertStyle), 
-                        okText: "Exit Breez", okFunc: () => exit(0), disableBack: true );        
+        return route.settings.name == "/home" || route.settings.name == "/";
+      });
+      await promptError(
+          context,
+          "Configuration Error",
+          Text(
+              "Breez detected another device is running with the same configuration (probably due to restore). Breez cannot run the same configuration on more than one device. Please reinstall Breez if you wish to continue using Breez on this device.",
+              style: theme.alertStyle),
+          okText: "Exit Breez",
+          okFunc: () => exit(0),
+          disableBack: true);
     });
   }
 
-  void _listenWhiltelistPermissionsRequest(){
+  void _listenWhiltelistPermissionsRequest() {
     widget.accountBloc.optimizationWhitelistExplainStream.listen((_) async {
-      await promptError(context, "Background Synchronization", 
-        Text("In order to support instantaneous payments, Breez needs your permission in order to synchronize the information while the app is not active. Please approve the app in the next dialog.", 
-        style: theme.alertStyle), 
-        okFunc: () => widget.accountBloc.optimizationWhitelistRequestSink.add(null));      
+      await promptError(
+          context,
+          "Background Synchronization",
+          Text(
+              "In order to support instantaneous payments, Breez needs your permission in order to synchronize the information while the app is not active. Please approve the app in the next dialog.",
+              style: theme.alertStyle),
+          okFunc: () => widget.accountBloc.optimizationWhitelistRequestSink.add(null));
     });
   }
 
@@ -242,27 +237,22 @@ class HomeState extends State<Home> {
     }
   }
 
-  void _registerNotificationHandlers(){        
-    new InvoiceNotificationsHandler(context, widget.accountBloc, widget.invoiceBloc.receivedInvoicesStream, firstPaymentItemKey, scrollController, _scaffoldKey);
-    new CTPJoinSessionHandler(widget.ctpBloc, this.context, 
-      (session) {
-        Navigator.popUntil(context, (route) {
-          return route.settings.name != "/connect_to_pay";          
-        });        
-        var ctpRoute = FadeInRoute(builder: (_) => new ConnectToPayPage(session), settings: RouteSettings(name: "/connect_to_pay"));
-        Navigator.of(context).push(ctpRoute);                    
-      },
-      (e) {
-        promptError(context, "Connect to Pay", Text(e.toString(), style: theme.alertStyle));
-      }
-    );
+  void _registerNotificationHandlers() {
+    new InvoiceNotificationsHandler(
+        context, widget.accountBloc, widget.invoiceBloc.receivedInvoicesStream, firstPaymentItemKey, scrollController, _scaffoldKey);
+    new CTPJoinSessionHandler(widget.ctpBloc, this.context, (session) {
+      Navigator.popUntil(context, (route) {
+        return route.settings.name != "/connect_to_pay";
+      });
+      var ctpRoute = FadeInRoute(builder: (_) => new ConnectToPayPage(session), settings: RouteSettings(name: "/connect_to_pay"));
+      Navigator.of(context).push(ctpRoute);
+    }, (e) {
+      promptError(context, "Connect to Pay", Text(e.toString(), style: theme.alertStyle));
+    });
     new SyncUIHandler(widget.accountBloc, context);
     new ShowPinHandler(widget.userProfileBloc, context);
 
     _accountNotificationsSubscription = widget.accountBloc.accountNotificationsStream
-      .listen(
-        (data) => showFlushbar(context, message: data), 
-        onError: (e) => showFlushbar(context, message: e.toString())
-      );    
+        .listen((data) => showFlushbar(context, message: data), onError: (e) => showFlushbar(context, message: e.toString()));
   }
 }

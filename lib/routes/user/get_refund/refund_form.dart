@@ -39,16 +39,13 @@ class _RefundFormState extends State<RefundForm> {
         ),
         titlePadding: EdgeInsets.fromLTRB(24.0, 22.0, 24.0, 8.0),
         content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                          "Please enter a destination address to receive a refund. Then, broadcast the refund transaction to the Blockchain.",
-                          style: theme.alertStyle
-                    ),
-                    _buildAddressForm()
-                  ],
-
-              ),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Please enter a destination address to receive a refund. Then, broadcast the refund transaction to the Blockchain.",
+                style: theme.alertStyle),
+            _buildAddressForm()
+          ],
+        ),
         actions: <Widget>[
           FlatButton(
               onPressed: () {
@@ -66,8 +63,7 @@ class _RefundFormState extends State<RefundForm> {
               },
               child: new Text("BROADCAST", style: theme.buttonStyle))
         ],
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12.0))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
       ),
     );
   }
@@ -83,7 +79,8 @@ class _RefundFormState extends State<RefundForm> {
   }
 
   Form _buildAddressForm() {
-    return Form(key: _formKey,
+    return Form(
+        key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -96,8 +93,7 @@ class _RefundFormState extends State<RefundForm> {
                   padding: EdgeInsets.only(top: 21.0),
                   alignment: Alignment.bottomRight,
                   icon: new Image(
-                    image: new AssetImage(
-                        "src/icon/qr_scan.png"),
+                    image: new AssetImage("src/icon/qr_scan.png"),
                     color: theme.alertStyle.color,
                     fit: BoxFit.contain,
                     width: 24.0,

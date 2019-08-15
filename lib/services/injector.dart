@@ -17,7 +17,7 @@ class ServiceInjector {
   static final _singleton = new ServiceInjector._internal();
   static ServiceInjector _injector;
 
-  BreezServer _breezServer;  
+  BreezServer _breezServer;
   FirebaseNotifications _notifications;
   BreezBridge _breezBridge;
   NFCService _nfcService;
@@ -64,9 +64,9 @@ class ServiceInjector {
 
   Notifications get notifications {
     return _notifications ??= FirebaseNotifications();
-  }     
+  }
 
-  Permissions get permissions  {
+  Permissions get permissions {
     return _permissions ??= Permissions();
   }
 

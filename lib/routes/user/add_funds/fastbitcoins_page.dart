@@ -68,8 +68,8 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
                         child: new TextFormField(
                           controller: _codeController,
                           decoration: new InputDecoration(
-                              labelText: "Voucher Code",
-                              hintText: "Enter your voucher code",
+                            labelText: "Voucher Code",
+                            hintText: "Enter your voucher code",
                             suffixIcon: new IconButton(
                               padding: EdgeInsets.only(top: 21.0),
                               alignment: Alignment.bottomRight,
@@ -94,16 +94,15 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
                       ),
                       _scannerErrorMessage.length > 0
                           ? new Text(
-                        _scannerErrorMessage,
-                        style: theme.validatorStyle,
-                      )
+                              _scannerErrorMessage,
+                              style: theme.validatorStyle,
+                            )
                           : SizedBox(),
                       new Container(
                         padding: new EdgeInsets.only(top: 8.0),
                         child: new TextFormField(
                           controller: _emailController,
-                          decoration:
-                              new InputDecoration(labelText: "E-mail Address"),
+                          decoration: new InputDecoration(labelText: "E-mail Address"),
                           style: theme.FieldTextStyle.textStyle,
                           textCapitalization: TextCapitalization.none,
                           validator: (value) {
@@ -125,22 +124,17 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
                                   flex: 10,
                                   child: TextFormField(
                                     controller: _valueController,
-                                    inputFormatters: [
-                                      WhitelistingTextInputFormatter(
-                                          RegExp(r'\d+\.?\d*'))
-                                    ],
+                                    inputFormatters: [WhitelistingTextInputFormatter(RegExp(r'\d+\.?\d*'))],
                                     keyboardType: TextInputType.number,
                                     decoration: new InputDecoration(
                                         // contentPadding:
                                         //           new EdgeInsets.only(
                                         //               bottom: 10.74*5),
                                         labelText: "Voucher Value",
-                                        hintText:
-                                            "Provide the redeemable value of your voucher",
+                                        hintText: "Provide the redeemable value of your voucher",
                                         hintStyle: TextStyle(fontSize: 14.0)),
                                     style: theme.FieldTextStyle.textStyle,
-                                    textCapitalization:
-                                        TextCapitalization.words,
+                                    textCapitalization: TextCapitalization.words,
                                     validator: (value) {
                                       if (value.isEmpty) {
                                         return "Please enter a voucher value";
@@ -174,19 +168,10 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
                                                   state.didChange(newValue);
                                                 });
                                               },
-                                              items: [
-                                                "USD",
-                                                "GBP",
-                                                "EUR",
-                                                "CAD",
-                                                "AUD"
-                                              ].map((String value) {
+                                              items: ["USD", "GBP", "EUR", "CAD", "AUD"].map((String value) {
                                                 return new DropdownMenuItem(
                                                   value: value,
-                                                  child: new Text(value,
-                                                      style: theme
-                                                          .FieldTextStyle
-                                                          .textStyle),
+                                                  child: new Text(value, style: theme.FieldTextStyle.textStyle),
                                                 );
                                               }).toList(),
                                             ),
@@ -220,15 +205,9 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
                         var _request = new ValidateRequestModel(
-                            _emailController.text.trim(),
-                            _codeController.text.trim(),
-                            double.parse(_valueController.text),
-                            _currency);
-                        Navigator.of(context).push(TransparentPageRoute(
-                            (context) => new RedeemVoucherRoute(
-                                _userProfileBloc,
-                                _fastBitcoinsBloc,
-                                _request)));
+                            _emailController.text.trim(), _codeController.text.trim(), double.parse(_valueController.text), _currency);
+                        Navigator.of(context)
+                            .push(TransparentPageRoute((context) => new RedeemVoucherRoute(_userProfileBloc, _fastBitcoinsBloc, _request)));
                       }
                     },
                   ))
@@ -266,8 +245,7 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
-          this._scannerErrorMessage =
-          'Please grant Breez camera permission to scan QR codes.';
+          this._scannerErrorMessage = 'Please grant Breez camera permission to scan QR codes.';
         });
       } else {
         setState(() => this._scannerErrorMessage = '');
@@ -291,8 +269,7 @@ class RedeemVoucherRoute extends StatefulWidget {
   final UserProfileBloc _userProfileBloc;
   final ValidateRequestModel _voucherRequest;
 
-  const RedeemVoucherRoute(
-      this._userProfileBloc, this._fbBloc, this._voucherRequest);
+  const RedeemVoucherRoute(this._userProfileBloc, this._fbBloc, this._voucherRequest);
 
   @override
   State<StatefulWidget> createState() {
@@ -303,7 +280,7 @@ class RedeemVoucherRoute extends StatefulWidget {
 class RedeemVoucherRouteState extends State<RedeemVoucherRoute> {
   bool _loading = true;
   StreamSubscription<ValidateResponseModel> _validateSubscription;
-  StreamSubscription<RedeemResponseModel> _redeemSubscription;  
+  StreamSubscription<RedeemResponseModel> _redeemSubscription;
 
   @override
   Widget build(BuildContext context) {
@@ -326,18 +303,18 @@ class RedeemVoucherRouteState extends State<RedeemVoucherRoute> {
     widget._userProfileBloc.userStream.first.then((user) {
       widget._fbBloc.validateRequestSink.add(widget._voucherRequest);
 
-      _validateSubscription =
-          widget._fbBloc.validateResponseStream.listen((res) async {
+      _validateSubscription = widget._fbBloc.validateResponseStream.listen((res) async {
         showLoading(false);
         if (res.kycRequired == 1) {
           showKYCRequiredMessage();
           return;
         }
 
-        Widget content = FastBitcoinsConfirmWidget(
-            request: widget._voucherRequest, response: res, user: user);
+        Widget content = FastBitcoinsConfirmWidget(request: widget._voucherRequest, response: res, user: user);
         bool sure = await promptAreYouSure(context, "Confirm Order", content,
-            textStyle: theme.dialogBlackStye, okText: "CONFIRM", cancelText: "CANCEL",
+            textStyle: theme.dialogBlackStye,
+            okText: "CONFIRM",
+            cancelText: "CANCEL",
             wideTitle: true,
             contentPadding: EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0));
         if (sure == true) {
@@ -347,26 +324,17 @@ class RedeemVoucherRouteState extends State<RedeemVoucherRoute> {
         }
         popToForm();
       }, onError: (err) {
-        promptError(
-                context,
-                "Redeem Voucher",
-                Text("Failed to redeem voucher: " + err.toString(),
-                    style: theme.alertStyle))
+        promptError(context, "Redeem Voucher", Text("Failed to redeem voucher: " + err.toString(), style: theme.alertStyle))
             .whenComplete(() => popToForm());
       });
     });
 
     _redeemSubscription = widget._fbBloc.redeemResponseStream.listen((vm) {
       showLoading(false);
-      Navigator.popUntil(
-          context, ModalRoute.withName(Navigator.defaultRouteName));
+      Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
       showFlushbar(context, message: "Voucher was successfully redeemed!");
     }, onError: (err) {
-      promptError(
-              context,
-              "Redeem Voucher",
-              Text("Failed to redeem voucher: " + err.toString(),
-                  style: theme.dialogBlackStye))
+      promptError(context, "Redeem Voucher", Text("Failed to redeem voucher: " + err.toString(), style: theme.dialogBlackStye))
           .whenComplete(() => popToForm());
     });
   }
@@ -381,13 +349,8 @@ class RedeemVoucherRouteState extends State<RedeemVoucherRoute> {
         "Redeem Voucher",
         RichText(
             text: TextSpan(children: <TextSpan>[
-          TextSpan(
-              text: "This voucher can be redeemed only in ",
-              style: theme.dialogBlackStye),
-          _LinkTextSpan(
-              text: "fastbitcoins.com ",
-              url: "https://fastbitcoins.com",
-              style: theme.blueLinkStyle),
+          TextSpan(text: "This voucher can be redeemed only in ", style: theme.dialogBlackStye),
+          _LinkTextSpan(text: "fastbitcoins.com ", url: "https://fastbitcoins.com", style: theme.blueLinkStyle),
           TextSpan(text: "site.", style: theme.dialogBlackStye)
         ]))).whenComplete(() => popToForm());
   }
@@ -401,13 +364,8 @@ class RedeemVoucherRouteState extends State<RedeemVoucherRoute> {
   }
 
   void _redeemRequest(ValidateResponseModel validateRes) {
-    var redeemRequest = new RedeemRequestModel(
-        widget._voucherRequest.emailAddress,
-        widget._voucherRequest.code,
-        widget._voucherRequest.value,
-        widget._voucherRequest.currency,
-        validateRes.quotationId,
-        validateRes.quotationSecret);
+    var redeemRequest = new RedeemRequestModel(widget._voucherRequest.emailAddress, widget._voucherRequest.code,
+        widget._voucherRequest.value, widget._voucherRequest.currency, validateRes.quotationId, validateRes.quotationSecret);
     redeemRequest.validateResponse = validateRes;
     widget._fbBloc.redeemRequestSink.add(redeemRequest);
   }

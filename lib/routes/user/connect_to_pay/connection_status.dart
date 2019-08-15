@@ -37,7 +37,10 @@ class _ConnectionStatusState extends State<ConnectionStatus> {
 class _IdleCustomPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    var width = size.width, numberOfCircles = 10, circleHeight = 7.0, marginBetweenCircles = (width - (circleHeight * numberOfCircles)) / (numberOfCircles - 1);
+    var width = size.width,
+        numberOfCircles = 10,
+        circleHeight = 7.0,
+        marginBetweenCircles = (width - (circleHeight * numberOfCircles)) / (numberOfCircles - 1);
 
     canvas.drawCircle(size.centerLeft(Offset(2.5, 0.0)), circleHeight / 2, Paint()..color = Colors.white.withOpacity(0.3));
     for (var i = 1; i < numberOfCircles; ++i) {

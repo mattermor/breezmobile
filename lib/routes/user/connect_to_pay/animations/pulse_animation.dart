@@ -24,7 +24,7 @@ class _PulseAnimationDecoratorState extends State<PulseAnimationDecorator> with 
       child: widget._child,
       builder: _buildAnimation,
       animation: _animationController,
-    );    
+    );
   }
 
   @override
@@ -53,25 +53,25 @@ class _PulseAnimationDecoratorState extends State<PulseAnimationDecorator> with 
     _startAnimation();
   }
 
-  Widget _buildAnimation(BuildContext context, Widget child) {    
+  Widget _buildAnimation(BuildContext context, Widget child) {
     return Stack(
       alignment: AlignmentDirectional.center,
       children: <Widget>[
-        Positioned(child: Container(width: widget._maxRadius * 2, height: widget._maxRadius * 2)),        
-        Positioned(        
-          top: widget._maxRadius - _decorationRadius.value,
-          left: widget._maxRadius - _decorationRadius.value,
+        Positioned(child: Container(width: widget._maxRadius * 2, height: widget._maxRadius * 2)),
+        Positioned(
+            top: widget._maxRadius - _decorationRadius.value,
+            left: widget._maxRadius - _decorationRadius.value,
             child: Container(
-          height: _decorationRadius.value * 2,
-          width: _decorationRadius.value * 2,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: theme.pulseAnimationColor),
-        )),
+              height: _decorationRadius.value * 2,
+              width: _decorationRadius.value * 2,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: theme.pulseAnimationColor),
+            )),
         Positioned(child: child)
       ],
     );
   }
 
-  _startAnimation() {    
+  _startAnimation() {
     _animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _animationController.reverse();

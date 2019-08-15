@@ -9,16 +9,14 @@ class PaymentItemAvatar extends StatelessWidget {
 
   PaymentItemAvatar(this.paymentItem, {this.radius = 20.0});
 
-  bool get _shouldShowLeadingIcon => paymentItem.imageURL == null &&  paymentItem.containsPaymentInfo || paymentItem.isTransferRequest;
+  bool get _shouldShowLeadingIcon => paymentItem.imageURL == null && paymentItem.containsPaymentInfo || paymentItem.isTransferRequest;
 
   @override
   Widget build(BuildContext context) {
     if (_shouldShowLeadingIcon) {
-      IconData icon = [PaymentType.DEPOSIT, PaymentType.RECEIVED].indexOf(
-          paymentItem.type) >= 0 ? Icons.add : Icons.remove;
+      IconData icon = [PaymentType.DEPOSIT, PaymentType.RECEIVED].indexOf(paymentItem.type) >= 0 ? Icons.add : Icons.remove;
       return Container(
-          decoration: BoxDecoration(color: Colors.white,
-              borderRadius: new BorderRadius.all(new Radius.circular(radius))),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: new BorderRadius.all(new Radius.circular(radius))),
           width: radius * 2,
           height: radius * 2,
           child: Icon(icon, color: theme.BreezColors.blue[500]));

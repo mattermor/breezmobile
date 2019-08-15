@@ -57,8 +57,9 @@ class PaymentRequestInfoDialogState extends State<PaymentRequestInfoDialog> {
     return _buildPaymentRequestDialog();
   }
 
-  @override void dispose() {
-    _doneAction.dispose();    
+  @override
+  void dispose() {
+    _doneAction.dispose();
     super.dispose();
   }
 
@@ -119,30 +120,30 @@ class PaymentRequestInfoDialogState extends State<PaymentRequestInfoDialog> {
     if (widget.invoice.amount == 0) {
       return Theme(
         data: Theme.of(context).copyWith(
-          inputDecorationTheme: InputDecorationTheme(enabledBorder: UnderlineInputBorder(borderSide: theme.greyBorderSide)),
-          hintColor: theme.alertStyle.color,
-          accentColor: theme.BreezColors.blue[500],
-          primaryColor: theme.BreezColors.blue[500],
-          errorColor: Colors.red),         
-          child: Form(
-            autovalidate: true,
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-              child: Container(                                        
-                  height: 80.0,
-                child: AmountFormField(
-                  context: context,
-                  accountModel: account,
-                  iconColor: theme.BreezColors.blue[500],
-                  focusNode: _amountFocusNode,
-                  controller: _invoiceAmountController,
-                  validatorFn: account.validateOutgoingPayment,
-                  style: theme.alertStyle.copyWith(height: 1.0),
-                ),
+            inputDecorationTheme: InputDecorationTheme(enabledBorder: UnderlineInputBorder(borderSide: theme.greyBorderSide)),
+            hintColor: theme.alertStyle.color,
+            accentColor: theme.BreezColors.blue[500],
+            primaryColor: theme.BreezColors.blue[500],
+            errorColor: Colors.red),
+        child: Form(
+          autovalidate: true,
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+            child: Container(
+              height: 80.0,
+              child: AmountFormField(
+                context: context,
+                accountModel: account,
+                iconColor: theme.BreezColors.blue[500],
+                focusNode: _amountFocusNode,
+                controller: _invoiceAmountController,
+                validatorFn: account.validateOutgoingPayment,
+                style: theme.alertStyle.copyWith(height: 1.0),
               ),
             ),
           ),
+        ),
       );
     }
     return GestureDetector(

@@ -40,13 +40,13 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
   bool _inProgress = false;
   final FocusNode _amountFocusNode = FocusNode();
   final FocusNode _feeFocusNode = FocusNode();
-  KeyboardDoneAction _doneAction;  
+  KeyboardDoneAction _doneAction;
 
   @override
   Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(context).copyWith(
-        inputDecorationTheme: InputDecorationTheme(enabledBorder: UnderlineInputBorder(borderSide: theme.greyBorderSide)),
+          inputDecorationTheme: InputDecorationTheme(enabledBorder: UnderlineInputBorder(borderSide: theme.greyBorderSide)),
           hintColor: theme.alertStyle.color,
           accentColor: theme.BreezColors.blue[500],
           primaryColor: theme.BreezColors.blue[500],
@@ -60,51 +60,46 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
             automaticallyImplyLeading: false,
             backgroundColor: Colors.white,
             actions: <Widget>[
-              IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close, color: theme.BreezColors.grey[600]))
+              IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.close, color: theme.BreezColors.grey[600]))
             ],
-            title: new Text("Unexpected Funds",
-                style: theme.alertTitleStyle, textAlign: TextAlign.left),
+            title: new Text("Unexpected Funds", style: theme.alertTitleStyle, textAlign: TextAlign.left),
             elevation: 0.0),
         bottomNavigationBar: BottomAppBar(
           color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.only(right: 12.0),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  StreamBuilder<AccountSettings>(
-                      stream: widget._accountBloc.accountSettingsStream,
-                      builder: (context, snapshot) {
-                        AccountSettings settings = snapshot.data;
-                        return FlatButton(
-                            onPressed: () {
-                              _onDismiss(settings);
-                            },
-                            child: Text("DISMISS", style: theme.buttonStyle));
-                      }),
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text("LATER", style: theme.buttonStyle)),
-                  StreamBuilder<AccountModel>(
-                      stream: widget._accountBloc.accountStream,
-                      builder: (context, snapshot) {
-                        AccountModel acc = snapshot.data;
-                        return FlatButton(
-                            onPressed: () {
-                              _asyncValidate().then((validated) {
-                                if (validated) {
-                                  _formKey.currentState.save();
-                                  _showAlertDialog(acc.currency);
-                                }
-                              });
-                            },
-                            child: Text("SEND", style: theme.buttonStyle));
-                      })
-                ]),
+            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+              StreamBuilder<AccountSettings>(
+                  stream: widget._accountBloc.accountSettingsStream,
+                  builder: (context, snapshot) {
+                    AccountSettings settings = snapshot.data;
+                    return FlatButton(
+                        onPressed: () {
+                          _onDismiss(settings);
+                        },
+                        child: Text("DISMISS", style: theme.buttonStyle));
+                  }),
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("LATER", style: theme.buttonStyle)),
+              StreamBuilder<AccountModel>(
+                  stream: widget._accountBloc.accountStream,
+                  builder: (context, snapshot) {
+                    AccountModel acc = snapshot.data;
+                    return FlatButton(
+                        onPressed: () {
+                          _asyncValidate().then((validated) {
+                            if (validated) {
+                              _formKey.currentState.save();
+                              _showAlertDialog(acc.currency);
+                            }
+                          });
+                        },
+                        child: Text("SEND", style: theme.buttonStyle));
+                  })
+            ]),
           ),
         ),
         body: StreamBuilder<AccountModel>(
@@ -119,8 +114,7 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
                 child: Form(
                   key: _formKey,
                   child: new Padding(
-                    padding: EdgeInsets.only(
-                        left: 16.0, right: 16.0, bottom: 0.0, top: 12.0),
+                    padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 0.0, top: 12.0),
                     child: new Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,10 +122,7 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
                         constraints.maxHeight > 400.0
                             ? Text(
                                 "Breez found unexpected funds in its underlying  wallet. These funds cannot be used for Breez payments, so it is highly recommended you send them to an external address as soon as possible.",
-                                style: new TextStyle(
-                                    color: theme.BreezColors.grey[500],
-                                    fontSize: 16.0,
-                                    height: 1.2))
+                                style: new TextStyle(color: theme.BreezColors.grey[500], fontSize: 16.0, height: 1.2))
                             : SizedBox(),
                         new TextFormField(
                           controller: _addressController,
@@ -174,12 +165,9 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
                         new TextFormField(
                             focusNode: _feeFocusNode,
                             controller: _feeController,
-                            inputFormatters: [
-                              WhitelistingTextInputFormatter.digitsOnly
-                            ],
+                            inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
                             keyboardType: TextInputType.number,
-                            decoration: new InputDecoration(
-                                labelText: "Sat Per Byte Fee Rate"),
+                            decoration: new InputDecoration(labelText: "Sat Per Byte Fee Rate"),
                             style: theme.alertStyle,
                             validator: (value) {
                               if (_feeController.text.isEmpty) {
@@ -214,12 +202,11 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
     super.initState();
     _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode, _feeFocusNode]);
 
-    withdrawalResultSubscription =
-        widget._accountBloc.withdrawalResultStream.listen((response) {
+    withdrawalResultSubscription = widget._accountBloc.withdrawalResultStream.listen((response) {
       setState(() {
         _inProgress = false;
       });
-      Navigator.of(context).pop();      
+      Navigator.of(context).pop();
       Navigator.of(context).pop();
       showFlushbar(context, message: "The funds were successfully sent to the address you have specified.");
     }, onError: (err) {
@@ -230,8 +217,7 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
       promptError(context, null, Text(err.toString(), style: theme.alertStyle));
     });
 
-    widget._accountBloc.accountStream.first
-        .then((acc) => _feeController.text = acc.onChainFeeRate?.toString());
+    widget._accountBloc.accountStream.first.then((acc) => _feeController.text = acc.onChainFeeRate?.toString());
   }
 
   Future<bool> _asyncValidate() {
@@ -250,8 +236,7 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
         new Text("Available:", style: theme.alertStyle),
         new Padding(
           padding: EdgeInsets.only(left: 3.0),
-          child: new Text(acc.currency.format(acc.walletBalance),
-              style: theme.alertStyle),
+          child: new Text(acc.currency.format(acc.walletBalance), style: theme.alertStyle),
         )
       ],
     );
@@ -259,14 +244,11 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
 
   void _onDismiss(AccountSettings settings) async {
     TextStyle textStyle = TextStyle(color: Colors.black);
-    String exitSessionMessage =
-        "Dismissing this dialog means you won't be able to to redeem these funds. Are you sure?";
-    bool cancel = await promptAreYouSure(
-        context, null, Text(exitSessionMessage, style: textStyle),
-        textStyle: textStyle);
+    String exitSessionMessage = "Dismissing this dialog means you won't be able to to redeem these funds. Are you sure?";
+    bool cancel = await promptAreYouSure(context, null, Text(exitSessionMessage, style: textStyle), textStyle: textStyle);
     if (cancel) {
       widget._accountBloc.accountSettingsSink.add(settings.copyWith(ignoreWalletBalance: true));
-      Navigator.pop(context);    
+      Navigator.pop(context);
     }
   }
 
@@ -288,8 +270,7 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
-          this._scannerErrorMessage =
-              'Please grant Breez camera permission to scan QR codes.';
+          this._scannerErrorMessage = 'Please grant Breez camera permission to scan QR codes.';
         });
       } else {
         setState(() => this._scannerErrorMessage = '');
@@ -309,25 +290,17 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
               " from Breez and send this amount to the address you've specified?",
           style: theme.alertStyle),
       actions: <Widget>[
-        new FlatButton(
-            onPressed: () => Navigator.pop(context),
-            child: new Text("NO", style: theme.buttonStyle)),
+        new FlatButton(onPressed: () => Navigator.pop(context), child: new Text("NO", style: theme.buttonStyle)),
         new FlatButton(
             onPressed: () {
               Navigator.pop(context);
               _showLoadingDialog();
-              widget._accountBloc.withdrawalSink.add(new RemoveFundRequestModel(
-                  currency.parse(_amountController.text),
-                  _addressValidated,
-                  fromWallet: true,
-                  satPerByteFee: _feeController.text.isNotEmpty
-                      ? Int64.parseInt(_feeController.text)
-                      : Int64(0)));
+              widget._accountBloc.withdrawalSink.add(new RemoveFundRequestModel(currency.parse(_amountController.text), _addressValidated,
+                  fromWallet: true, satPerByteFee: _feeController.text.isNotEmpty ? Int64.parseInt(_feeController.text) : Int64(0)));
             },
             child: new Text("YES", style: theme.buttonStyle))
       ],
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
     );
     showDialog(context: context, builder: (_) => dialog);
   }
@@ -359,12 +332,8 @@ class SendWalletFundsDialogState extends State<SendWalletFundsDialog> {
               ))
         ],
       ),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
     );
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => WillPopScope(onWillPop: _onWillPop, child: dialog));
+    showDialog(context: context, barrierDismissible: false, builder: (_) => WillPopScope(onWillPop: _onWillPop, child: dialog));
   }
 }

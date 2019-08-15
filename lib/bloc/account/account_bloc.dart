@@ -37,10 +37,8 @@ class AccountBloc {
   Map<Type, Function> _actionHandlers = Map();
   final _reconnectStreamController = new StreamController<void>.broadcast();
 
-  final _broadcastRefundRequestController =
-      new StreamController<BroadcastRefundRequestModel>.broadcast();
-  final _broadcastRefundResponseController =
-      new StreamController<BroadcastRefundResponseModel>.broadcast();
+  final _broadcastRefundRequestController = new StreamController<BroadcastRefundRequestModel>.broadcast();
+  final _broadcastRefundResponseController = new StreamController<BroadcastRefundResponseModel>.broadcast();
 
   final _accountController = new BehaviorSubject<AccountModel>();
   final _accountEnableController = new StreamController<bool>.broadcast();
@@ -48,25 +46,20 @@ class AccountBloc {
   final _accountSettingsController = new BehaviorSubject<AccountSettings>();
   final _routingNodeConnectionController = new BehaviorSubject<bool>();
 
-  final _withdrawalController =
-      new StreamController<RemoveFundRequestModel>.broadcast();
-  final _withdrawalResultController =
-      new StreamController<RemoveFundResponseModel>.broadcast();
+  final _withdrawalController = new StreamController<RemoveFundRequestModel>.broadcast();
+  final _withdrawalResultController = new StreamController<RemoveFundResponseModel>.broadcast();
 
   final _paymentsController = new BehaviorSubject<PaymentsModel>();
   final _paymentFilterController = new BehaviorSubject<PaymentFilterModel>();
 
-  final _accountNotificationsController =
-      new StreamController<String>.broadcast();
+  final _accountNotificationsController = new StreamController<String>.broadcast();
   final _completedPaymentsController = new StreamController<CompletedPayment>.broadcast();
   final _lightningDownController = new StreamController<bool>.broadcast();
 
-  final BehaviorSubject<void> _nodeConflictController =
-      new BehaviorSubject<void>();
+  final BehaviorSubject<void> _nodeConflictController = new BehaviorSubject<void>();
   Stream<Map<String, DownloadFileInfo>> chainBootstrapProgress;
 
-  final AccountPermissionsHandler _permissionsHandler =
-      new AccountPermissionsHandler();
+  final AccountPermissionsHandler _permissionsHandler = new AccountPermissionsHandler();
   BreezUserModel _currentUser;
 
   bool _allowReconnect = true;
@@ -80,7 +73,7 @@ class AccountBloc {
   Device _device;
 
   BackgroundTaskService _backgroundService;
-  CurrencyService _currencyService;  
+  CurrencyService _currencyService;
 
   Completer _onBoardingCompleter = new Completer();
   Stream<BreezUserModel> userProfileStream;
@@ -113,10 +106,10 @@ class AccountBloc {
       _sharedPreferences = preferences;
       _refreshAccount();
       //listen streams
-      _listenAccountActions();      
+      _listenAccountActions();
       _hanleAccountSettings();
       _listenUserChanges(userProfileStream);
-      _listenWithdrawalRequests();      
+      _listenWithdrawalRequests();
       _listenFilterChanges();
       _listenAccountChanges();
       _listenEnableAccount();
@@ -126,54 +119,43 @@ class AccountBloc {
       _trackOnBoardingStatus();
     });
   }
-  Sink<bool> get accountEnableSink => _accountEnableController.sink;  
+  Sink<bool> get accountEnableSink => _accountEnableController.sink;
 
-  Stream<String> get accountNotificationsStream =>
-      _accountNotificationsController.stream;
-  Sink<AccountSettings> get accountSettingsSink =>
-      _accountSettingsController.sink;
+  Stream<String> get accountNotificationsStream => _accountNotificationsController.stream;
+  Sink<AccountSettings> get accountSettingsSink => _accountSettingsController.sink;
 
-  Stream<AccountSettings> get accountSettingsStream =>
-      _accountSettingsController.stream;
+  Stream<AccountSettings> get accountSettingsStream => _accountSettingsController.stream;
 
   Stream<AccountModel> get accountStream => _accountController.stream;
-  Sink<BroadcastRefundRequestModel> get broadcastRefundRequestSink =>
-      _broadcastRefundRequestController.sink;
-  Stream<BroadcastRefundResponseModel> get broadcastRefundResponseStream =>
-      _broadcastRefundResponseController.stream;
+  Sink<BroadcastRefundRequestModel> get broadcastRefundRequestSink => _broadcastRefundRequestController.sink;
+  Stream<BroadcastRefundResponseModel> get broadcastRefundResponseStream => _broadcastRefundResponseController.stream;
 
   Stream<CompletedPayment> get completedPaymentsStream => _completedPaymentsController.stream;
   Stream<bool> get lightningDownStream => _lightningDownController.stream;
   Stream<void> get nodeConflictStream => _nodeConflictController.stream;
-  Stream<bool> get optimizationWhitelistExplainStream =>
-      _permissionsHandler.optimizationWhitelistExplainStream;
-  Sink get optimizationWhitelistRequestSink =>
-      _permissionsHandler.optimizationWhitelistRequestSink;
-  Sink<PaymentFilterModel> get paymentFilterSink =>
-      _paymentFilterController.sink;
-  Stream<PaymentFilterModel> get paymentFilterStream =>
-      _paymentFilterController.stream;
+  Stream<bool> get optimizationWhitelistExplainStream => _permissionsHandler.optimizationWhitelistExplainStream;
+  Sink get optimizationWhitelistRequestSink => _permissionsHandler.optimizationWhitelistRequestSink;
+  Sink<PaymentFilterModel> get paymentFilterSink => _paymentFilterController.sink;
+  Stream<PaymentFilterModel> get paymentFilterStream => _paymentFilterController.stream;
   Stream<PaymentsModel> get paymentsStream => _paymentsController.stream;
-  Stream<bool> get routingNodeConnectionStream =>
-      _routingNodeConnectionController.stream;
+  Stream<bool> get routingNodeConnectionStream => _routingNodeConnectionController.stream;
   Sink<AsyncAction> get userActionsSink => _userActionsController.sink;
-  Stream<RemoveFundResponseModel> get withdrawalResultStream =>
-      _withdrawalResultController.stream;
+  Stream<RemoveFundResponseModel> get withdrawalResultStream => _withdrawalResultController.stream;
   Sink<RemoveFundRequestModel> get withdrawalSink => _withdrawalController.sink;
 
   Sink<void> get _reconnectSink => _reconnectStreamController.sink;
 
   //settings persistency
   close() {
-    _accountEnableController.close();    
+    _accountEnableController.close();
     _paymentsController.close();
-    _accountNotificationsController.close();    
+    _accountNotificationsController.close();
     _withdrawalController.close();
     _paymentFilterController.close();
     _lightningDownController.close();
     _reconnectStreamController.close();
     _routingNodeConnectionController.close();
-    _broadcastRefundRequestController.close();    
+    _broadcastRefundRequestController.close();
     _userActionsController.close();
     _permissionsHandler.dispose();
   }
@@ -183,17 +165,16 @@ class AccountBloc {
     return preferences.getString(PERSISTENT_NODE_ID_PREFERENCES_KEY);
   }
 
-  Future _bootstrapWitRetry(){    
+  Future _bootstrapWitRetry() {
     return _breezLib.bootstrap().then((downloadNeeded) async {
-      print("Account bloc bootstrap has finished");      
-    })
-    .catchError((err){
+      print("Account bloc bootstrap has finished");
+    }).catchError((err) {
       print("bootstrap failed, retrying in 2 seconds...");
       return Future.delayed(Duration(seconds: 2), () => _bootstrapWitRetry());
     });
   }
 
-  Future _cancelPaymentRequest(CancelPaymentRequest cancelRequest){
+  Future _cancelPaymentRequest(CancelPaymentRequest cancelRequest) {
     _completedPaymentsController.add(CompletedPayment(cancelRequest.paymentRequest, cancelled: true));
     return Future.value(null);
   }
@@ -208,81 +189,68 @@ class AccountBloc {
       return Future.value(null);
     }
 
-    return _breezLib.getFundStatus(_currentUser.userID).then((status) {      
-      _accountController
-            .add(_accountController.value.copyWith(addedFundsReply: status));
+    return _breezLib.getFundStatus(_currentUser.userID).then((status) {
+      _accountController.add(_accountController.value.copyWith(addedFundsReply: status));
     }).catchError((err) {
       log.severe("Error in getFundStatus " + err.toString());
     });
   }
 
   Future _fetchFundStatusAction(FetchSwapFundStatus action) async {
-    action.resolve(await _fetchFundStatus());    
+    action.resolve(await _fetchFundStatus());
   }
 
   Future _fetchRates(FetchRates rates) async {
     if (this._accountController.value.fiatConversionList.isEmpty) {
-      await _getExchangeRate();  
+      await _getExchangeRate();
     }
     rates.resolve(this._accountController.value.fiatConversionList);
   }
 
   _filterPayments(List<PaymentInfo> paymentsList) {
-    Set<PaymentInfo> paymentsSet = paymentsList
-        .where(
-            (p) => _paymentFilterController.value.paymentType.contains(p.type))
-        .toSet();
-    if (_paymentFilterController.value.startDate != null &&
-        _paymentFilterController.value.endDate != null) {
+    Set<PaymentInfo> paymentsSet = paymentsList.where((p) => _paymentFilterController.value.paymentType.contains(p.type)).toSet();
+    if (_paymentFilterController.value.startDate != null && _paymentFilterController.value.endDate != null) {
       Set<PaymentInfo> _dateFilteredPaymentsSet = paymentsList
-          .where((p) => (p.creationTimestamp.toInt() * 1000 >=
-                  _paymentFilterController
-                      .value.startDate.millisecondsSinceEpoch &&
-              p.creationTimestamp.toInt() * 1000 <=
-                  _paymentFilterController
-                      .value.endDate.millisecondsSinceEpoch))
+          .where((p) => (p.creationTimestamp.toInt() * 1000 >= _paymentFilterController.value.startDate.millisecondsSinceEpoch &&
+              p.creationTimestamp.toInt() * 1000 <= _paymentFilterController.value.endDate.millisecondsSinceEpoch))
           .toSet();
       return _dateFilteredPaymentsSet.intersection(paymentsSet).toList();
     }
     return paymentsSet.toList();
   }
 
-  Future _getExchangeRate() async {    
+  Future _getExchangeRate() async {
     _currencyData = await _currencyService.currencies();
     Rates _rate = await _breezLib.rate();
-    List<FiatConversion> _fiatConversionList = _rate.rates
-        .map((rate) => new FiatConversion(_currencyData[rate.coin], rate.value))
-        .toList();
+    List<FiatConversion> _fiatConversionList = _rate.rates.map((rate) => new FiatConversion(_currencyData[rate.coin], rate.value)).toList();
     _fiatConversionList.sort((a, b) => a.currencyData.shortName.compareTo(b.currencyData.shortName));
-    _accountController.add(_accountController.value
-        .copyWith(
+    _accountController.add(_accountController.value.copyWith(
       fiatConversionList: _fiatConversionList,
-      fiatShortName: _currentUser?.fiatCurrency,));
+      fiatShortName: _currentUser?.fiatCurrency,
+    ));
   }
 
   Future _handleResetNetwork(ResetNetwork action) async {
-    action.resolve(await _breezLib.setPeers([]));    
+    action.resolve(await _breezLib.setPeers([]));
   }
 
   Future _handleRestartDaemon(RestartDaemon action) async {
-    action.resolve(await _breezLib.restartLightningDaemon());    
+    action.resolve(await _breezLib.restartLightningDaemon());
   }
 
   Future _handleSendQueryRoute(SendPaymentFailureReport action) async {
-    action.resolve(await _breezLib.sendPaymentFailureBugReport(action.traceReport));        
+    action.resolve(await _breezLib.sendPaymentFailureBugReport(action.traceReport));
   }
 
   Future _hanleAccountSettings() async {
     var preferences = await ServiceInjector().sharedPreferences;
-    var accountSettings =
-        preferences.getString(ACCOUNT_SETTINGS_PREFERENCES_KEY);
+    var accountSettings = preferences.getString(ACCOUNT_SETTINGS_PREFERENCES_KEY);
     if (accountSettings != null) {
       Map<String, dynamic> settings = json.decode(accountSettings);
       _accountSettingsController.add(AccountSettings.fromJson(settings));
     }
     _accountSettingsController.stream.listen((settings) {
-      preferences.setString(
-          ACCOUNT_SETTINGS_PREFERENCES_KEY, json.encode(settings.toJson()));
+      preferences.setString(ACCOUNT_SETTINGS_PREFERENCES_KEY, json.encode(settings.toJson()));
     });
 
     _accountController.stream.listen((acc) async {
@@ -307,31 +275,28 @@ class AccountBloc {
 
   void _listenAccountChanges() {
     StreamSubscription<NotificationEvent> eventSubscription;
-    eventSubscription =
-        Observable(_breezLib.notificationStream).listen((event) {
-      if (event.type ==
-          NotificationEvent_NotificationType.LIGHTNING_SERVICE_DOWN) {
-            _pollSyncStatus();
-            if (!_retryingLightningService) {
-              _retryingLightningService = true;
-              _breezLib.restartLightningDaemon();
-              return;
-            }
-            _retryingLightningService = false;
-            _lightningDownController.add(true);         
+    eventSubscription = Observable(_breezLib.notificationStream).listen((event) {
+      if (event.type == NotificationEvent_NotificationType.LIGHTNING_SERVICE_DOWN) {
+        _pollSyncStatus();
+        if (!_retryingLightningService) {
+          _retryingLightningService = true;
+          _breezLib.restartLightningDaemon();
+          return;
+        }
+        _retryingLightningService = false;
+        _lightningDownController.add(true);
       }
       if (event.type == NotificationEvent_NotificationType.ACCOUNT_CHANGED) {
         _refreshAccount();
       }
-      if (event.type ==
-          NotificationEvent_NotificationType.BACKUP_NODE_CONFLICT) {
+      if (event.type == NotificationEvent_NotificationType.BACKUP_NODE_CONFLICT) {
         eventSubscription.cancel();
         _nodeConflictController.add(null);
       }
     });
   }
 
-  void _listenBootstrapStatus() {    
+  void _listenBootstrapStatus() {
     _breezLib.chainBootstrapProgress.listen((fileInfo) {
       double totalContentLength = 0;
       double downloadedContentLength = 0;
@@ -340,19 +305,16 @@ class AccountBloc {
         downloadedContentLength += f.bytesDownloaded;
       });
       double progress = downloadedContentLength / totalContentLength;
-      _accountController
-          .add(_accountController.value.copyWith(bootstrapProgress: progress));      
+      _accountController.add(_accountController.value.copyWith(bootstrapProgress: progress));
     }, onDone: () {
-      _accountController
-          .add(_accountController.value.copyWith(bootstrapProgress: 1));
-    });    
+      _accountController.add(_accountController.value.copyWith(bootstrapProgress: 1));
+    });
   }
 
   void _listenConnectivityChanges() {
     var connectivity = Connectivity();
     connectivity.onConnectivityChanged.skip(1).listen((connectivityResult) {
-      log.info("_listenConnectivityChanges: connection changed to: " +
-          connectivityResult.toString());
+      log.info("_listenConnectivityChanges: connection changed to: " + connectivityResult.toString());
       _allowReconnect = (connectivityResult != ConnectivityResult.none);
       _reconnectSink.add(null);
     });
@@ -360,11 +322,9 @@ class AccountBloc {
 
   void _listenEnableAccount() {
     _accountEnableController.stream.listen((enable) {
-      _accountController
-          .add(_accountController.value.copyWith(enableInProgress: true));
+      _accountController.add(_accountController.value.copyWith(enableInProgress: true));
       _breezLib.enableAccount(enable).whenComplete(() {
-        _accountController
-            .add(_accountController.value.copyWith(enableInProgress: false));
+        _accountController.add(_accountController.value.copyWith(enableInProgress: false));
       });
     });
   }
@@ -377,13 +337,10 @@ class AccountBloc {
 
   void _listenMempoolTransactions() {
     _notificationsService.notifications
-        .where((message) =>
-            message["msg"] == "Unconfirmed transaction" ||
-            message["msg"] == "Confirmed transaction")
+        .where((message) => message["msg"] == "Unconfirmed transaction" || message["msg"] == "Confirmed transaction")
         .listen((message) {
       log.severe(message.toString());
-      if (message["msg"] == "Unconfirmed transaction" &&
-          message["user_click"] == null) {
+      if (message["msg"] == "Unconfirmed transaction" && message["user_click"] == null) {
         _accountNotificationsController.add(message["body"].toString());
       }
       _fetchFundStatus();
@@ -397,24 +354,17 @@ class AccountBloc {
 
   void _listenReconnects() {
     Future connectingFuture = Future.value(null);
-    _reconnectStreamController.stream
-        .transform(DebounceStreamTransformer(Duration(milliseconds: 500)))
-        .listen((_) async {
+    _reconnectStreamController.stream.transform(DebounceStreamTransformer(Duration(milliseconds: 500))).listen((_) async {
       connectingFuture = connectingFuture.whenComplete(() async {
-        if (_allowReconnect == true &&
-            _accountController.value.connected == false) {
+        if (_allowReconnect == true && _accountController.value.connected == false) {
           await _breezLib.connectAccount();
         }
       }).catchError((e) {});
     });
   }
 
-  void _listenRefundableDeposits() {    
-    _breezLib.notificationStream
-        .where((n) =>
-            n.type ==
-            NotificationEvent_NotificationType.FUND_ADDRESS_UNSPENT_CHANGED)
-        .listen((e) {      
+  void _listenRefundableDeposits() {
+    _breezLib.notificationStream.where((n) => n.type == NotificationEvent_NotificationType.FUND_ADDRESS_UNSPENT_CHANGED).listen((e) {
       _fetchFundStatus();
     });
   }
@@ -422,17 +372,14 @@ class AccountBloc {
   void _listenRefundBroadcasts() {
     _broadcastRefundRequestController.stream.listen((request) {
       _breezLib.refund(request.fromAddress, request.toAddress).then((txID) {
-        _broadcastRefundResponseController
-            .add(new BroadcastRefundResponseModel(request, txID));
+        _broadcastRefundResponseController.add(new BroadcastRefundResponseModel(request, txID));
       }).catchError(_broadcastRefundResponseController.addError);
     });
   }
 
   void _listenRoutingNodeConnectionChanges() {
     Observable(_breezLib.notificationStream)
-        .where((event) =>
-            event.type ==
-            NotificationEvent_NotificationType.ROUTING_NODE_CONNECTION_CHANGED)
+        .where((event) => event.type == NotificationEvent_NotificationType.ROUTING_NODE_CONNECTION_CHANGED)
         .listen((change) => _refreshRoutingNodeConnection());
   }
 
@@ -456,15 +403,14 @@ class AccountBloc {
       //start lightning
       if (user.registered) {
         if (!_startedLightning) {
-          _breezLib.needsBootstrap().then((need){
-              _setBootstraping(need || _isBootstrapping());
+          _breezLib.needsBootstrap().then((need) {
+            _setBootstraping(need || _isBootstrapping());
           });
           //_askWhitelistOptimizations();
-          print(
-              "Account bloc got registered user, starting lightning daemon...");
+          print("Account bloc got registered user, starting lightning daemon...");
           _startedLightning = true;
-          _pollSyncStatus();          
-          _backgroundService.runAsTask(_onBoardingCompleter.future, (){
+          _pollSyncStatus();
+          _backgroundService.runAsTask(_onBoardingCompleter.future, () {
             log.info("onboarding background task finished");
           });
           _bootstrapWitRetry().then((_) async {
@@ -480,60 +426,48 @@ class AccountBloc {
         }
       }
     });
-  }  
+  }
 
   void _listenWithdrawalRequests() {
     _withdrawalController.stream.listen((removeFundRequestModel) {
       Future removeFunds = Future.value(null);
       if (removeFundRequestModel.fromWallet) {
         removeFunds = _breezLib
-            .sendWalletCoins(
-                removeFundRequestModel.address,
-                removeFundRequestModel.amount,
-                removeFundRequestModel.satPerByteFee)
-            .then((txID) => _withdrawalResultController
-                .add(new RemoveFundResponseModel(txID)));
+            .sendWalletCoins(removeFundRequestModel.address, removeFundRequestModel.amount, removeFundRequestModel.satPerByteFee)
+            .then((txID) => _withdrawalResultController.add(new RemoveFundResponseModel(txID)));
       } else {
         removeFunds = _breezLib
-            .removeFund(
-                removeFundRequestModel.address, removeFundRequestModel.amount)
-            .then((res) => _withdrawalResultController.add(
-                new RemoveFundResponseModel(res.txid,
-                    errorMessage: res.errorMessage)));
+            .removeFund(removeFundRequestModel.address, removeFundRequestModel.amount)
+            .then((res) => _withdrawalResultController.add(new RemoveFundResponseModel(res.txid, errorMessage: res.errorMessage)));
       }
 
       removeFunds.catchError(_withdrawalResultController.addError);
     });
   }
 
-  void _pollSyncStatus(){
+  void _pollSyncStatus() {
     if (_accountSynchronizer != null) {
       _accountSynchronizer.dismiss();
     }
 
-    _accountSynchronizer = new AccountSynchronizer(
-      _breezLib, 
-      onStart: (startPollTimestamp, bootstraping) async {
-        if (
-            bootstraping || Duration(milliseconds: DateTime.now().millisecondsSinceEpoch - startPollTimestamp) > Duration(days: 1) &&
-            _accountController.value.syncUIState == SyncUIState.NONE) {
-              await userProfileStream.where((u) => u.locked == false).first;
-             _accountController.add(_accountController.value.copyWith(syncUIState: SyncUIState.BLOCKING));
+    _accountSynchronizer = new AccountSynchronizer(_breezLib,
+        onStart: (startPollTimestamp, bootstraping) async {
+          if (bootstraping ||
+              Duration(milliseconds: DateTime.now().millisecondsSinceEpoch - startPollTimestamp) > Duration(days: 1) &&
+                  _accountController.value.syncUIState == SyncUIState.NONE) {
+            await userProfileStream.where((u) => u.locked == false).first;
+            _accountController.add(_accountController.value.copyWith(syncUIState: SyncUIState.BLOCKING));
           }
-      },
-      onProgress: (progress) => _accountController.add(_accountController.value.copyWith(syncProgress: progress)),
-      onComplete: () => _accountController.add(_accountController.value.copyWith(syncUIState: SyncUIState.NONE, syncProgress: 1.0))
-    );   
+        },
+        onProgress: (progress) => _accountController.add(_accountController.value.copyWith(syncProgress: progress)),
+        onComplete: () => _accountController.add(_accountController.value.copyWith(syncUIState: SyncUIState.NONE, syncProgress: 1.0)));
   }
 
   _refreshAccount() {
     print("Account bloc refreshing account...");
     _breezLib.getAccount().then((acc) {
       if (acc.id.isNotEmpty) {
-        print("ACCOUNT CHANGED BALANCE=" +
-            acc.balance.toString() +
-            " STATUS = " +
-            acc.status.toString());
+        print("ACCOUNT CHANGED BALANCE=" + acc.balance.toString() + " STATUS = " + acc.status.toString());
         _accountController.add(_accountController.value
             .copyWith(accountResponse: acc, currency: _currentUser?.currency, fiatShortName: _currentUser?.fiatCurrency, initial: false));
       }
@@ -542,8 +476,7 @@ class AccountBloc {
     if (_accountController.value.onChainFeeRate == null) {
       _breezLib.getDefaultOnChainFeeRate().then((rate) {
         if (rate.toInt() > 0) {
-          _accountController
-              .add(_accountController.value.copyWith(onChainFeeRate: rate));
+          _accountController.add(_accountController.value.copyWith(onChainFeeRate: rate));
         }
       });
     }
@@ -553,28 +486,20 @@ class AccountBloc {
     DateTime _firstDate;
     print("refreshing payments...");
     _breezLib.getPayments().then((payments) {
-      List<PaymentInfo> _paymentsList = payments.paymentsList
-          .map((payment) => new PaymentInfo(payment, _currentUser?.currency))
-          .toList();
+      List<PaymentInfo> _paymentsList = payments.paymentsList.map((payment) => new PaymentInfo(payment, _currentUser?.currency)).toList();
       if (_paymentsList.length > 0) {
-        _firstDate = DateTime.fromMillisecondsSinceEpoch(
-            _paymentsList.last.creationTimestamp.toInt() * 1000);
+        _firstDate = DateTime.fromMillisecondsSinceEpoch(_paymentsList.last.creationTimestamp.toInt() * 1000);
       }
       print("refresh payments finished");
       _paymentsController.add(PaymentsModel(
-          _paymentsList,
-          _filterPayments(_paymentsList),
-          _paymentFilterController.value,
-          _firstDate ?? DateTime(DateTime.now().year)));
+          _paymentsList, _filterPayments(_paymentsList), _paymentFilterController.value, _firstDate ?? DateTime(DateTime.now().year)));
     }).catchError(_paymentsController.addError);
   }
 
   _refreshRoutingNodeConnection() {
     _breezLib.isConnectedToRoutingNode().then((connected) async {
-      _accountController
-          .add(_accountController.value.copyWith(connected: connected));
-      _setBootstraping(
-          connected ? false : _accountController.value.bootstraping);
+      _accountController.add(_accountController.value.copyWith(connected: connected));
+      _setBootstraping(connected ? false : _accountController.value.bootstraping);
       if (!connected) {
         log.info("Node disconnected, adding reconnect request");
         _reconnectSink.add(null); //try to reconnect
@@ -584,31 +509,23 @@ class AccountBloc {
 
   Future _sendPayment(SendPayment sendPayment) {
     var payRequest = sendPayment.paymentRequest;
-    _accountController.add(_accountController.value
-          .copyWith(paymentRequestInProgress: payRequest.paymentRequest));
-    var sendPaymentFuture = _breezLib
-        .sendPaymentForRequest(payRequest.paymentRequest,
-            amount: payRequest.amount)
-        .then((response) {
-      _accountController.add(
-        _accountController.value.copyWith(paymentRequestInProgress: ""));
+    _accountController.add(_accountController.value.copyWith(paymentRequestInProgress: payRequest.paymentRequest));
+    var sendPaymentFuture = _breezLib.sendPaymentForRequest(payRequest.paymentRequest, amount: payRequest.amount).then((response) {
+      _accountController.add(_accountController.value.copyWith(paymentRequestInProgress: ""));
 
-      if (response.paymentError.isNotEmpty) {         
+      if (response.paymentError.isNotEmpty) {
         return Future.error(PaymentError(payRequest, response.paymentError, response.traceReport));
       }
-      
+
       _completedPaymentsController.add(CompletedPayment(payRequest));
       return Future.value(null);
-
-    }).catchError((err) {        
-      _accountController.add(
-          _accountController.value.copyWith(paymentRequestInProgress: ""));
+    }).catchError((err) {
+      _accountController.add(_accountController.value.copyWith(paymentRequestInProgress: ""));
       var error = (err.runtimeType == PaymentError ? err : PaymentError(payRequest, err, null));
-      _completedPaymentsController
-          .addError(error);
-        return Future.error(error);
+      _completedPaymentsController.addError(error);
+      return Future.error(error);
     });
-    _backgroundService.runAsTask(sendPaymentFuture, (){
+    _backgroundService.runAsTask(sendPaymentFuture, () {
       log.info("sendpayment background task finished");
     });
     return sendPaymentFuture;
@@ -617,8 +534,7 @@ class AccountBloc {
   void _setBootstraping(bool bootstraping) async {
     _sharedPreferences.setBool(BOOTSTRAPING_PREFERENCES_KEY, bootstraping);
     bool initial = bootstraping ? false : _accountController.value.initial;
-    _accountController
-        .add(_accountController.value.copyWith(bootstraping: bootstraping, initial: initial));  
+    _accountController.add(_accountController.value.copyWith(bootstraping: bootstraping, initial: initial));
     if (bootstraping && _accountController.value.syncUIState == SyncUIState.NONE) {
       await userProfileStream.where((u) => u.locked == false).first;
       _accountController.add(_accountController.value.copyWith(syncUIState: SyncUIState.BLOCKING));
@@ -631,8 +547,8 @@ class AccountBloc {
     });
   }
 
-  void _trackOnBoardingStatus(){
-    _accountController.where((acc) => !acc.initial && !acc.isInitialBootstrap).first.then((_){
+  void _trackOnBoardingStatus() {
+    _accountController.where((acc) => !acc.initial && !acc.isInitialBootstrap).first.then((_) {
       _onBoardingCompleter.complete();
     });
   }

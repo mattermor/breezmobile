@@ -10,11 +10,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class POSProfileBloc {
-
   static const PROFILE_DATA_FOLDER_PATH = "profile";
-  
-  static const String POS_PROFILE_PREFERENCES_KEY =
-      "BreezUserModel.posProfile";
+
+  static const String POS_PROFILE_PREFERENCES_KEY = "BreezUserModel.posProfile";
 
   final _requestPosProfileController = new StreamController<POSProfileModel>();
   final _posProfileController = new BehaviorSubject<POSProfileModel>();
@@ -28,23 +26,22 @@ class POSProfileBloc {
     _listenRegistrationRequests(injector);
     _listenUploadLogoRequests(injector);
   }
-  Sink<POSProfileModel> get posProfileSink => _requestPosProfileController.sink; 
+  Sink<POSProfileModel> get posProfileSink => _requestPosProfileController.sink;
 
   Stream<POSProfileModel> get posProfileStream => _posProfileController.stream;
-  Stream<Exception> get profileUpdatesErrorStream => _profileUpdatesErrorController.stream; 
+  Stream<Exception> get profileUpdatesErrorStream => _profileUpdatesErrorController.stream;
 
   Sink<List<int>> get uploadLogoSink => _uploadLogoController.sink;
 
   close() {
-    _requestPosProfileController.close(); 
-    _uploadLogoController.close();   
+    _requestPosProfileController.close();
+    _uploadLogoController.close();
     _profileUpdatesErrorController.close();
   }
 
   void _initializeWithSavedUser(ServiceInjector injector) {
     injector.sharedPreferences.then((preferences) {
-      String jsonStr =
-          preferences.getString(POS_PROFILE_PREFERENCES_KEY) ?? "{}";
+      String jsonStr = preferences.getString(POS_PROFILE_PREFERENCES_KEY) ?? "{}";
       Map profile = json.decode(jsonStr);
       _posProfileController.add(POSProfileModel.fromJson(profile));
     });
@@ -58,42 +55,35 @@ class POSProfileBloc {
 
   _listenUploadLogoRequests(ServiceInjector injector) {
     BreezServer breezServer = injector.breezServer;
-    _uploadLogoController.stream.listen(
-      (logoBytes) {        
-        _saveLogoImage(logoBytes)        
-        .then((file) {                    
-          var oldProfile = _posProfileController.value;
-          _posProfileController.add(oldProfile.copyWith(uploadInProgress: true, logoLocalPath: file.path));
-          return breezServer.uploadLogo(logoBytes)
-          .then( (logoURL) { 
-            if(oldProfile.logoLocalPath != null) {
-               new File(oldProfile.logoLocalPath).delete();
-            }
-            _saveProfile(_posProfileController.value.copyWith(logo: logoURL, uploadInProgress: false), injector);
-          });
-        })                    
-        .catchError((err){
-          log.severe(err);
-          _posProfileController.add(_posProfileController.value.copyWith(uploadInProgress: false));
-          _profileUpdatesErrorController.addError(err);
+    _uploadLogoController.stream.listen((logoBytes) {
+      _saveLogoImage(logoBytes).then((file) {
+        var oldProfile = _posProfileController.value;
+        _posProfileController.add(oldProfile.copyWith(uploadInProgress: true, logoLocalPath: file.path));
+        return breezServer.uploadLogo(logoBytes).then((logoURL) {
+          if (oldProfile.logoLocalPath != null) {
+            new File(oldProfile.logoLocalPath).delete();
+          }
+          _saveProfile(_posProfileController.value.copyWith(logo: logoURL, uploadInProgress: false), injector);
         });
-      },
-      onError: _profileUpdatesErrorController.addError
-    );
+      }).catchError((err) {
+        log.severe(err);
+        _posProfileController.add(_posProfileController.value.copyWith(uploadInProgress: false));
+        _profileUpdatesErrorController.addError(err);
+      });
+    }, onError: _profileUpdatesErrorController.addError);
   }
 
-  _saveLogoImage(List<int> logoBytes){
+  _saveLogoImage(List<int> logoBytes) {
     return getApplicationDocumentsDirectory()
         .then((docDir) => new Directory([docDir.path, PROFILE_DATA_FOLDER_PATH].join("/")).create(recursive: true))
-        .then((profileDir) => new File( [profileDir.path, 'profile-${DateTime.now().millisecondsSinceEpoch}-.png'].join("/") )
-          .writeAsBytes(logoBytes, flush: true)); 
+        .then((profileDir) => new File([profileDir.path, 'profile-${DateTime.now().millisecondsSinceEpoch}-.png'].join("/"))
+            .writeAsBytes(logoBytes, flush: true));
   }
 
   _saveProfile(POSProfileModel posProfile, ServiceInjector injector) {
     injector.sharedPreferences.then((preferences) {
-        preferences.setString(
-            POS_PROFILE_PREFERENCES_KEY, json.encode(posProfile));
-        _posProfileController.add(posProfile);
-      }).catchError(_requestPosProfileController.addError);
+      preferences.setString(POS_PROFILE_PREFERENCES_KEY, json.encode(posProfile));
+      _posProfileController.add(posProfile);
+    }).catchError(_requestPosProfileController.addError);
   }
 }

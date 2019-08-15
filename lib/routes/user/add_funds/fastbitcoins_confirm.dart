@@ -35,30 +35,21 @@ class FastBitcoinsConfirmWidget extends StatelessWidget {
   final ValidateResponseModel response;
   final BreezUserModel user;
 
-  const FastBitcoinsConfirmWidget(
-      {Key key, this.user, this.request, this.response})
-      : super(key: key);
+  const FastBitcoinsConfirmWidget({Key key, this.user, this.request, this.response}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     String btcReceived = user.currency.format(Int64(response.satoshiAmount));
-    String comissionRate =
-        (response.commissionTotal / response.value * 100).toStringAsFixed(2) + "%";
+    String comissionRate = (response.commissionTotal / response.value * 100).toStringAsFixed(2) + "%";
 
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Column(
         children: <Widget>[
-          ConfirmationItem(
-              title: "Voucher value",
-              details: '${response.value.toStringAsFixed(2)} ${request.currency}'),
-          ConfirmationItem(
-              title: "Exchange rate",
-              details: '${response.exchangeRate.toStringAsFixed(2)} ${request.currency}'),
+          ConfirmationItem(title: "Voucher value", details: '${response.value.toStringAsFixed(2)} ${request.currency}'),
+          ConfirmationItem(title: "Exchange rate", details: '${response.exchangeRate.toStringAsFixed(2)} ${request.currency}'),
           ConfirmationItem(title: "Commission rate", details: comissionRate),
-          ConfirmationItem(
-              title: "Commission total",
-              details: '${response.commissionTotal.toStringAsFixed(2)} ${request.currency}'),
+          ConfirmationItem(title: "Commission total", details: '${response.commissionTotal.toStringAsFixed(2)} ${request.currency}'),
           ConfirmationItem(title: "Bitcoins received", details: btcReceived),
         ],
       ),

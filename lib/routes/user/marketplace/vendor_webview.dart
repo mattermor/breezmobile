@@ -26,8 +26,8 @@ class VendorWebViewPage extends StatefulWidget {
 }
 
 class VendorWebViewPageState extends State<VendorWebViewPage> {
-  final _widgetWebview = new FlutterWebviewPlugin();    
-  StreamSubscription _postMessageListener;  
+  final _widgetWebview = new FlutterWebviewPlugin();
+  StreamSubscription _postMessageListener;
   WeblnHandlers _weblnHandlers;
   bool _isInit = false;
   Uint8List _screenshotData;
@@ -64,25 +64,24 @@ class VendorWebViewPageState extends State<VendorWebViewPage> {
 
       String loadedURL;
       _widgetWebview.onStateChanged.listen((state) async {
-        if (state.type == WebViewState.finishLoad && loadedURL != state.url) {          
+        if (state.type == WebViewState.finishLoad && loadedURL != state.url) {
           loadedURL = state.url;
           _widgetWebview.evalJavascript(await _weblnHandlers.initWeblnScript);
         }
       });
-      
-      _postMessageListener = _widgetWebview.onPostMessage.listen((msg) {        
-        if (msg != null ) {         
-          var postMessage = (widget._title == "ln.pizza") ? {"action": "sendPayment", "payReq": msg} : JSON.jsonDecode(msg);                    
-          _weblnHandlers.handleMessage(postMessage)
-            .then((resScript){
-              if (resScript != null) {
-                _widgetWebview.evalJavascript(resScript);
-                _widgetWebview.show();
-                setState(() {
-                  _screenshotData = null;
-                });
-              }
-            });            
+
+      _postMessageListener = _widgetWebview.onPostMessage.listen((msg) {
+        if (msg != null) {
+          var postMessage = (widget._title == "ln.pizza") ? {"action": "sendPayment", "payReq": msg} : JSON.jsonDecode(msg);
+          _weblnHandlers.handleMessage(postMessage).then((resScript) {
+            if (resScript != null) {
+              _widgetWebview.evalJavascript(resScript);
+              _widgetWebview.show();
+              setState(() {
+                _screenshotData = null;
+              });
+            }
+          });
         }
       });
       _isInit = true;
@@ -91,7 +90,7 @@ class VendorWebViewPageState extends State<VendorWebViewPage> {
   }
 
   @override
-  void dispose() {    
+  void dispose() {
     _postMessageListener.cancel();
     _widgetWebview.dispose();
     _weblnHandlers?.dispose();
@@ -100,26 +99,26 @@ class VendorWebViewPageState extends State<VendorWebViewPage> {
 
   @override
   void initState() {
-    super.initState();    
+    super.initState();
     _widgetWebview.onDestroy.listen((_) {
       if (Navigator.canPop(context)) {
         Navigator.of(context).pop();
       }
-    });    
+    });
   }
 
   Future<String> loadAsset(String path) async {
     return await rootBundle.loadString(path);
   }
 
-  Future onBeforeCallHandler(String handlerName){
-    if (_screenshotData != null || !["makeInvoice", "sendPayment"].contains(handlerName)){
+  Future onBeforeCallHandler(String handlerName) {
+    if (_screenshotData != null || !["makeInvoice", "sendPayment"].contains(handlerName)) {
       return Future.value(null);
     }
 
-    Completer beforeCompleter = Completer(); 
+    Completer beforeCompleter = Completer();
     FocusScope.of(context).requestFocus(FocusNode());
-      // Wait for keyboard and screen animations to settle
+    // Wait for keyboard and screen animations to settle
     Timer(Duration(milliseconds: 750), () {
       // Take screenshot and show payment request dialog
       _takeScreenshot().then((imageData) {
@@ -129,13 +128,13 @@ class VendorWebViewPageState extends State<VendorWebViewPage> {
         // Wait for memory image to load
         Timer(Duration(milliseconds: 200), () {
           // Hide Webview to interact with payment request dialog
-          _widgetWebview.hide(); 
+          _widgetWebview.hide();
           beforeCompleter.complete();
         });
       });
-    }); 
+    });
 
-    return beforeCompleter.future; 
+    return beforeCompleter.future;
   }
 
   Future _takeScreenshot() async {

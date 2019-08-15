@@ -1,5 +1,4 @@
 class SecurityModel {
-
   static List<int> lockIntervals = List.unmodifiable([0, 30, 120, 300, 600, 1800, 3600]);
   static const int _defaultLockInterval = 120;
 
@@ -16,10 +15,15 @@ class SecurityModel {
         automaticallyLockInterval = json['automaticallyLockInterval'] ?? _defaultLockInterval,
         secureBackupWithPin = json['secureBackupWithPin'] ?? false;
 
-  SecurityModel.initial() : this(requiresPin:false, pinCode: null, secureBackupWithPin: false, automaticallyLockInterval: _defaultLockInterval);
+  SecurityModel.initial()
+      : this(requiresPin: false, pinCode: null, secureBackupWithPin: false, automaticallyLockInterval: _defaultLockInterval);
 
   SecurityModel copyWith({bool requiresPin, String pinCode, bool secureBackupWithPin, int automaticallyLockInterval}) {
-    return new SecurityModel(requiresPin: requiresPin ?? this.requiresPin, pinCode: pinCode ?? this.pinCode, secureBackupWithPin: secureBackupWithPin ?? this.secureBackupWithPin, automaticallyLockInterval: automaticallyLockInterval ?? this.automaticallyLockInterval);
+    return new SecurityModel(
+        requiresPin: requiresPin ?? this.requiresPin,
+        pinCode: pinCode ?? this.pinCode,
+        secureBackupWithPin: secureBackupWithPin ?? this.secureBackupWithPin,
+        automaticallyLockInterval: automaticallyLockInterval ?? this.automaticallyLockInterval);
   }
 
   Map<String, dynamic> toJson() => {

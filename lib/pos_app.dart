@@ -42,14 +42,12 @@ class PosApp extends StatelessWidget {
               switch (settings.name) {
                 case '/home':
                   return new FadeInRoute(
-                    builder: (_) =>
-                        new PosHome(accountBloc, backupBloc),
+                    builder: (_) => new PosHome(accountBloc, backupBloc),
                     settings: settings,
                   );
                 case '/intro':
                   return new FadeInRoute(
-                    builder: (_) => new InitialWalkthroughPage(
-                        userProfileBloc, backupBloc, true),
+                    builder: (_) => new InitialWalkthroughPage(userProfileBloc, backupBloc, true),
                     settings: settings,
                   );
                 case '/transactions':

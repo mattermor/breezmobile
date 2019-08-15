@@ -22,7 +22,7 @@ class PinCodeWidgetState extends State<PinCodeWidget> {
   String _enteredPinCode;
   String _errorMessage;
 
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -30,24 +30,20 @@ class PinCodeWidgetState extends State<PinCodeWidget> {
           Flexible(
             flex: 1,
             child: new Container(
-                child: Center(
-                  child: _buildBreezLogo(context),
-                ),                
+              child: Center(
+                child: _buildBreezLogo(context),
               ),
+            ),
           ),
           Flexible(
             flex: 1,
             child: new Container(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[Text(widget.label), _buildPinCircles(), _buildErrorMessage()]),                
-                ),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[Text(widget.label), _buildPinCircles(), _buildErrorMessage()]),
+            ),
           ),
-          Flexible(
-            flex: 2,
-            child: Container(
-              child: _numPad(context)            
-          ))
+          Flexible(flex: 2, child: Container(child: _numPad(context)))
         ],
       ),
     );
@@ -114,39 +110,39 @@ class PinCodeWidgetState extends State<PinCodeWidget> {
 
   Widget _numberButton(String number) {
     return FlatButton(
-        onPressed: () => _onNumButtonPressed(number),
-        child: new Text(number, textAlign: TextAlign.center, style: theme.numPadNumberStyle),
-      );
+      onPressed: () => _onNumButtonPressed(number),
+      child: new Text(number, textAlign: TextAlign.center, style: theme.numPadNumberStyle),
+    );
   }
 
   Widget _numPad(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,            
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
-          mainAxisSize: MainAxisSize.max, 
-          children: List<Widget>.generate(3, (i) => _numberButton( (i+1).toString())),),
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.max,
+          children: List<Widget>.generate(3, (i) => _numberButton((i + 1).toString())),
+        ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
-          mainAxisSize: MainAxisSize.max, 
-          children: List<Widget>.generate(3, (i) => _numberButton( (i+4).toString())),),
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.max,
+          children: List<Widget>.generate(3, (i) => _numberButton((i + 4).toString())),
+        ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
-          mainAxisSize: MainAxisSize.max, 
-          children: List<Widget>.generate(3, (i) => _numberButton( (i+7).toString())),),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
-          mainAxisSize: MainAxisSize.max, 
-          children: <Widget>[
-            IconButton(
-              onPressed: () => _setPinCodeInput(""),
-              icon: Icon(
-                Icons.delete_forever,
-                color: Colors.white,
-              ),
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.max,
+          children: List<Widget>.generate(3, (i) => _numberButton((i + 7).toString())),
+        ),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, mainAxisSize: MainAxisSize.max, children: <Widget>[
+          IconButton(
+            onPressed: () => _setPinCodeInput(""),
+            icon: Icon(
+              Icons.delete_forever,
+              color: Colors.white,
             ),
+          ),
           _numberButton("0"),
           Container(
             child: new IconButton(
@@ -157,8 +153,7 @@ class PinCodeWidgetState extends State<PinCodeWidget> {
               ),
             ),
           )
-          ]
-        )
+        ])
       ],
     );
   }

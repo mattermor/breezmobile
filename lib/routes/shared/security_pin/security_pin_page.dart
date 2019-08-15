@@ -27,7 +27,7 @@ class SecurityPage extends StatefulWidget {
   }
 }
 
-class SecurityPageState extends State<SecurityPage> {  
+class SecurityPageState extends State<SecurityPage> {
   bool _screenLocked = true;
 
   @override
@@ -41,9 +41,11 @@ class SecurityPageState extends State<SecurityPage> {
           } else {
             if (snapshot.data.securityModel.pinCode != null && this._screenLocked) {
               return AppLockScreen(
-                snapshot.data.securityModel, 
+                snapshot.data.securityModel,
                 canCancel: true,
-                onUnlock: () => setState((){ this._screenLocked = false; }),
+                onUnlock: () => setState(() {
+                  this._screenLocked = false;
+                }),
               );
             }
             return Scaffold(
@@ -89,14 +91,12 @@ class SecurityPageState extends State<SecurityPage> {
               activeColor: Colors.white,
               onChanged: (bool value) {
                 if (this.mounted) {
-                  _updateSecurityModel(securityModel, SecurityModel.initial());                  
+                  _updateSecurityModel(securityModel, SecurityModel.initial());
                 }
               },
             )
           : Icon(Icons.keyboard_arrow_right, color: Colors.white, size: 30.0),
-      onTap: securityModel.pinCode != null
-          ? null
-          : () => _onChangePinSelected(securityModel),
+      onTap: securityModel.pinCode != null ? null : () => _onChangePinSelected(securityModel),
     );
   }
 
@@ -116,10 +116,7 @@ class SecurityPageState extends State<SecurityPage> {
           items: SecurityModel.lockIntervals.map((int seconds) {
             return new DropdownMenuItem(
               value: seconds,
-              child: new Text(_formatSeconds(seconds),
-                  style: theme
-                      .FieldTextStyle
-                      .textStyle),
+              child: new Text(_formatSeconds(seconds), style: theme.FieldTextStyle.textStyle),
             );
           }).toList(),
         ),
@@ -141,17 +138,16 @@ class SecurityPageState extends State<SecurityPage> {
           if (this.mounted) {
             if (value) {
               bool approved = await showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext context) {
-                  return SecurityPINWarningDialog();
-                }
-              );
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return SecurityPINWarningDialog();
+                  });
               if (!approved) {
                 return;
-              }                                                
+              }
             }
-            _updateSecurityModel(securityModel, securityModel.copyWith(secureBackupWithPin: value));                        
+            _updateSecurityModel(securityModel, securityModel.copyWith(secureBackupWithPin: value));
           }
         },
       ),
@@ -161,13 +157,13 @@ class SecurityPageState extends State<SecurityPage> {
   List<Widget> _buildSecurityPINTiles(SecurityModel securityModel) {
     List<Widget> _tiles = <Widget>[_buildDisablePINTile(securityModel)];
     if (securityModel.pinCode != null)
-      _tiles..add(
-        Divider())
+      _tiles
+        ..add(Divider())
         ..add(_buildSecureBackupWithPinTile(securityModel))
         ..add(Divider())
         ..add(_buildPINIntervalTile(securityModel))
         ..add(Divider())
-        ..add(_buildChangePINTile(securityModel));        
+        ..add(_buildChangePINTile(securityModel));
     return _tiles;
   }
 
@@ -175,19 +171,19 @@ class SecurityPageState extends State<SecurityPage> {
     if (seconds == 0) {
       return "Immediate";
     }
-    return printDuration(Duration(seconds: seconds));    
+    return printDuration(Duration(seconds: seconds));
   }
 
-  void _onChangePinSelected(SecurityModel securityModel){
+  void _onChangePinSelected(SecurityModel securityModel) {
     Navigator.of(context).push(
       new FadeInRoute(
         builder: (BuildContext context) {
           return ChangePinCode();
         },
       ),
-    ).then((newPIN){
+    ).then((newPIN) {
       if (newPIN != null) {
-        _updateSecurityModel(securityModel, securityModel.copyWith(pinCode: newPIN, requiresPin: true));            
+        _updateSecurityModel(securityModel, securityModel.copyWith(pinCode: newPIN, requiresPin: true));
       }
     });
   }
@@ -196,24 +192,27 @@ class SecurityPageState extends State<SecurityPage> {
     _screenLocked = false;
     var action = UpdateSecurityModel(newModel);
     widget.userProfileBloc.userActionsSink.add(action);
-    action.future
-    .then((_){
-      if (
-        newModel.secureBackupWithPin != oldModel.secureBackupWithPin ||
-        newModel.secureBackupWithPin && newModel.pinCode != oldModel.pinCode) {
-        widget.backupBloc.backupNowSink.add(true);                        
-        widget.backupBloc.backupStateStream.firstWhere((s) => s.inProgress).then((s){
+    action.future.then((_) {
+      if (newModel.secureBackupWithPin != oldModel.secureBackupWithPin ||
+          newModel.secureBackupWithPin && newModel.pinCode != oldModel.pinCode) {
+        widget.backupBloc.backupNowSink.add(true);
+        widget.backupBloc.backupStateStream.firstWhere((s) => s.inProgress).then((s) {
           if (mounted) {
             showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (ctx) => buildBackupInProgressDialog(ctx, widget.backupBloc.backupStateStream));
+                barrierDismissible: false,
+                context: context,
+                builder: (ctx) => buildBackupInProgressDialog(ctx, widget.backupBloc.backupStateStream));
           }
         });
       }
-    })
-    .catchError((err){
-      promptError(context, "Internal Error", Text(err.toString(), style: theme.alertStyle,));
-    });    
+    }).catchError((err) {
+      promptError(
+          context,
+          "Internal Error",
+          Text(
+            err.toString(),
+            style: theme.alertStyle,
+          ));
+    });
   }
 }

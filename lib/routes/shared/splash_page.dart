@@ -31,18 +31,14 @@ class SplashPageState extends State<SplashPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            new Image.asset('src/images/waves-bottom.png', fit: BoxFit.cover)
-          ])
+          children: <Widget>[new Image.asset('src/images/waves-bottom.png', fit: BoxFit.cover)])
     ]));
   }
 
   Future checkIfFirstRun() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool _isFirstRun = (prefs.getBool('isFirstRun') ?? true);
-    if (widget._user.registered == null ||
-        widget._user.registered == false ||
-        _isFirstRun) {
+    if (widget._user.registered == null || widget._user.registered == false || _isFirstRun) {
       prefs.setBool('isFirstRun', false);
       _startTime();
     } else {

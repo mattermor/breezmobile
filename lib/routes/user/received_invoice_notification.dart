@@ -17,25 +17,24 @@ class InvoiceNotificationsHandler {
   ModalRoute _loaderRoute;
   bool _handlingRequest = false;
 
-  InvoiceNotificationsHandler(
-      this._context, this._accountBloc, this._receivedInvoicesStream, this.firstPaymentItemKey, this.scrollController, this.scaffoldController) {
+  InvoiceNotificationsHandler(this._context, this._accountBloc, this._receivedInvoicesStream, this.firstPaymentItemKey,
+      this.scrollController, this.scaffoldController) {
     _listenPaymentRequests();
     _listenCompletedPayments();
   }
 
   _listenCompletedPayments() {
-    _accountBloc.completedPaymentsStream.listen( (completedPayment){ _handlingRequest = false;}, onError: (err){
-        _handlingRequest = false;
-      });
+    _accountBloc.completedPaymentsStream.listen((completedPayment) {
+      _handlingRequest = false;
+    }, onError: (err) {
+      _handlingRequest = false;
+    });
   }
 
   _listenPaymentRequests() {
     _accountBloc.accountStream.where((acc) => acc.active).first.then((acc) {
       // show payment request dialog for decoded requests
-      _receivedInvoicesStream
-          .where((payreq) => payreq != null && !_handlingRequest)
-          .listen((payreq) {
-
+      _receivedInvoicesStream.where((payreq) => payreq != null && !_handlingRequest).listen((payreq) {
         if (!payreq.loaded) {
           _setLoading(true);
           return;
@@ -51,8 +50,7 @@ class InvoiceNotificationsHandler {
         showDialog(
             context: _context,
             barrierDismissible: false,
-            builder: (_) => paymentRequest.PaymentRequestDialog(
-                        _context, _accountBloc, payreq, firstPaymentItemKey, scrollController));            
+            builder: (_) => paymentRequest.PaymentRequestDialog(_context, _accountBloc, payreq, firstPaymentItemKey, scrollController));
       }).onError((error) {
         _setLoading(false);
         _handlingRequest = false;
@@ -72,5 +70,4 @@ class InvoiceNotificationsHandler {
       _loaderRoute = null;
     }
   }
-
 }

@@ -15,35 +15,34 @@ void listenNoConnection(BuildContext context, AccountBloc accountBloc) {
       context,
       "No Internet Connection",
       RichText(
-      text: TextSpan(
-        style: theme.dialogGrayStyle,
-        text: "You can try:\n",
-        children:<TextSpan>[
+        text: TextSpan(style: theme.dialogGrayStyle, text: "You can try:\n", children: <TextSpan>[
           TextSpan(text: "• Turning off airplane mode\n", style: theme.dialogGrayStyle),
           TextSpan(text: "• Turning on mobile data or Wi-Fi\n", style: theme.dialogGrayStyle),
-          TextSpan(text: "• Checking the signal in your area\n", style: theme.dialogGrayStyle),        
-          TextSpan(text: "• ", style: theme.dialogGrayStyle),  
+          TextSpan(text: "• Checking the signal in your area\n", style: theme.dialogGrayStyle),
+          TextSpan(text: "• ", style: theme.dialogGrayStyle),
           TextSpan(
-            text: "Reset ", 
-            style: theme.blueLinkStyle,
-            recognizer: TapGestureRecognizer()..onTap = () async {
-              ResetNetwork resetAction = ResetNetwork();
-              accountBloc.userActionsSink.add(resetAction);
-              await resetAction.future;
-              Navigator.pop(context);
-              accountBloc.userActionsSink.add(RestartDaemon());
-            }), 
+              text: "Reset ",
+              style: theme.blueLinkStyle,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () async {
+                  ResetNetwork resetAction = ResetNetwork();
+                  accountBloc.userActionsSink.add(resetAction);
+                  await resetAction.future;
+                  Navigator.pop(context);
+                  accountBloc.userActionsSink.add(RestartDaemon());
+                }),
           TextSpan(text: "your Bitcoin node\n", style: theme.dialogGrayStyle),
-          TextSpan(text: "• ", style: theme.dialogGrayStyle),  
+          TextSpan(text: "• ", style: theme.dialogGrayStyle),
           TextSpan(
-            text: "View ", 
-            style: theme.blueLinkStyle,
-            recognizer: TapGestureRecognizer()..onTap = () async {
-              var logPath = await ServiceInjector().breezBridge.getLogPath();
-              ShareExtend.share(logPath, "file");
-            }), 
+              text: "View ",
+              style: theme.blueLinkStyle,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () async {
+                  var logPath = await ServiceInjector().breezBridge.getLogPath();
+                  ShareExtend.share(logPath, "file");
+                }),
           TextSpan(text: "your logs \n", style: theme.dialogGrayStyle),
-        ]), 
+        ]),
       ),
       // Text(
       //     "You can try:\n• Turning off airplane mode\n• Turning on mobile data or Wi-Fi\n• Checking the signal in your area",
@@ -51,7 +50,7 @@ void listenNoConnection(BuildContext context, AccountBloc accountBloc) {
       okText: "Try Again",
       okFunc: () => accountBloc.userActionsSink.add(RestartDaemon()),
       optionText: "Exit",
-      optionFunc: () => exit(0),      
+      optionFunc: () => exit(0),
       disableBack: true,
     );
   });

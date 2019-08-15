@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 
 class PayerSessionWidget extends StatelessWidget {
   final PayerRemoteSession _currentSession;
-  final AccountModel _account;  
+  final AccountModel _account;
 
   PayerSessionWidget(this._currentSession, this._account);
 
@@ -32,23 +32,27 @@ class PayerSessionWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              SessionInstructions(_PayerInstructions(sessionState, _account)),              
+              SessionInstructions(_PayerInstructions(sessionState, _account)),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                 child: PeersConnection(sessionState, onShareInvite: () {
-                    _currentSession.sentInvitesSink.add(null);
-                  }),
+                  _currentSession.sentInvitesSink.add(null);
+                }),
               ),
-              waitingFormPayee(sessionState) ? Container() : Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(32.0, 0.0, 32.0, 0.0),
-                    child: DelayRender(
-                      child: PaymentDetailsForm(_account, sessionState, (amountToPay, {description}) => _currentSession.paymentDetailsSink.add(
-                        PaymentDetails(amountToPay, description)
-                      )),
-                      duration: PaymentSessionState.connectionEmulationDuration),
-                  ),
-                  flex: 1)
+              waitingFormPayee(sessionState)
+                  ? Container()
+                  : Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(32.0, 0.0, 32.0, 0.0),
+                        child: DelayRender(
+                            child: PaymentDetailsForm(
+                                _account,
+                                sessionState,
+                                (amountToPay, {description}) =>
+                                    _currentSession.paymentDetailsSink.add(PaymentDetails(amountToPay, description))),
+                            duration: PaymentSessionState.connectionEmulationDuration),
+                      ),
+                      flex: 1)
             ],
           );
         });
@@ -74,12 +78,15 @@ class _PayerInstructions extends StatelessWidget {
       if (sessionState.payeeData.status.online) {
         message = '${sessionState.payeeData.userName} joined the session.\nPlease enter an amount and tap Pay to proceed.';
       } else if (!sessionState.invitationSent && sessionState.payeeData.userName == null) {
-        message = "Tap the Share button to share a link with a person that you want to pay.\nThen, please wait while this person clicks the link and joins the session.";
+        message =
+            "Tap the Share button to share a link with a person that you want to pay.\nThen, please wait while this person clicks the link and joins the session.";
       } else {
-        return LoadingAnimatedText('Waiting for ${sessionState.payeeData.userName ?? "someone"} to join this session', textStyle: theme.sessionNotificationStyle);
+        return LoadingAnimatedText('Waiting for ${sessionState.payeeData.userName ?? "someone"} to join this session',
+            textStyle: theme.sessionNotificationStyle);
       }
     } else if (sessionState.payeeData.paymentRequest == null) {
-      return LoadingAnimatedText('Waiting for ${sessionState.payeeData.userName} to approve your payment', textStyle: theme.sessionNotificationStyle);
+      return LoadingAnimatedText('Waiting for ${sessionState.payeeData.userName} to approve your payment',
+          textStyle: theme.sessionNotificationStyle);
     } else {
       message = "Sending payment...";
     }

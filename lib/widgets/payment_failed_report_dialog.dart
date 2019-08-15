@@ -8,10 +8,9 @@ import 'package:flutter/material.dart';
 
 class PaymentFailedReportDialog extends StatefulWidget {
   final BuildContext context;
-  final AccountBloc _accountBloc;  
+  final AccountBloc _accountBloc;
 
-  PaymentFailedReportDialog(
-      this.context, this._accountBloc);
+  PaymentFailedReportDialog(this.context, this._accountBloc);
 
   @override
   PaymentFailedReportDialogState createState() {
@@ -60,9 +59,7 @@ class PaymentFailedReportDialogState extends State<PaymentFailedReportDialog> {
                         children: <Widget>[
                           Checkbox(
                               activeColor: theme.BreezColors.blue[500],
-                              value: _doneAsk ??
-                                  _settings.failePaymentBehavior !=
-                                      BugReportBehavior.PROMPT,
+                              value: _doneAsk ?? _settings.failePaymentBehavior != BugReportBehavior.PROMPT,
                               onChanged: (v) {
                                 setState(() {
                                   _doneAsk = v;
@@ -87,14 +84,13 @@ class PaymentFailedReportDialogState extends State<PaymentFailedReportDialog> {
             ),
             new SimpleDialogOption(
               onPressed: (() async {
-                onSubmit(true);                
+                onSubmit(true);
                 Navigator.pop(widget.context, true);
               }),
               child: new Text("YES", style: theme.buttonStyle),
             ),
           ],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
         ));
   }
 
@@ -107,20 +103,16 @@ class PaymentFailedReportDialogState extends State<PaymentFailedReportDialog> {
   @override
   void initState() {
     super.initState();
-    _settingsSubscription = widget._accountBloc.accountSettingsStream
-        .listen((settings) => setState(() {
-              _settings = settings;
-            }));
+    _settingsSubscription = widget._accountBloc.accountSettingsStream.listen((settings) => setState(() {
+          _settings = settings;
+        }));
   }
 
   void onSubmit(bool yesNo) {
-    var dontAsk =
-        _doneAsk ?? _settings.failePaymentBehavior != BugReportBehavior.PROMPT;
+    var dontAsk = _doneAsk ?? _settings.failePaymentBehavior != BugReportBehavior.PROMPT;
     if (dontAsk) {
-      widget._accountBloc.accountSettingsSink.add(_settings.copyWith(
-          failePaymentBehavior: yesNo
-              ? BugReportBehavior.SEND_REPORT
-              : BugReportBehavior.IGNORE));
+      widget._accountBloc.accountSettingsSink
+          .add(_settings.copyWith(failePaymentBehavior: yesNo ? BugReportBehavior.SEND_REPORT : BugReportBehavior.IGNORE));
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:breez/theme_data.dart' as theme;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import  'package:keyboard_actions/keyboard_actions.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 
 class FormActionsWrapper extends StatelessWidget {
   final FocusNode numericFieldNode;
@@ -10,27 +10,26 @@ class FormActionsWrapper extends StatelessWidget {
   const FormActionsWrapper({Key key, this.numericFieldNode, this.child}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {   
+  Widget build(BuildContext context) {
     return FormKeyboardActions(child: _KeyboardActionsWrapper(focusNode: numericFieldNode, child: child));
   }
 }
 
 class _KeyboardActionsWrapper extends StatefulWidget {
-  final FocusNode focusNode;  
+  final FocusNode focusNode;
   final Widget child;
 
   const _KeyboardActionsWrapper({Key key, this.focusNode, this.child}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {    
+  State<StatefulWidget> createState() {
     return _KeyboardActionsWrapperState();
   }
 }
 
 class _KeyboardActionsWrapperState extends State<_KeyboardActionsWrapper> {
-
-  @override 
-  Widget build(BuildContext context) {    
+  @override
+  Widget build(BuildContext context) {
     return widget.child;
   }
 
@@ -45,17 +44,16 @@ class _KeyboardActionsWrapperState extends State<_KeyboardActionsWrapper> {
 
   KeyboardActionsConfig _buildActionsConfig(BuildContext context) {
     return KeyboardActionsConfig(
-      keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
-      keyboardBarColor: Colors.grey[200],
-      nextFocus: true,
-      actions: [
-        KeyboardAction(
-          focusNode: widget.focusNode,
-          closeWidget: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text("Done", style: TextStyle(color: theme.BreezColors.blue[500], fontWeight: FontWeight.bold )),
-          )
-        )
-      ]);
+        keyboardActionsPlatform: KeyboardActionsPlatform.IOS,
+        keyboardBarColor: Colors.grey[200],
+        nextFocus: true,
+        actions: [
+          KeyboardAction(
+              focusNode: widget.focusNode,
+              closeWidget: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text("Done", style: TextStyle(color: theme.BreezColors.blue[500], fontWeight: FontWeight.bold)),
+              ))
+        ]);
   }
 }

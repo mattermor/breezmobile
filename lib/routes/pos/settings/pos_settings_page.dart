@@ -10,8 +10,7 @@ import 'package:breez/widgets/error_dialog.dart';
 import 'package:breez/widgets/static_loader.dart';
 import 'package:flutter/material.dart';
 
-class PosSettingsPage extends StatelessWidget { 
-
+class PosSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var posProfileBloc = AppBlocsProvider.of<POSProfileBloc>(context);
@@ -60,9 +59,14 @@ class PosSettingsPageState extends State<_PosSettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             new Center(
-              child: widget.currentProfile == null ||
-                      widget.currentProfile != null && widget.currentProfile.uploadInProgress
-                  ? new Padding(padding: EdgeInsets.only(top: 24.0),child:new Container(child:CircularProgressIndicator(),height: 88.0,width: 88.0,))
+              child: widget.currentProfile == null || widget.currentProfile != null && widget.currentProfile.uploadInProgress
+                  ? new Padding(
+                      padding: EdgeInsets.only(top: 24.0),
+                      child: new Container(
+                        child: CircularProgressIndicator(),
+                        height: 88.0,
+                        width: 88.0,
+                      ))
                   : AvatarPicker(widget.currentProfile.logoLocalPath,
                       (newSelectedImage) => widget._posProfileBloc.uploadLogoSink.add(newSelectedImage),
                       radius: 44.0,
@@ -79,18 +83,14 @@ class PosSettingsPageState extends State<_PosSettingsPage> {
                   controller: _invoiceStringController,
                   textAlign: TextAlign.center,
                   decoration: new InputDecoration(
-                    border: UnderlineInputBorder(
-                        borderSide: BorderSide(style: BorderStyle.solid, color: Color.fromRGBO(255, 255, 255, 0.12))),
+                    border:
+                        UnderlineInputBorder(borderSide: BorderSide(style: BorderStyle.solid, color: Color.fromRGBO(255, 255, 255, 0.12))),
                     contentPadding: EdgeInsets.only(top: 25.0, bottom: 25.0),
                     hintText: "Enter your business name",
                     hintStyle: TextStyle(
-                        fontSize: 16.4,
-                        color: Color.fromRGBO(255, 255, 255, 0.48),
-                        letterSpacing: 0.0,
-                        fontFamily: "IBMPlexSans"),
+                        fontSize: 16.4, color: Color.fromRGBO(255, 255, 255, 0.48), letterSpacing: 0.0, fontFamily: "IBMPlexSans"),
                   ),
-                  style: new TextStyle(
-                      fontFamily: "IBMPlexSansMedium", fontSize: 16.4, letterSpacing: 0.0, color: Colors.white),
+                  style: new TextStyle(fontFamily: "IBMPlexSansMedium", fontSize: 16.4, letterSpacing: 0.0, color: Colors.white),
                   onChanged: (text) {
                     widget._posProfileBloc.posProfileSink.add(widget.currentProfile.copyWith(invoiceString: text));
                   },
@@ -113,40 +113,35 @@ class PosSettingsPageState extends State<_PosSettingsPage> {
               padding: EdgeInsets.only(top: 32.0, bottom: 19.0, left: 16.0),
               child: new Text(
                 "Payment Cancellation Timeout (in seconds)",
-                style: TextStyle(
-                    fontSize: 12.4, letterSpacing: 0.11, height: 1.24, color: Color.fromRGBO(255, 255, 255, 0.87)),
+                style: TextStyle(fontSize: 12.4, letterSpacing: 0.11, height: 1.24, color: Color.fromRGBO(255, 255, 255, 0.87)),
               ),
             ),
-            new Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  new Container(
-                    width: 304.0,
-                    child: new Padding(
-                      padding: EdgeInsets.zero,
-                      child: new Slider(
-                          value: widget.currentProfile.cancellationTimeoutValue,
-                          label: '${widget.currentProfile.cancellationTimeoutValue.toStringAsFixed(0)}',
-                          min: 30.0,
-                          max: 180.0,
-                          divisions: 5,
-                          onChanged: (double value) {
-                            FocusScope.of(context).requestFocus(FocusNode());
-                            _cancellationTimeoutValueController.text = value.toString();
-                            widget._posProfileBloc.posProfileSink
-                                .add(widget.currentProfile.copyWith(cancellationTimeoutValue: value));
-                          }),
-                    ),
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.only(left: 8.0, right: 16.0),
-                    child: new Text(
-                      num.parse(_cancellationTimeoutValueController.text).toStringAsFixed(0),
-                      style: TextStyle(color: Colors.white, fontSize: 12.4, letterSpacing: 0.11),
-                    ),
-                  ),
-                ]),
+            new Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, children: <Widget>[
+              new Container(
+                width: 304.0,
+                child: new Padding(
+                  padding: EdgeInsets.zero,
+                  child: new Slider(
+                      value: widget.currentProfile.cancellationTimeoutValue,
+                      label: '${widget.currentProfile.cancellationTimeoutValue.toStringAsFixed(0)}',
+                      min: 30.0,
+                      max: 180.0,
+                      divisions: 5,
+                      onChanged: (double value) {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        _cancellationTimeoutValueController.text = value.toString();
+                        widget._posProfileBloc.posProfileSink.add(widget.currentProfile.copyWith(cancellationTimeoutValue: value));
+                      }),
+                ),
+              ),
+              new Padding(
+                padding: EdgeInsets.only(left: 8.0, right: 16.0),
+                child: new Text(
+                  num.parse(_cancellationTimeoutValueController.text).toStringAsFixed(0),
+                  style: TextStyle(color: Colors.white, fontSize: 12.4, letterSpacing: 0.11),
+                ),
+              ),
+            ]),
           ],
         ),
       ),

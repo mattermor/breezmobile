@@ -9,8 +9,7 @@ class RestoreDialog extends StatefulWidget {
   final BackupBloc backupBloc;
   final List<SnapshotInfo> snapshots;
 
-  RestoreDialog(
-      this.context, this.backupBloc, this.snapshots);
+  RestoreDialog(this.context, this.backupBloc, this.snapshots);
 
   @override
   RestoreDialogState createState() {
@@ -18,7 +17,7 @@ class RestoreDialog extends StatefulWidget {
   }
 }
 
-class RestoreDialogState extends State<RestoreDialog> {  
+class RestoreDialogState extends State<RestoreDialog> {
   SnapshotInfo _selectedSnapshot;
 
   @override
@@ -42,23 +41,27 @@ class RestoreDialogState extends State<RestoreDialog> {
             "You have mulitple Breez backups on your Google Drive, please choose which to restore:",
             style: theme.paymentRequestSubtitleStyle,
           ),
-         
           new Padding(
             padding: EdgeInsets.only(top: 16.0),
             child: Container(
               width: 150.0,
               height: 200.0,
-              child: ListView.builder(                
+              child: ListView.builder(
                 shrinkWrap: false,
                 itemCount: widget.snapshots.length,
-                itemBuilder: (BuildContext context, int index) {                  
-                  return ListTile(  
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0.0),                    
-                    selected: _selectedSnapshot?.nodeID == widget.snapshots[index].nodeID  ,
-                    trailing: _selectedSnapshot?.nodeID == widget.snapshots[index].nodeID ? Icon(Icons.check, color: theme.BreezColors.blue[500],) : Icon(Icons.check),
-                    title: Text( 
-                      DateUtils.formatYearMonthDayHourMinute(DateTime.parse(widget.snapshots[index].modifiedTime)) + 
-                        (widget.snapshots[index].encrypted ? " - (PIN required)" : ""), 
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                    selected: _selectedSnapshot?.nodeID == widget.snapshots[index].nodeID,
+                    trailing: _selectedSnapshot?.nodeID == widget.snapshots[index].nodeID
+                        ? Icon(
+                            Icons.check,
+                            color: theme.BreezColors.blue[500],
+                          )
+                        : Icon(Icons.check),
+                    title: Text(
+                      DateUtils.formatYearMonthDayHourMinute(DateTime.parse(widget.snapshots[index].modifiedTime)) +
+                          (widget.snapshots[index].encrypted ? " - (PIN required)" : ""),
                       style: theme.bolt11Style.apply(fontSizeDelta: 1.3),
                     ),
                     subtitle: Text(
@@ -68,7 +71,7 @@ class RestoreDialogState extends State<RestoreDialog> {
                     onTap: () {
                       setState(() {
                         _selectedSnapshot = widget.snapshots[index];
-                      });                      
+                      });
                     },
                   );
                 },
@@ -84,25 +87,26 @@ class RestoreDialogState extends State<RestoreDialog> {
                         style: theme.errorStyle,
                       )
                     : Container();
-              }),          
+              }),
         ],
       ),
       actions: <Widget>[
         new FlatButton(
-          onPressed: () =>  Navigator.pop(widget.context, null),
+          onPressed: () => Navigator.pop(widget.context, null),
           child: new Text("CANCEL", style: theme.buttonStyle),
         ),
-        new FlatButton(     
+        new FlatButton(
           textColor: theme.BreezColors.blue[500],
-          disabledTextColor: theme.BreezColors.blue[500].withOpacity(0.4),               
-          onPressed: _selectedSnapshot == null ? null : () {
-            Navigator.pop(widget.context, _selectedSnapshot);
-          },
+          disabledTextColor: theme.BreezColors.blue[500].withOpacity(0.4),
+          onPressed: _selectedSnapshot == null
+              ? null
+              : () {
+                  Navigator.pop(widget.context, _selectedSnapshot);
+                },
           child: new Text("OK"),
         )
       ],
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
     );
   }
 }

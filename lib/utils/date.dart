@@ -12,6 +12,7 @@ class DateUtils {
     var formatter = (startDate.year == endDate.year) ? _monthDateFormat : _yearMonthDayFormat;
     return formatter.format(startDate) + "-" + formatter.format(endDate);
   }
+
   static String formatMonthDate(DateTime d) => _monthDateFormat.format(d);
   static String formatYearMonthDay(DateTime d) => _yearMonthDayFormat.format(d);
   static String formatYearMonthDayHourMinute(DateTime d) => _yearMonthDayHourMinuteFormat.format(d);

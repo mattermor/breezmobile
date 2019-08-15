@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/number_symbols.dart';
 import 'package:intl/number_symbols_data.dart';
 
-class Currency extends Object{
+class Currency extends Object {
   static const Currency BTC = Currency._internal("BTC");
   static const Currency BIT = Currency._internal("Bit");
   static const Currency SAT = Currency._internal("Sat");
@@ -16,8 +16,9 @@ class Currency extends Object{
   const Currency._internal(this.symbol);
 
   String get displayName => symbol;
-  String format(Int64 sat, {includeSymbol = true, fixedDecimals = true, userInput = false}) => _CurrencyFormatter().format(sat, this, addCurrencySuffix: includeSymbol, fixedDecimals: fixedDecimals, userInput: userInput);
-  Int64 parse(String amountStr) =>  _CurrencyFormatter().parse(amountStr, this);
+  String format(Int64 sat, {includeSymbol = true, fixedDecimals = true, userInput = false}) =>
+      _CurrencyFormatter().format(sat, this, addCurrencySuffix: includeSymbol, fixedDecimals: fixedDecimals, userInput: userInput);
+  Int64 parse(String amountStr) => _CurrencyFormatter().parse(amountStr, this);
 }
 
 enum CurrencyID { BTC, BIT, SAT }
@@ -31,8 +32,7 @@ class _CurrencyFormatter {
       case Currency.BTC:
         if (fixedDecimals) {
           formattedAmount = (satoshies.toInt() / 100000000).toStringAsFixed(8);
-        }
-        else {
+        } else {
           formattedAmount = (satoshies.toInt() / 100000000).toString();
         }
         break;
@@ -88,5 +88,5 @@ class _CurrencyFormatter {
     );
     final formatter = new NumberFormat('###,###.##', 'space-between');
     return formatter;
-  }  
+  }
 }

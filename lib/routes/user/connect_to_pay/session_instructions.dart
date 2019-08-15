@@ -19,11 +19,11 @@ class SessionInstructions extends StatelessWidget {
       alignment: AlignmentDirectional.bottomCenter,
       children: <Widget>[
         Container(
-          height: 100.0,           
+          height: 100.0,
           color: theme.massageBackgroundColor,
           padding: new EdgeInsets.only(left: 16.0, top: 0.0, right: 16.0, bottom: hasActions ? 0.0 : 0.0),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Row(              
+            Row(
               children: <Widget>[
                 Expanded(
                   flex: 1,
@@ -35,20 +35,21 @@ class SessionInstructions extends StatelessWidget {
                   ),
                 )
               ],
-            ),            
+            ),
           ]),
         ),
         Positioned(
-              bottom: 10.0,
-                child: Container(                  
-                  height: 36.0,                  
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: (_actions ?? []).map((action) {
-                      return FlatButton(child: Text(action.toUpperCase()), onPressed: _disabledActions.contains(action) ? null : () => _onAction(action));
-                    }).toList(),
-            ),
-                ))
+            bottom: 10.0,
+            child: Container(
+              height: 36.0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: (_actions ?? []).map((action) {
+                  return FlatButton(
+                      child: Text(action.toUpperCase()), onPressed: _disabledActions.contains(action) ? null : () => _onAction(action));
+                }).toList(),
+              ),
+            ))
       ],
     );
   }

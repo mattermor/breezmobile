@@ -10,7 +10,6 @@ Future promptAreYouSure(BuildContext context, String title, Widget body,
     String okText = "YES",
     String cancelText = "NO",
     TextStyle textStyle = const TextStyle(color: Colors.white)}) {
-  
   Widget titleWidget = title == null ? null : Text(title, style: theme.alertTitleStyle);
   if (titleWidget != null && wideTitle) {
     titleWidget = Container(
@@ -23,14 +22,14 @@ Future promptAreYouSure(BuildContext context, String title, Widget body,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return new AlertDialog(
-          contentPadding: contentPadding,          
+          contentPadding: contentPadding,
           title: titleWidget,
           content: new SingleChildScrollView(
             child: body,
           ),
           actions: <Widget>[
             new FlatButton(
-              child: new Text(cancelText, style: theme.buttonStyle),              
+              child: new Text(cancelText, style: theme.buttonStyle),
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
@@ -42,18 +41,13 @@ Future promptAreYouSure(BuildContext context, String title, Widget body,
               },
             ),
           ],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
         );
       });
 }
 
 Future<Null> promptError(BuildContext context, String title, Widget body,
-    {String okText = "OK",
-    String optionText,
-    Function optionFunc,
-    Function okFunc,
-    bool disableBack = false}) {
+    {String okText = "OK", String optionText, Function optionFunc, Function okFunc, bool disableBack = false}) {
   bool canPop = !disableBack;
   Future<bool> Function() canPopCallback = () => Future.value(canPop);
 
@@ -79,11 +73,7 @@ Future<Null> promptError(BuildContext context, String title, Widget body,
                   ? new FlatButton(
                       child: new Text(
                         optionText,
-                        style: new TextStyle(
-                            fontFamily: "IBMPlexSansMedium",
-                            fontSize: 16.4,
-                            letterSpacing: 0.0,
-                            color: Colors.black),
+                        style: new TextStyle(fontFamily: "IBMPlexSansMedium", fontSize: 16.4, letterSpacing: 0.0, color: Colors.black),
                       ),
                       onPressed: () {
                         canPop = true;
@@ -102,8 +92,7 @@ Future<Null> promptError(BuildContext context, String title, Widget body,
                 },
               ),
             ],
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(12.0))),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
           ),
         );
       });

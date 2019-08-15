@@ -5,7 +5,6 @@ import 'package:breez/widgets/static_loader.dart';
 import 'package:flutter/material.dart';
 
 class LNDBootstrapProgress extends StatelessWidget {
-  
   LNDBootstrapProgress();
 
   @override
@@ -22,13 +21,11 @@ class LNDBootstrapProgress extends StatelessWidget {
         });
   }
 
-  Widget _buildDownloadProgress(
-      Map<String, DownloadFileInfo> aggregatedDownloadsInfo) {
+  Widget _buildDownloadProgress(Map<String, DownloadFileInfo> aggregatedDownloadsInfo) {
     return new Column(
         children: <Widget>[
       Padding(
-          padding: aggregatedDownloadsInfo.isEmpty
-              ? new EdgeInsets.all(0.0) : new EdgeInsets.all(20.0),
+          padding: aggregatedDownloadsInfo.isEmpty ? new EdgeInsets.all(0.0) : new EdgeInsets.all(20.0),
           child: aggregatedDownloadsInfo.isEmpty
               ? null
               : Row(
@@ -50,8 +47,7 @@ class LNDBootstrapProgress extends StatelessWidget {
             Expanded(
                 child: LinearProgressIndicator(
                     valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-                    value: downloadInfo.bytesDownloaded /
-                        downloadInfo.contentLength))
+                    value: downloadInfo.bytesDownloaded / downloadInfo.contentLength))
           ],
         ));
   }

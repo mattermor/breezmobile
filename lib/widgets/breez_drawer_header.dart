@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 const double _kBreezDrawerHeaderHeight = 160.0 + 1.0; // bottom edge
 
 class BreezDrawerHeader extends DrawerHeader {
-
   final Decoration decoration;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
@@ -36,14 +35,16 @@ class BreezDrawerHeader extends DrawerHeader {
         decoration: decoration,
         duration: duration,
         curve: curve,
-        child: child == null ? null : new DefaultTextStyle(
-          style: theme.textTheme.body2,
-          child: new MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: child,
-          ),
-        ),
+        child: child == null
+            ? null
+            : new DefaultTextStyle(
+                style: theme.textTheme.body2,
+                child: new MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: child,
+                ),
+              ),
       ),
     );
   }

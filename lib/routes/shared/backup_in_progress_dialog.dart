@@ -4,16 +4,14 @@ import 'package:breez/bloc/backup/backup_model.dart';
 import 'package:breez/widgets/animated_loader_dialog.dart';
 import 'package:flutter/material.dart';
 
-Widget buildBackupInProgressDialog(
-    BuildContext context, Stream<BackupState> backupStateStream) {
+Widget buildBackupInProgressDialog(BuildContext context, Stream<BackupState> backupStateStream) {
   return new _BackupInProgressDialog(backupStateStream: backupStateStream);
 }
 
 class _BackupInProgressDialog extends StatefulWidget {
   final Stream<BackupState> backupStateStream;
 
-  const _BackupInProgressDialog({Key key, this.backupStateStream})
-      : super(key: key);
+  const _BackupInProgressDialog({Key key, this.backupStateStream}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return _BackupInProgressDialogState();

@@ -65,9 +65,7 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
                             })),
                     new Padding(
                         padding: EdgeInsets.only(top: 15.0),
-                        child: new Text(_countdownString,
-                            textAlign: TextAlign.center,
-                            style: theme.paymentRequestTitleStyle)),
+                        child: new Text(_countdownString, textAlign: TextAlign.center, style: theme.paymentRequestTitleStyle)),
                     _cancelButton(),
                   ],
                 )
@@ -95,8 +93,7 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
                     ],
                   ),
                 )),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
     );
   }
 
@@ -114,16 +111,11 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
     super.initState();
 
     _posProfileSubscription = widget._posProfileBloc.posProfileStream.asBroadcastStream().listen((posProfile) {
-      _paymentTimer = CountDown(
-          new Duration(seconds: posProfile.cancellationTimeoutValue.toInt()));
+      _paymentTimer = CountDown(new Duration(seconds: posProfile.cancellationTimeoutValue.toInt()));
       _timerSubscription = _paymentTimer.stream.listen(null);
       _timerSubscription.onData((Duration d) {
         setState(() {
-          _countdownString = d.inMinutes.toRadixString(10) +
-              ":" +
-              (d.inSeconds - (d.inMinutes * 60))
-                  .toRadixString(10)
-                  .padLeft(2, '0');
+          _countdownString = d.inMinutes.toRadixString(10) + ":" + (d.inSeconds - (d.inMinutes * 60)).toRadixString(10).padLeft(2, '0');
         });
       });
 
@@ -135,11 +127,7 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
 
       _timerSubscription.onData((Duration d) {
         setState(() {
-          _countdownString = d.inMinutes.toRadixString(10) +
-              ":" +
-              (d.inSeconds - (d.inMinutes * 60))
-                  .toRadixString(10)
-                  .padLeft(2, '0');
+          _countdownString = d.inMinutes.toRadixString(10) + ":" + (d.inSeconds - (d.inMinutes * 60)).toRadixString(10).padLeft(2, '0');
         });
       });
 
@@ -150,8 +138,7 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
       });
     });
 
-    _sentInvoicesSubscription =
-        widget._invoiceBloc.sentInvoicesStream.listen((message) {
+    _sentInvoicesSubscription = widget._invoiceBloc.sentInvoicesStream.listen((message) {
       _debugMessage = message;
 
       setState(() {
@@ -159,21 +146,16 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
       });
     }, onError: (err) {
       Navigator.of(context).pop(false);
-      widget._scaffoldKey.currentState.showSnackBar(new SnackBar(
-          duration: new Duration(seconds: 3),
-          content: new Text(err.toString())));
+      widget._scaffoldKey.currentState.showSnackBar(new SnackBar(duration: new Duration(seconds: 3), content: new Text(err.toString())));
     });
 
-    _paidInvoicesSubscription =
-        widget._invoiceBloc.paidInvoicesStream.listen((paid) {
+    _paidInvoicesSubscription = widget._invoiceBloc.paidInvoicesStream.listen((paid) {
       setState(() {
         _state = _PosPaymentState.PAYMENT_RECEIVED;
       });
     }, onError: (err) {
       Navigator.of(context).pop(false);
-      widget._scaffoldKey.currentState.showSnackBar(new SnackBar(
-          duration: new Duration(seconds: 3),
-          content: new Text(err.toString())));
+      widget._scaffoldKey.currentState.showSnackBar(new SnackBar(duration: new Duration(seconds: 3), content: new Text(err.toString())));
     });
   }
 

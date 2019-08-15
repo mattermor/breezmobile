@@ -23,8 +23,7 @@ class InitialWalkthroughPage extends StatefulWidget {
   State createState() => new InitialWalkthroughPageState();
 }
 
-class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
-    with TickerProviderStateMixin {
+class InitialWalkthroughPageState extends State<InitialWalkthroughPage> with TickerProviderStateMixin {
   String _instructions;
   AnimationController _controller;
   Animation<int> _animation;
@@ -64,8 +63,7 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
                     child: new AnimatedBuilder(
                       animation: _animation,
                       builder: (BuildContext context, Widget child) {
-                        String frame =
-                            _animation.value.toString().padLeft(2, '0');
+                        String frame = _animation.value.toString().padLeft(2, '0');
                         return new Image.asset(
                           'src/animations/welcome/frame_${frame}_delay-0.04s.png',
                           gaplessPlayback: true,
@@ -88,8 +86,7 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
                       height: 48.0,
                       width: 168.0,
                       child: new RaisedButton(
-                          child: new Text("LET'S BREEZ!",
-                              style: theme.buttonStyle),
+                          child: new Text("LET'S BREEZ!", style: theme.buttonStyle),
                           color: theme.whiteColor,
                           elevation: 0.0,
                           shape: const StadiumBorder(),
@@ -112,8 +109,7 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
                         child: new GestureDetector(
                             onTap: () {
                               // Restore then start lightninglib
-                              Navigator.push(
-                                  context, createLoaderRoute(context));
+                              Navigator.push(context, createLoaderRoute(context));
                               widget._backupBloc.restoreRequestSink.add(null);
                             },
                             child: new Text(
@@ -148,27 +144,23 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
   void initState() {
     super.initState();
 
-    _instructions = widget._isPos ?
-    "The simplest, fastest & safest way\nto earn bitcoin" :
-    "The simplest, fastest & safest way\nto spend your bitcoins";
+    _instructions = widget._isPos
+        ? "The simplest, fastest & safest way\nto earn bitcoin"
+        : "The simplest, fastest & safest way\nto spend your bitcoins";
 
-    _multipleRestoreSubscription =
-        widget._backupBloc.multipleRestoreStream.listen((options) async {
+    _multipleRestoreSubscription = widget._backupBloc.multipleRestoreStream.listen((options) async {
       if (options.length == 0) {
         popToWalkthrough(error: "Could not locate backup for this account");
         return;
       }
-
 
       SnapshotInfo toRestore;
       if (options.length == 1) {
         toRestore = options.first;
       } else {
         popToWalkthrough();
-        toRestore = await showDialog<SnapshotInfo>(
-            context: context,
-            builder: (_) =>
-                new RestoreDialog(context, widget._backupBloc, options));
+        toRestore =
+            await showDialog<SnapshotInfo>(context: context, builder: (_) => new RestoreDialog(context, widget._backupBloc, options));
       }
 
       String restorePIN;
@@ -179,36 +171,23 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
             return;
           }
         }
-        widget._backupBloc.restoreRequestSink
-            .add(RestoreRequest(toRestore, restorePIN));
-        Navigator.push(
-            context,
-            createLoaderRoute(context,
-                message: "Restoring data...", opacity: 0.8));
+        widget._backupBloc.restoreRequestSink.add(RestoreRequest(toRestore, restorePIN));
+        Navigator.push(context, createLoaderRoute(context, message: "Restoring data...", opacity: 0.8));
       }
     }, onError: (error) {
-      popToWalkthrough(
-          error: error.runtimeType != SignInFailedException
-              ? error.toString()
-              : null);
+      popToWalkthrough(error: error.runtimeType != SignInFailedException ? error.toString() : null);
     });
 
-    _restoreFinishedSubscription =
-        widget._backupBloc.restoreFinishedStream.listen((restored) {
+    _restoreFinishedSubscription = widget._backupBloc.restoreFinishedStream.listen((restored) {
       popToWalkthrough();
       if (restored) {
         _proceedToRegister();
       }
     }, onError: (error) {
-      popToWalkthrough(
-          error: error.runtimeType != SignInFailedException
-              ? error.toString()
-              : null);
+      popToWalkthrough(error: error.runtimeType != SignInFailedException ? error.toString() : null);
     });
 
-    _controller = new AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 2720))
-      ..forward(from: 0.0);
+    _controller = new AnimationController(vsync: this, duration: const Duration(milliseconds: 2720))..forward(from: 0.0);
     _animation = new IntTween(begin: 0, end: 67).animate(_controller);
     if (_controller.isCompleted) {
       _controller.stop();
@@ -221,9 +200,7 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
       return route.settings.name == "/intro";
     });
     if (error != null) {
-      _scaffoldKey.currentState.showSnackBar(new SnackBar(
-          duration: new Duration(seconds: 3),
-          content: new Text(error.toString())));
+      _scaffoldKey.currentState.showSnackBar(new SnackBar(duration: new Duration(seconds: 3), content: new Text(error.toString())));
     }
   }
 

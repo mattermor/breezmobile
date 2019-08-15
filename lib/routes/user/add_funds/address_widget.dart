@@ -7,15 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:share_extend/share_extend.dart';
 
 class AddressWidget extends StatelessWidget {
-  
   final String address;
   final String backupJson;
 
   AddressWidget(this.address, this.backupJson);
 
   @override
-  Widget build(
-      BuildContext context) {
+  Widget build(BuildContext context) {
     return new Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
@@ -88,7 +86,9 @@ class AddressWidget extends StatelessWidget {
   List<Widget> _buildShareAndCopyIcons(BuildContext context) {
     List<Widget> _icons = List();
     if (address == null) {
-      _icons.add(SizedBox(height: 48.0,));
+      _icons.add(SizedBox(
+        height: 48.0,
+      ));
       return _icons;
     }
     Widget _shareIcon = new IconButton(
@@ -96,10 +96,7 @@ class AddressWidget extends StatelessWidget {
       color: theme.whiteColor,
       onPressed: () {
         final RenderBox box = context.findRenderObject();
-        ShareExtend.share(address,
-            "text",
-            sharePositionOrigin:
-            box.localToGlobal(Offset.zero) & box.size);
+        ShareExtend.share(address, "text", sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
       },
     );
     Widget _copyIcon = new IconButton(
@@ -117,7 +114,7 @@ class AddressWidget extends StatelessWidget {
 
   void _showAlertDialog(BuildContext context) {
     AlertDialog dialog = new AlertDialog(
-      contentPadding: EdgeInsets.fromLTRB(20.0,20.0,20.0,4.0),
+      contentPadding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 4.0),
       content: RichText(
         text: TextSpan(
             style: theme.alertStyle,

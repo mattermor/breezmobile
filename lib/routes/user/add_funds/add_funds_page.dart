@@ -36,12 +36,10 @@ class AddFundsState extends State<AddFundsPage> {
     AccountBloc accountBloc = AppBlocsProvider.of<AccountBloc>(context);
     return new StreamBuilder(
         stream: accountBloc.accountStream,
-        builder:
-            (BuildContext context, AsyncSnapshot<AccountModel> accSnapshot) {
+        builder: (BuildContext context, AsyncSnapshot<AccountModel> accSnapshot) {
           return StreamBuilder(
               stream: _addFundsBloc.addFundResponseStream,
-              builder: (BuildContext context,
-                  AsyncSnapshot<AddFundResponse> snapshot) {
+              builder: (BuildContext context, AsyncSnapshot<AddFundResponse> snapshot) {
                 return Material(
                   child: new Scaffold(
                       appBar: new AppBar(
@@ -77,8 +75,7 @@ class AddFundsState extends State<AddFundsPage> {
     super.dispose();
   }
 
-  Widget getBody(BuildContext context, AccountModel account,
-      AddFundResponse response, String error) {
+  Widget getBody(BuildContext context, AccountModel account, AddFundResponse response, String error) {
     var unconfirmedTxID = account?.swapFundsStatus?.unconfirmedTxID;
     bool waitingDepositConfirmation = unconfirmedTxID?.isNotEmpty == true;
 
@@ -86,10 +83,8 @@ class AddFundsState extends State<AddFundsPage> {
     if (error != null) {
       errorMessage = error;
     } else if (account == null || account.bootstraping) {
-      errorMessage =
-          'You\'d be able to add funds after Breez is finished bootstrapping.';
-    } else if (unconfirmedTxID?.isNotEmpty == true ||
-        account.processingWithdrawal) {
+      errorMessage = 'You\'d be able to add funds after Breez is finished bootstrapping.';
+    } else if (unconfirmedTxID?.isNotEmpty == true || account.processingWithdrawal) {
       errorMessage =
           'Breez is processing your previous ${waitingDepositConfirmation || account.processingBreezConnection ? "deposit" : "withdrawal"}. You will be able to add more funds once this operation is completed.';
     } else if (response != null && response.errorMessage.isNotEmpty) {
@@ -107,33 +102,24 @@ class AddFundsState extends State<AddFundsPage> {
           Padding(
             padding: EdgeInsets.only(top: 50.0, left: 30.0, right: 30.0),
             child: Text(errorMessage, textAlign: TextAlign.center),
-          ),          
+          ),
           waitingDepositConfirmation
-              ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                  [ 
-                    Padding(
-                      padding: EdgeInsets.only(top: 30.0, left: 30.0, right: 30.0),
-                      child: Text("Transaction ID:", textAlign: TextAlign.start),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(top: 10.0, left: 30.0, right: 22.0),
-                          child: 
-                          LinkLauncher(
-                            linkName: unconfirmedTxID,
-                            linkAddress: "https://blockstream.info/tx/$unconfirmedTxID",
-                            onCopy: (){
-                              Clipboard.setData(ClipboardData(text: unconfirmedTxID));
-                              showFlushbar(context,
-                                  message:
-                                      "Transaction ID was copied to your clipboard.",
-                                  duration: Duration(seconds: 3));
-                            },
-                          )
-                  )
-                  ])                      
+              ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 30.0, left: 30.0, right: 30.0),
+                    child: Text("Transaction ID:", textAlign: TextAlign.start),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(top: 10.0, left: 30.0, right: 22.0),
+                      child: LinkLauncher(
+                        linkName: unconfirmedTxID,
+                        linkAddress: "https://blockstream.info/tx/$unconfirmedTxID",
+                        onCopy: () {
+                          Clipboard.setData(ClipboardData(text: unconfirmedTxID));
+                          showFlushbar(context, message: "Transaction ID was copied to your clipboard.", duration: Duration(seconds: 3));
+                        },
+                      ))
+                ])
               : SizedBox()
         ],
       );
@@ -144,12 +130,10 @@ class AddFundsState extends State<AddFundsPage> {
           ? SizedBox()
           : Expanded(
               child: Container(
-                padding:
-                    new EdgeInsets.only(top: 36.0, left: 12.0, right: 12.0),
+                padding: new EdgeInsets.only(top: 36.0, left: 12.0, right: 12.0),
                 child: Text(
                   "Send up to " +
-                      account.currency.format(response.maxAllowedDeposit,
-                          includeSymbol: true) +
+                      account.currency.format(response.maxAllowedDeposit, includeSymbol: true) +
                       " to this address." +
                       "\nBreez requires you to keep ${account.currency.format(account.warningMaxChanReserveAmount)} in your balance.",
                   style: theme.warningStyle,
@@ -157,8 +141,7 @@ class AddFundsState extends State<AddFundsPage> {
                 ),
               ),
             ),
-      _buildBottomBar(response, account,
-          hasError: error != null ? true : false),
+      _buildBottomBar(response, account, hasError: error != null ? true : false),
     ]);
   }
 
@@ -174,8 +157,7 @@ class AddFundsState extends State<AddFundsPage> {
     });
   }
 
-  Widget _buildBottomBar(AddFundResponse response, AccountModel account,
-      {hasError = false}) {
+  Widget _buildBottomBar(AddFundResponse response, AccountModel account, {hasError = false}) {
     if (hasError || response?.errorMessage?.isNotEmpty == true) {
       return SingleButtonBottomBar(
           text: hasError ? "RETRY" : "CLOSE",
@@ -194,12 +176,7 @@ class AddFundsState extends State<AddFundsPage> {
             padding: new EdgeInsets.only(bottom: 40.0),
             child: new Column(
                 mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  new SizedBox(
-                      height: 48.0,
-                      width: 256.0,
-                      child: _buildRedeemVoucherButton())
-                ]));
+                children: <Widget>[new SizedBox(height: 48.0, width: 256.0, child: _buildRedeemVoucherButton())]));
   }
 
   Widget _buildRedeemVoucherButton() {
@@ -208,8 +185,7 @@ class AddFundsState extends State<AddFundsPage> {
         child: Container(
           decoration: BoxDecoration(
               color: theme.fastbitcoins.iconBgColor,
-              border: Border.all(
-                  color: Colors.white, style: BorderStyle.solid, width: 1.0),
+              border: Border.all(color: Colors.white, style: BorderStyle.solid, width: 1.0),
               borderRadius: BorderRadius.circular(14.0)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

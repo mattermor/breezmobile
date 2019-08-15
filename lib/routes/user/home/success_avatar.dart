@@ -11,9 +11,7 @@ class SuccessAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: new BorderRadius.all(new Radius.circular(20.0))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: new BorderRadius.all(new Radius.circular(20.0))),
         width: 20.0 * 2,
         height: 20.0 * 2,
         alignment: FractionalOffset.center,

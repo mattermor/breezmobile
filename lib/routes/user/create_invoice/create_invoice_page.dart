@@ -17,7 +17,6 @@ import 'package:breez/widgets/static_loader.dart';
 import 'package:flutter/material.dart';
 
 class CreateInvoicePage extends StatefulWidget {
-  
   const CreateInvoicePage();
 
   @override
@@ -30,8 +29,7 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
   final _formKey = GlobalKey<FormState>();
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  final TextEditingController _descriptionController =
-      new TextEditingController();
+  final TextEditingController _descriptionController = new TextEditingController();
   final TextEditingController _amountController = new TextEditingController();
 
   StreamSubscription<bool> _paidInvoicesSubscription;
@@ -62,31 +60,21 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
                     }
                     var account = snapshot.data;
                     return RaisedButton(
-                      padding: EdgeInsets.only(
-                          top: 16.0, bottom: 16.0, right: 39.0, left: 39.0),
+                      padding: EdgeInsets.only(top: 16.0, bottom: 16.0, right: 39.0, left: 39.0),
                       child: new Text(
                         "CREATE",
                         style: theme.buttonStyle,
                       ),
                       color: Colors.white,
                       elevation: 0.0,
-                      shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(42.0)),
+                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(42.0)),
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
-                          invoiceBloc.newInvoiceRequestSink.add(
-                              new InvoiceRequestModel(
-                                  null,
-                                  _descriptionController.text,
-                                  null,
-                                  account.currency
-                                      .parse(_amountController.text)));
-                          _bgService.runAsTask(
-                            showDialog(
-                              context: context, builder: (_) => QrCodeDialog(context, invoiceBloc)),
-                            (){
-                              log.info("waiting for payment background task finished");
-                            });
+                          invoiceBloc.newInvoiceRequestSink.add(new InvoiceRequestModel(
+                              null, _descriptionController.text, null, account.currency.parse(_amountController.text)));
+                          _bgService.runAsTask(showDialog(context: context, builder: (_) => QrCodeDialog(context, invoiceBloc)), () {
+                            log.info("waiting for payment background task finished");
+                          });
                         }
                       },
                     );
@@ -109,10 +97,9 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
           }
           AccountModel acc = snapshot.data;
           return Form(
-              key: _formKey,
-              child: new Padding(
-              padding: EdgeInsets.only(
-                  left: 16.0, right: 16.0, bottom: 40.0, top: 24.0),
+            key: _formKey,
+            child: new Padding(
+              padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 40.0, top: 24.0),
               child: new Column(
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,7 +119,8 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
                       if (text.length == 0) {
                         return "Please enter a description";
                       }
-                    },),
+                    },
+                  ),
                   new AmountFormField(
                       context: context,
                       accountModel: acc,
@@ -146,17 +134,14 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
                   ),
                   StreamBuilder(
                       stream: accountBloc.accountStream,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<AccountModel> accSnapshot) {
-
+                      builder: (BuildContext context, AsyncSnapshot<AccountModel> accSnapshot) {
                         AccountModel acc = accSnapshot.data;
 
                         String message;
                         if (accSnapshot.hasError) {
                           message = accSnapshot.error.toString();
                         } else if (!accSnapshot.hasData) {
-                          message =
-                              'Receiving payments will be available as soon as Breez is synchronized.';
+                          message = 'Receiving payments will be available as soon as Breez is synchronized.';
                         } else if (acc.processingBreezConnection) {
                           message =
                               'You will be able to receive payments after Breez is finished opening a secure channel with our server. This usually takes ~10 minutes to be completed. Please try again in a couple of minutes.';
@@ -168,8 +153,7 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
                             message += '.';
                           }
                           return Container(
-                              padding: EdgeInsets.only(
-                                  top: 50.0, left: 30.0, right: 30.0),
+                              padding: EdgeInsets.only(top: 50.0, left: 30.0, right: 30.0),
                               child: Column(children: <Widget>[
                                 Text(
                                   message,
@@ -177,26 +161,26 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
                                   style: theme.warningStyle,
                                 ),
                               ]));
-                        }
-                        else {
+                        } else {
                           return Container();
                         }
                       })
                 ],
               ),
-            ),            
+            ),
           );
         },
       ),
     );
   }
 
-  @override void didChangeDependencies(){        
+  @override
+  void didChangeDependencies() {
     InvoiceBloc invoiceBloc = AppBlocsProvider.of<InvoiceBloc>(context);
-    if (!_isInit) {      
-      _paidInvoicesSubscription = invoiceBloc.paidInvoicesStream.listen((paid) {            
-            Navigator.popUntil(context, ModalRoute.withName("/create_invoice"));  
-            Navigator.pop(context, "Payment was successfuly received!");            
+    if (!_isInit) {
+      _paidInvoicesSubscription = invoiceBloc.paidInvoicesStream.listen((paid) {
+        Navigator.popUntil(context, ModalRoute.withName("/create_invoice"));
+        Navigator.pop(context, "Payment was successfuly received!");
       });
       _isInit = true;
     }
@@ -210,7 +194,7 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
     super.dispose();
   }
 
-  @override 
+  @override
   void initState() {
     _doneAction = new KeyboardDoneAction(<FocusNode>[_amountFocusNode]);
     super.initState();
@@ -222,8 +206,7 @@ class CreateInvoicePageState extends State<CreateInvoicePage> {
         new Text("Receive up to:", style: theme.textStyle),
         new Padding(
           padding: EdgeInsets.only(left: 3.0),
-          child: new Text(acc.currency.format(acc.maxAllowedToReceive),
-              style: theme.textStyle),
+          child: new Text(acc.currency.format(acc.maxAllowedToReceive), style: theme.textStyle),
         )
       ],
     );

@@ -58,24 +58,16 @@ class AccountModel {
   FiatConversion get fiatCurrency => _fiatConversionList.firstWhere((f) => f.currencyData.shortName == _fiatShortName, orElse: () => null);
   String get formattedFiatBalance => fiatCurrency?.format(balance);
   String get id => _accountResponse.id;
-  bool get isInitialBootstrap =>
-      (bootstraping ||
-      (!active && !processingWithdrawal && !processingBreezConnection)) && !initial;
-  Int64 get maxAllowedToPay => Int64(min(
-      _accountResponse.maxAllowedToPay.toInt(),
-      _accountResponse.maxPaymentAmount.toInt()));
+  bool get isInitialBootstrap => (bootstraping || (!active && !processingWithdrawal && !processingBreezConnection)) && !initial;
+  Int64 get maxAllowedToPay => Int64(min(_accountResponse.maxAllowedToPay.toInt(), _accountResponse.maxPaymentAmount.toInt()));
   Int64 get maxAllowedToReceive => _accountResponse.maxAllowedToReceive;
   Int64 get maxPaymentAmount => _accountResponse.maxPaymentAmount;
-  bool get processingBreezConnection =>
-      _accountResponse.status ==
-      Account_AccountStatus.PROCESSING_BREEZ_CONNECTION;
-  bool get processingWithdrawal =>
-      _accountResponse.status == Account_AccountStatus.PROCESSING_WITHDRAWAL;
+  bool get processingBreezConnection => _accountResponse.status == Account_AccountStatus.PROCESSING_BREEZ_CONNECTION;
+  bool get processingWithdrawal => _accountResponse.status == Account_AccountStatus.PROCESSING_WITHDRAWAL;
   Int64 get reserveAmount => balance - maxAllowedToPay;
   Int64 get routingNodeFee => _accountResponse.routingNodeFee;
   String get statusLine => _accountResponse.status.toString();
   String get statusMessage {
-
     if (this.isInitialBootstrap) {
       return "Please wait a minute while Breez is bootstrapping (keep the app open).";
     }
@@ -100,6 +92,7 @@ class AccountModel {
 
     return null;
   }
+
   SwapFundStatus get swapFundsStatus => SwapFundStatus(this.addedFundsReply);
   bool get synced => syncProgress == 1.0;
   bool get transferringOnChainDeposit => swapFundsStatus.depositConfirmed && this.active;
@@ -123,23 +116,19 @@ class AccountModel {
       double syncProgress,
       bool initial,
       SyncUIState syncUIState}) {
-    return AccountModel(
-        accountResponse ?? this._accountResponse, currency ?? this.currency,
-        fiatShortName ?? this._fiatShortName,
-        fiatCurrency ?? this._fiatCurrency,
-        fiatConversionList ?? this._fiatConversionList,
+    return AccountModel(accountResponse ?? this._accountResponse, currency ?? this.currency, fiatShortName ?? this._fiatShortName,
+        fiatCurrency ?? this._fiatCurrency, fiatConversionList ?? this._fiatConversionList,
         addedFundsReply: addedFundsReply ?? this.addedFundsReply,
         connected: connected ?? this.connected,
         onChainFeeRate: onChainFeeRate ?? this.onChainFeeRate,
         bootstraping: bootstraping ?? this.bootstraping,
         bootstrapProgress: bootstrapProgress ?? this.bootstrapProgress,
         enableInProgress: enableInProgress ?? this.enableInProgress,
-        paymentRequestInProgress:
-            paymentRequestInProgress ?? this.paymentRequestInProgress,
+        paymentRequestInProgress: paymentRequestInProgress ?? this.paymentRequestInProgress,
         syncProgress: syncProgress ?? this.syncProgress,
         syncUIState: syncUIState ?? this.syncUIState,
         initial: initial ?? this.initial);
-  }  
+  }
 
   String validateIncomingPayment(Int64 amount) {
     return validatePayment(amount, false);
@@ -180,10 +169,7 @@ class AccountSettings {
   final bool showConnectProgress;
   final BugReportBehavior failePaymentBehavior;
 
-  AccountSettings(
-      this.ignoreWalletBalance,
-      {this.showConnectProgress = false,
-      this.failePaymentBehavior = BugReportBehavior.PROMPT});
+  AccountSettings(this.ignoreWalletBalance, {this.showConnectProgress = false, this.failePaymentBehavior = BugReportBehavior.PROMPT});
   AccountSettings.fromJson(Map<String, dynamic> json)
       : this(json["ignoreWalletBalance"] ?? false,
             failePaymentBehavior: BugReportBehavior.values[json["failePaymentBehavior"] ?? 0],
@@ -191,13 +177,9 @@ class AccountSettings {
 
   AccountSettings.start() : this(false);
 
-  AccountSettings copyWith(
-      {bool ignoreWalletBalance,
-      bool showConnectProgress,
-      BugReportBehavior failePaymentBehavior}) {
+  AccountSettings copyWith({bool ignoreWalletBalance, bool showConnectProgress, BugReportBehavior failePaymentBehavior}) {
     return AccountSettings(ignoreWalletBalance ?? this.ignoreWalletBalance,
-        failePaymentBehavior:
-            failePaymentBehavior ?? this.failePaymentBehavior,
+        failePaymentBehavior: failePaymentBehavior ?? this.failePaymentBehavior,
         showConnectProgress: showConnectProgress ?? this.showConnectProgress);
   }
 
@@ -235,11 +217,7 @@ class BroadcastRefundResponseModel {
   BroadcastRefundResponseModel(this.request, this.txID);
 }
 
-enum BugReportBehavior {
-  PROMPT,
-  SEND_REPORT,
-  IGNORE
-}
+enum BugReportBehavior { PROMPT, SEND_REPORT, IGNORE }
 
 class CompletedPayment {
   final PayRequest paymentRequest;
@@ -266,21 +244,13 @@ class PaymentFilterModel {
   final DateTime endDate;
   final bool initial;
 
-  PaymentFilterModel(this.paymentType, this.startDate, this.endDate,
-      {this.initial = false});
+  PaymentFilterModel(this.paymentType, this.startDate, this.endDate, {this.initial = false});
 
   PaymentFilterModel.initial()
-      : this([
-          PaymentType.SENT,
-          PaymentType.DEPOSIT,
-          PaymentType.WITHDRAWAL,
-          PaymentType.RECEIVED
-        ], null, null, initial: true);
+      : this([PaymentType.SENT, PaymentType.DEPOSIT, PaymentType.WITHDRAWAL, PaymentType.RECEIVED], null, null, initial: true);
 
-  PaymentFilterModel copyWith(
-      {List<PaymentType> filter, DateTime startDate, DateTime endDate}) {
-    return PaymentFilterModel(filter ?? this.paymentType,
-        startDate ?? this.startDate, endDate ?? this.endDate);
+  PaymentFilterModel copyWith({List<PaymentType> filter, DateTime startDate, DateTime endDate}) {
+    return PaymentFilterModel(filter ?? this.paymentType, startDate ?? this.startDate, endDate ?? this.endDate);
   }
 }
 
@@ -298,21 +268,16 @@ class PaymentInfo {
   PaymentInfo(this._paymentResponse, this._currency);
   Int64 get amount => _paymentResponse.amount;
   bool get containsPaymentInfo {
-    String remoteName = (type == PaymentType.SENT
-        ? _paymentResponse.invoiceMemo?.payeeName
-        : _paymentResponse.invoiceMemo?.payerName);
+    String remoteName = (type == PaymentType.SENT ? _paymentResponse.invoiceMemo?.payeeName : _paymentResponse.invoiceMemo?.payerName);
     String description = _paymentResponse.invoiceMemo?.description;
     return remoteName?.isNotEmpty == true || description.isNotEmpty == true;
   }
+
   Int64 get creationTimestamp => _paymentResponse.creationTimestamp;
   Currency get currency => _currency;
-  String get description =>
-      _paymentResponse.invoiceMemo.description.startsWith("Bitrefill")
-          ? _paymentResponse.invoiceMemo.description
-              .substring(10, _paymentResponse.invoiceMemo.description.length)
-          : type == PaymentType.DEPOSIT || type == PaymentType.WITHDRAWAL
-              ? "Bitcoin Transfer"
-              : _paymentResponse.invoiceMemo?.description;
+  String get description => _paymentResponse.invoiceMemo.description.startsWith("Bitrefill")
+      ? _paymentResponse.invoiceMemo.description.substring(10, _paymentResponse.invoiceMemo.description.length)
+      : type == PaymentType.DEPOSIT || type == PaymentType.WITHDRAWAL ? "Bitcoin Transfer" : _paymentResponse.invoiceMemo?.description;
   String get destination => _paymentResponse.destination;
   Int64 get fee => _paymentResponse.fee;
   String get imageURL {
@@ -326,21 +291,18 @@ class PaymentInfo {
       return "src/icon/vendors/lnpizza_logo.png";
     }
 
-    String url = (type == PaymentType.SENT
-        ? _paymentResponse.invoiceMemo?.payeeImageURL
-        : _paymentResponse.invoiceMemo?.payerImageURL);
+    String url = (type == PaymentType.SENT ? _paymentResponse.invoiceMemo?.payeeImageURL : _paymentResponse.invoiceMemo?.payerImageURL);
     return (url == null || url.isEmpty) ? null : url;
   }
-  bool get isTransferRequest =>
-      _paymentResponse?.invoiceMemo?.transferRequest == true;
+
+  bool get isTransferRequest => _paymentResponse?.invoiceMemo?.transferRequest == true;
   String get paymentHash => _paymentResponse.paymentHash;
 
   bool get pending => _paymentResponse.pendingExpirationHeight > 0;
 
   int get pendingExpirationHeight => _paymentResponse.pendingExpirationHeight;
 
-  Int64 get pendingExpirationTimestamp =>
-      _paymentResponse.pendingExpirationTimestamp;
+  Int64 get pendingExpirationTimestamp => _paymentResponse.pendingExpirationTimestamp;
 
   String get preimage => _paymentResponse.preimage;
 
@@ -357,9 +319,7 @@ class PaymentInfo {
     if (type == PaymentType.DEPOSIT || type == PaymentType.WITHDRAWAL) {
       return "Bitcoin Transfer";
     }
-    String result = (type == PaymentType.SENT
-        ? _paymentResponse.invoiceMemo?.payeeName
-        : _paymentResponse.invoiceMemo?.payerName);
+    String result = (type == PaymentType.SENT ? _paymentResponse.invoiceMemo?.payeeName : _paymentResponse.invoiceMemo?.payerName);
     if (result == null || result.isEmpty) {
       result = _paymentResponse.invoiceMemo.description;
     }
@@ -381,17 +341,12 @@ class PaymentsModel {
 
   PaymentsModel(this.nonFilteredItems, this.paymentsList, this.filter, [this.firstDate]);
 
-  PaymentsModel.initial()
-      : this(List<PaymentInfo>(), List<PaymentInfo>(), PaymentFilterModel.initial(),
-            DateTime(DateTime.now().year));
+  PaymentsModel.initial() : this(List<PaymentInfo>(), List<PaymentInfo>(), PaymentFilterModel.initial(), DateTime(DateTime.now().year));
 
   PaymentsModel copyWith(
-      {List<PaymentInfo> nonFilteredItems,
-      List<PaymentInfo> paymentsList,
-      PaymentFilterModel filter,
-      DateTime firstDate}) {
-    return PaymentsModel(nonFilteredItems ?? this.nonFilteredItems, paymentsList ?? this.paymentsList,
-        filter ?? this.filter, firstDate ?? this.firstDate);
+      {List<PaymentInfo> nonFilteredItems, List<PaymentInfo> paymentsList, PaymentFilterModel filter, DateTime firstDate}) {
+    return PaymentsModel(
+        nonFilteredItems ?? this.nonFilteredItems, paymentsList ?? this.paymentsList, filter ?? this.filter, firstDate ?? this.firstDate);
   }
 }
 
@@ -415,7 +370,7 @@ class RefundableAddress {
   String get lastRefundTxID => _refundableInfo.lastRefundTxID;
   int get lockHeight => _refundableInfo.lockHeight;
   String get refundableError {
-    switch(_refundableInfo.swapError) {
+    switch (_refundableInfo.swapError) {
       case SwapError.FUNDS_EXCEED_LIMIT:
         return "the executed transaction was above the specified limit.";
       case SwapError.INVOICE_AMOUNT_MISMATCH:
@@ -436,8 +391,7 @@ class RefundableDepositModel {
 
   String get address => _address.address;
   Int64 get confirmedAmount => _address.confirmedAmount;
-  bool get refundBroadcasted =>
-      _address.lastRefundTxID != null && _address.lastRefundTxID.isNotEmpty;
+  bool get refundBroadcasted => _address.lastRefundTxID != null && _address.lastRefundTxID.isNotEmpty;
 }
 
 class RemoveFundRequestModel {
@@ -446,8 +400,7 @@ class RemoveFundRequestModel {
   final bool fromWallet;
   final Int64 satPerByteFee;
 
-  RemoveFundRequestModel(this.amount, this.address,
-      {this.fromWallet = false, this.satPerByteFee});
+  RemoveFundRequestModel(this.amount, this.address, {this.fromWallet = false, this.satPerByteFee});
 }
 
 class RemoveFundResponseModel {
@@ -463,8 +416,8 @@ class SwapFundStatus {
   SwapFundStatus(this._addedFundsReply);
 
   bool get depositConfirmed {
-      var waitingPaymentAddresses = _addedFundsReply?.confirmedAddresses?.where((a) => a.errorMessage.isEmpty);
-      return waitingPaymentAddresses != null && waitingPaymentAddresses.length > 0;
+    var waitingPaymentAddresses = _addedFundsReply?.confirmedAddresses?.where((a) => a.errorMessage.isEmpty);
+    return waitingPaymentAddresses != null && waitingPaymentAddresses.length > 0;
   }
 
   String get error {
@@ -473,7 +426,7 @@ class SwapFundStatus {
       return refundAddresses[0].refundableError;
     }
 
-    var errorAddresses = _addedFundsReply?.confirmedAddresses?.where((a) => a.errorMessage.isNotEmpty);    
+    var errorAddresses = _addedFundsReply?.confirmedAddresses?.where((a) => a.errorMessage.isNotEmpty);
     if (errorAddresses == null || errorAddresses.isEmpty) {
       return null;
     }
@@ -492,15 +445,11 @@ class SwapFundStatus {
   }
 
   String get unconfirmedTxID {
-      if (_addedFundsReply == null || _addedFundsReply.unConfirmedAddresses.length == 0) {
-        return null;
-      }
-      return _addedFundsReply.unConfirmedAddresses[0].fundingTxID;
+    if (_addedFundsReply == null || _addedFundsReply.unConfirmedAddresses.length == 0) {
+      return null;
+    }
+    return _addedFundsReply.unConfirmedAddresses[0].fundingTxID;
   }
 }
 
-enum SyncUIState {
-  BLOCKING,
-  COLLAPSED,
-  NONE
-}
+enum SyncUIState { BLOCKING, COLLAPSED, NONE }

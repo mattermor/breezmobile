@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class WaitingPeerConnectWidget extends StatefulWidget {
-  
   @override
   State<StatefulWidget> createState() {
     return _WaitingPeerConnecWidgettState();
@@ -26,7 +25,8 @@ class _ConnectingCustomPainter extends CustomPainter {
     }
     double distance = (circleIndex - rangeIndex).abs();
     double sizeFactor = (((1.8 - distance) / 4) + 1.0).clamp(1.0, 1.45);
-    canvas.drawCircle(start, circleHeight / 2 * sizeFactor, Paint()..color = Colors.white.withOpacity(((sizeFactor * 2) - 1.7).clamp(0.0, 1.0)));
+    canvas.drawCircle(
+        start, circleHeight / 2 * sizeFactor, Paint()..color = Colors.white.withOpacity(((sizeFactor * 2) - 1.7).clamp(0.0, 1.0)));
   }
 
   @override

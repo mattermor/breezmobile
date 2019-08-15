@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -25,16 +24,13 @@ class LoadingAnimatedTextState extends State<LoadingAnimatedText> {
   String get paddingDots => '${List.filled(3 - _timerIteration % 4, ".").join("")}';
 
   @override
-  Widget build(BuildContext context) {   
+  Widget build(BuildContext context) {
     return RichText(
-      text: TextSpan(
-        style: widget.textStyle ?? DefaultTextStyle.of(context).style,
-        text: widget._loadingMessage,
-        children:<TextSpan>[
-          TextSpan(text: loadingDots),
-          TextSpan(text: paddingDots, style: TextStyle(color: Colors.transparent))
-        ]), 
-      textAlign: widget.textAlign == null ? TextAlign.center : widget.textAlign);
+        text: TextSpan(
+            style: widget.textStyle ?? DefaultTextStyle.of(context).style,
+            text: widget._loadingMessage,
+            children: <TextSpan>[TextSpan(text: loadingDots), TextSpan(text: paddingDots, style: TextStyle(color: Colors.transparent))]),
+        textAlign: widget.textAlign == null ? TextAlign.center : widget.textAlign);
   }
 
   @override
@@ -42,6 +38,7 @@ class LoadingAnimatedTextState extends State<LoadingAnimatedText> {
     _loadingTimer.cancel();
     super.dispose();
   }
+
   @override
   void initState() {
     super.initState();

@@ -7,14 +7,11 @@ import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Device {
-  static const EventChannel _notificationsChannel =
-      const EventChannel('com.breez.client/lifecycle_events_notifications');
-  static const MethodChannel _breezShareChannel =
-      const MethodChannel('com.breez.client/share_breez');
+  static const EventChannel _notificationsChannel = const EventChannel('com.breez.client/lifecycle_events_notifications');
+  static const MethodChannel _breezShareChannel = const MethodChannel('com.breez.client/share_breez');
 
   static const String LAST_CLIPPING_PREFERENCES_KEY = "lastClipping";
-  final StreamController _eventsController =
-      new StreamController<NotificationType>.broadcast();
+  final StreamController _eventsController = new StreamController<NotificationType>.broadcast();
 
   final _deviceClipboardController = new BehaviorSubject<String>();
   String _lastClipping = "";
@@ -31,7 +28,7 @@ class Device {
         _eventsController.add(NotificationType.RESUME);
         sharedPrefrences.then((preferences) {
           fetchClipboard(preferences);
-        });        
+        });
       }
       if (event == "pause") {
         _eventsController.add(NotificationType.PAUSE);
@@ -42,7 +39,7 @@ class Device {
 
   Stream<NotificationType> get eventStream => _eventsController.stream;
 
-  fetchClipboard(SharedPreferences preferences){
+  fetchClipboard(SharedPreferences preferences) {
     Clipboard.getData("text/plain").then((clipboardData) {
       if (clipboardData != null) {
         var text = clipboardData.text;

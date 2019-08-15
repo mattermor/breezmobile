@@ -14,8 +14,7 @@ class PaymentDetailsForm extends StatefulWidget {
   final PaymentSessionState _sessionState;
   final Function(Int64 amount, {String description}) _onSubmitPayementDetails;
 
-  PaymentDetailsForm(
-      this._account, this._sessionState, this._onSubmitPayementDetails);
+  PaymentDetailsForm(this._account, this._sessionState, this._onSubmitPayementDetails);
 
   @override
   State<StatefulWidget> createState() {
@@ -24,8 +23,7 @@ class PaymentDetailsForm extends StatefulWidget {
 }
 
 class _PaymentDetailsFormState extends State<PaymentDetailsForm> {
-  TextEditingController _invoiceDescriptionController =
-      new TextEditingController();
+  TextEditingController _invoiceDescriptionController = new TextEditingController();
   TextEditingController _amountController = new TextEditingController();
   double _maxHeight = 0.0;
   final _formKey = GlobalKey<FormState>();
@@ -37,7 +35,7 @@ class _PaymentDetailsFormState extends State<PaymentDetailsForm> {
     const double bottomBarHeight = 96.0;
     const double bottomBarTopMargin = 24.0;
     const double formMinHeight = 250.0;
-    
+
     return LayoutBuilder(builder: (context, constraints) {
       print("constraints biggest = " + constraints.biggest.toString());
       _maxHeight = max(_maxHeight, constraints.maxHeight);
@@ -45,12 +43,12 @@ class _PaymentDetailsFormState extends State<PaymentDetailsForm> {
         alignment: Alignment.topCenter,
         children: <Widget>[
           Positioned(
-            top: 0.0,        
-            bottom: 0.0,    
+            top: 0.0,
+            bottom: 0.0,
             child: SingleChildScrollView(
               child: Container(
-                height: max(formMinHeight, constraints.maxHeight - bottomBarHeight),                
-                width: constraints.maxWidth,            
+                height: max(formMinHeight, constraints.maxHeight - bottomBarHeight),
+                width: constraints.maxWidth,
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -81,16 +79,13 @@ class _PaymentDetailsFormState extends State<PaymentDetailsForm> {
                             new Text("Available:", style: theme.textStyle),
                             new Padding(
                               padding: EdgeInsets.only(left: 3.0),
-                              child: new Text(
-                                  widget._account.currency
-                                      .format(widget._account.balance),
-                                  style: theme.textStyle),
+                              child: new Text(widget._account.currency.format(widget._account.balance), style: theme.textStyle),
                             )
                           ],
                         ),
                       )
                     ],
-                  ),                  
+                  ),
                 ),
               ),
             ),
@@ -99,16 +94,13 @@ class _PaymentDetailsFormState extends State<PaymentDetailsForm> {
             top: _maxHeight - bottomBarHeight + bottomBarTopMargin,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 36.0),
-              child: SubmitButton(
-                  widget._sessionState.paymentFulfilled ? "Close" : "Pay", () {
+              child: SubmitButton(widget._sessionState.paymentFulfilled ? "Close" : "Pay", () {
                 if (widget._sessionState.paymentFulfilled) {
                   Navigator.pop(context);
                 } else {
                   if (_formKey.currentState.validate()) {
-                    Int64 satoshies =
-                        widget._account.currency.parse(_amountController.text);
-                    widget._onSubmitPayementDetails(satoshies,
-                        description: _invoiceDescriptionController.text);
+                    Int64 satoshies = widget._account.currency.parse(_amountController.text);
+                    widget._onSubmitPayementDetails(satoshies, description: _invoiceDescriptionController.text);
                   }
                 }
               }),
@@ -119,7 +111,7 @@ class _PaymentDetailsFormState extends State<PaymentDetailsForm> {
     });
   }
 
-  @override 
+  @override
   void dispose() {
     _doneAction.dispose();
     super.dispose();

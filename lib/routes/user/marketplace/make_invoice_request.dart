@@ -15,7 +15,7 @@ class MakeInvoiceRequest extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> children = [
       Text("This site wants to pay you:", style: theme.paymentRequestSubtitleStyle, textAlign: TextAlign.center),
-      Text(account.currency.format(Int64(amount)), style: theme.paymentRequestAmountStyle,textAlign: TextAlign.center)
+      Text(account.currency.format(Int64(amount)), style: theme.paymentRequestAmountStyle, textAlign: TextAlign.center)
     ];
 
     if (description != null && description.isEmpty) {
@@ -49,7 +49,7 @@ class MakeInvoiceRequest extends StatelessWidget {
     ));
 
     return Dialog(
-        child: Container(            
+        child: Container(
             width: MediaQuery.of(context).size.width,
             constraints: BoxConstraints(minHeight: 220.0, maxHeight: 320.0),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: children)),

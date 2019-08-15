@@ -9,7 +9,7 @@ class VendorRow extends StatelessWidget {
   final AccountBloc accountBloc;
   final VendorModel _vendor;
 
-  VendorRow(this.accountBloc,this._vendor);
+  VendorRow(this.accountBloc, this._vendor);
 
   @override
   Widget build(BuildContext context) {

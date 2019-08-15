@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class ConnectedWidget extends StatefulWidget {
   final Duration _connectionEmulationDuration;
   final bool _waitingAction;
-  
+
   ConnectedWidget(this._connectionEmulationDuration, this._waitingAction);
 
   @override
@@ -23,14 +23,16 @@ class ConnectedWidgetState extends State<ConnectedWidget> with TickerProviderSta
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(painter: _ConnectedCustomPainter(_lineWidthFactor, showCircle: widget._waitingAction, circleLoation: this._circleLoation, circleRadius: this._circleRadius));
+    return CustomPaint(
+        painter: _ConnectedCustomPainter(_lineWidthFactor,
+            showCircle: widget._waitingAction, circleLoation: this._circleLoation, circleRadius: this._circleRadius));
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     _circleController.dispose();
-    super.dispose();    
+    super.dispose();
   }
 
   @override
@@ -80,7 +82,7 @@ class ConnectedWidgetState extends State<ConnectedWidget> with TickerProviderSta
       ),
     );
 
-    _animationController.forward();  
+    _animationController.forward();
     _circleController.repeat();
   }
 }
@@ -92,25 +94,26 @@ class _ConnectedCustomPainter extends CustomPainter {
   final Animation<double> circleRadius;
   final bool showCircle;
   final int numberOfCircles = 10;
-  final double circleHeight = 7.0;  
+  final double circleHeight = 7.0;
 
   _ConnectedCustomPainter(this._lineWidthFactor, {this.showCircle, this.circleLoation, this.circleRadius});
 
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()..strokeWidth = lineHeight
+    var paint = Paint()
+      ..strokeWidth = lineHeight
       ..color = Colors.white;
     paintCircles(canvas, size);
     canvas.drawCircle(Offset(size.width * _lineWidthFactor.value, size.height / 2), lineHeight / 2, paint);
-    canvas.drawLine(Offset(0.0, size.height / 2), Offset(size.width * _lineWidthFactor.value, size.height / 2), paint);  
+    canvas.drawLine(Offset(0.0, size.height / 2), Offset(size.width * _lineWidthFactor.value, size.height / 2), paint);
 
     if (showCircle) {
       canvas.drawCircle(Offset(size.width * circleLoation.value, size.height / 2),
-          (lineHeight / 2) + (lineHeight * 2) * (0.5 - (circleRadius.value - 0.5).abs()), paint);  
+          (lineHeight / 2) + (lineHeight * 2) * (0.5 - (circleRadius.value - 0.5).abs()), paint);
     }
   }
 
-  void paintCircles(Canvas canvas, Size size){
+  void paintCircles(Canvas canvas, Size size) {
     var width = size.width, marginBetweenCircles = (width - (circleHeight * numberOfCircles)) / (numberOfCircles - 1);
 
     canvas.drawCircle(size.centerLeft(Offset(2.5, 0.0)), circleHeight / 2, Paint()..color = Colors.white.withOpacity(0.3));

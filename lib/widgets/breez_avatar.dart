@@ -36,18 +36,18 @@ class BreezAvatar extends StatelessWidget {
   final double radius;
   final Color backgroundColor;
 
-  BreezAvatar(this.avatarURL, {this.radius = 20.0,  this.backgroundColor});
+  BreezAvatar(this.avatarURL, {this.radius = 20.0, this.backgroundColor});
 
   @override
   Widget build(BuildContext context) {
     Color avatarBgColor = this.backgroundColor ?? theme.sessionAvatarBackgroundColor;
     if (avatarURL != null && avatarURL.isNotEmpty) {
       if (avatarURL.startsWith("breez://profile_image?")) {
-        var queryParams = Uri.parse(avatarURL).queryParameters;        
+        var queryParams = Uri.parse(avatarURL).queryParameters;
         return _GeneratedAvatar(radius, queryParams["animal"], queryParams["color"], avatarBgColor);
       }
 
-      if(avatarURL.startsWith("src/icon/vendors/")){
+      if (avatarURL.startsWith("src/icon/vendors/")) {
         return _VendorAvatar(radius, avatarURL);
       }
 
@@ -107,14 +107,14 @@ class _UnknownAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      backgroundColor: backgroundColor,
-      radius: radius,
-      child: ImageIcon(
+        backgroundColor: backgroundColor,
+        radius: radius,
+        child: ImageIcon(
           AssetImage("src/icon/alien.png"),
           color: Color.fromARGB(255, 0, 166, 68),
           size: 0.70 * radius * 2,
-      ) // Used to be: Icon(Icons.person, color: theme.BreezColors.blue[500], size: 0.7 * radius * 2,)
-    );
+        ) // Used to be: Icon(Icons.person, color: theme.BreezColors.blue[500], size: 0.7 * radius * 2,)
+        );
   }
 }
 
@@ -124,10 +124,9 @@ class _VendorAvatar extends StatelessWidget {
 
   _VendorAvatar(this.radius, this.avatarURL);
 
-
   @override
   Widget build(BuildContext context) {
-    if(avatarURL.contains("fastbitcoins")){
+    if (avatarURL.contains("fastbitcoins")) {
       return _fastbitcoinsAvatar();
     } else {
       return _vendorAvatar();
@@ -136,12 +135,11 @@ class _VendorAvatar extends StatelessWidget {
 
   Widget _bitrefillAvatar() {
     return Container(
-      decoration: ShapeDecoration(color: theme.bitrefill.iconBgColor,
+      decoration: ShapeDecoration(
+          color: theme.bitrefill.iconBgColor,
           shape: CircleBorder(side: BorderSide(color: theme.bitrefill.iconBgColor)),
-          image: DecorationImage(
-              image: AssetImage(avatarURL),
-              colorFilter: ColorFilter.mode(
-                  theme.bitrefill.iconFgColor, BlendMode.color))),
+          image:
+              DecorationImage(image: AssetImage(avatarURL), colorFilter: ColorFilter.mode(theme.bitrefill.iconFgColor, BlendMode.color))),
       width: radius * 2,
       height: radius * 2,
     );
@@ -155,19 +153,17 @@ class _VendorAvatar extends StatelessWidget {
           AssetImage(avatarURL),
           color: theme.fastbitcoins.iconFgColor,
           size: 0.6 * radius * 2,
-        )
-    );
+        ));
   }
 
   Widget _vendorAvatar() {
     var _bgColor = avatarURL.contains("lnpizza") ? theme.lnpizza.iconBgColor : theme.bitrefill.iconBgColor;
     var _fgColor = avatarURL.contains("lnpizza") ? theme.lnpizza.iconFgColor : theme.bitrefill.iconFgColor;
     return Container(
-      decoration: ShapeDecoration(color: _bgColor,
+      decoration: ShapeDecoration(
+          color: _bgColor,
           shape: CircleBorder(side: BorderSide(color: _bgColor)),
-          image: DecorationImage(
-              image: AssetImage(avatarURL),
-              colorFilter: ColorFilter.mode(_fgColor, BlendMode.color))),
+          image: DecorationImage(image: AssetImage(avatarURL), colorFilter: ColorFilter.mode(_fgColor, BlendMode.color))),
       width: radius * 2,
       height: radius * 2,
     );

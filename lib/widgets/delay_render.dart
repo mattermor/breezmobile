@@ -18,22 +18,23 @@ class DelatedRenderState extends State<DelayRender> {
   }
 
   @override
-  void initState() {    
+  void initState() {
     super.initState();
-    _timer = Timer(widget.duration, () => setState((){
-      _childVisible = true;
-    }));
+    _timer = Timer(
+        widget.duration,
+        () => setState(() {
+              _childVisible = true;
+            }));
   }
-
 }
 
 class DelayRender extends StatefulWidget {
   final Duration duration;
-  final Widget child;  
+  final Widget child;
   final Widget initialChild;
 
   DelayRender({this.duration, this.child, this.initialChild = const SizedBox()});
-  
+
   @override
   State<StatefulWidget> createState() {
     return DelatedRenderState();

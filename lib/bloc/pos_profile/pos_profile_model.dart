@@ -7,7 +7,12 @@ class POSProfileModel {
 
   POSProfileModel(this.invoiceString, this.logo, {this.logoLocalPath, this.uploadInProgress = false, this.cancellationTimeoutValue});
 
-  POSProfileModel.empty() : invoiceString = null, logo = null, logoLocalPath = null, uploadInProgress = false, cancellationTimeoutValue = 90.0;
+  POSProfileModel.empty()
+      : invoiceString = null,
+        logo = null,
+        logoLocalPath = null,
+        uploadInProgress = false,
+        cancellationTimeoutValue = 90.0;
 
   POSProfileModel.fromJson(Map<String, dynamic> json)
       : invoiceString = json['invoiceString'],
@@ -17,14 +22,12 @@ class POSProfileModel {
         cancellationTimeoutValue = json['cancellationTimeoutValue'] == null ? 90.0 : json['cancellationTimeoutValue'];
 
   POSProfileModel copyWith({String invoiceString, String logo, String logoLocalPath, uploadInProgress, double cancellationTimeoutValue}) {
-    return POSProfileModel(
-      invoiceString ?? this.invoiceString,
-      logo  ?? this.logo,
-      logoLocalPath: logoLocalPath ?? this.logoLocalPath,
-      uploadInProgress: uploadInProgress ?? this.uploadInProgress,
-      cancellationTimeoutValue: cancellationTimeoutValue ?? this.cancellationTimeoutValue
-    );
+    return POSProfileModel(invoiceString ?? this.invoiceString, logo ?? this.logo,
+        logoLocalPath: logoLocalPath ?? this.logoLocalPath,
+        uploadInProgress: uploadInProgress ?? this.uploadInProgress,
+        cancellationTimeoutValue: cancellationTimeoutValue ?? this.cancellationTimeoutValue);
   }
 
-  Map<String, dynamic> toJson() => {'invoiceString': invoiceString, 'logo': logo, 'logoLocalPath': logoLocalPath,'cancellationTimeoutValue': cancellationTimeoutValue};
+  Map<String, dynamic> toJson() =>
+      {'invoiceString': invoiceString, 'logo': logo, 'logoLocalPath': logoLocalPath, 'cancellationTimeoutValue': cancellationTimeoutValue};
 }

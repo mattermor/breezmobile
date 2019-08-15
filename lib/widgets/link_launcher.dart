@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class LinkLauncher extends StatelessWidget {  
+class LinkLauncher extends StatelessWidget {
   final String linkName;
   final String linkAddress;
   final Function onCopy;
 
-  const LinkLauncher({Key key, this.linkName, this.linkAddress, this.onCopy})
-      : super(key: key);
+  const LinkLauncher({Key key, this.linkName, this.linkAddress, this.onCopy}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +17,7 @@ class LinkLauncher extends StatelessWidget {
         Expanded(
           flex: 1,
           child: GestureDetector(
-            onTap: (){
+            onTap: () {
               this.onCopy();
             },
             child: Text(
@@ -36,7 +35,7 @@ class LinkLauncher extends StatelessWidget {
               child: new Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[                  
+                children: <Widget>[
                   IconButton(
                     alignment: Alignment.centerRight,
                     padding: EdgeInsets.zero,

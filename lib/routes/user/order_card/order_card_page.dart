@@ -77,8 +77,7 @@ class OrderCardPageState extends State<OrderCardPage> {
                       new Container(
                         padding: new EdgeInsets.only(top: 8.0),
                         child: new TextFormField(
-                          decoration:
-                          new InputDecoration(labelText: "Full Name"),
+                          decoration: new InputDecoration(labelText: "Full Name"),
                           style: theme.FieldTextStyle.textStyle,
                           textCapitalization: TextCapitalization.words,
                           onSaved: (String value) {
@@ -94,8 +93,7 @@ class OrderCardPageState extends State<OrderCardPage> {
                       new Container(
                         padding: new EdgeInsets.only(top: 8.0),
                         child: new TextFormField(
-                          decoration:
-                          new InputDecoration(labelText: "E-mail Address"),
+                          decoration: new InputDecoration(labelText: "E-mail Address"),
                           style: theme.FieldTextStyle.textStyle,
                           textCapitalization: TextCapitalization.none,
                           onSaved: (String value) {
@@ -104,8 +102,7 @@ class OrderCardPageState extends State<OrderCardPage> {
                           validator: (value) {
                             if (value.isEmpty) {
                               return "Please enter your e-mail address";
-                            } else if (!_validateEmail(
-                                value)) {
+                            } else if (!_validateEmail(value)) {
                               return "Invalid e-mail";
                             }
                           },
@@ -140,8 +137,7 @@ class OrderCardPageState extends State<OrderCardPage> {
                                     child: new Container(
                                       child: new TextFormField(
                                         focusNode: _cityFocusNode,
-                                        decoration: new InputDecoration(
-                                            labelText: "City"),
+                                        decoration: new InputDecoration(labelText: "City"),
                                         style: theme.FieldTextStyle.textStyle,
                                         textCapitalization: TextCapitalization.words,
                                         onSaved: (String value) {
@@ -163,22 +159,16 @@ class OrderCardPageState extends State<OrderCardPage> {
                                         autovalidate: _autoValidateState,
                                         controller: _stateController,
                                         focusNode: _stateFocusNode,
-                                        decoration: new InputDecoration(
-                                            labelText: "State"),
+                                        decoration: new InputDecoration(labelText: "State"),
                                         style: theme.FieldTextStyle.textStyle,
                                         textCapitalization: TextCapitalization.words,
                                         onSaved: (String value) {
                                           this._data.state = value;
                                         },
                                         validator: (value) {
-                                          if (value.isEmpty &&
-                                              _specialCountriesShort.contains(
-                                                  _userCountryShort)) {
+                                          if (value.isEmpty && _specialCountriesShort.contains(_userCountryShort)) {
                                             return "Enter your state";
-                                          } else if (_specialCountriesShort
-                                              .contains(
-                                              _userCountryShort) &&
-                                              _checkStates(value)) {
+                                          } else if (_specialCountriesShort.contains(_userCountryShort) && _checkStates(value)) {
                                             return "Invalid state";
                                           }
                                         },
@@ -193,8 +183,7 @@ class OrderCardPageState extends State<OrderCardPage> {
                                 new Container(
                                   padding: new EdgeInsets.only(top: 19.0),
                                   child: new Row(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       new Expanded(
                                         flex: 200,
@@ -203,8 +192,7 @@ class OrderCardPageState extends State<OrderCardPage> {
                                             autovalidate: _autoValidateCountry,
                                             controller: _countryController,
                                             focusNode: _countryFocusNode,
-                                            decoration: new InputDecoration(
-                                                labelText: "Country"),
+                                            decoration: new InputDecoration(labelText: "Country"),
                                             style: theme.FieldTextStyle.textStyle,
                                             textCapitalization: TextCapitalization.words,
                                             onSaved: (String value) {
@@ -213,8 +201,7 @@ class OrderCardPageState extends State<OrderCardPage> {
                                             validator: (value) {
                                               if (value.isEmpty) {
                                                 return "Please enter your country";
-                                              } else if (!_checkCountry(
-                                                  value)) {
+                                              } else if (!_checkCountry(value)) {
                                                 return "Invalid country";
                                               }
                                             },
@@ -236,8 +223,7 @@ class OrderCardPageState extends State<OrderCardPage> {
                                               this._data.zip = value;
                                             },
                                             validator: (value) {
-                                              if (value.isNotEmpty && !_validateZip(
-                                                  value)) {
+                                              if (value.isNotEmpty && !_validateZip(value)) {
                                                 return "Invalid zip code";
                                               }
                                             },
@@ -262,39 +248,31 @@ class OrderCardPageState extends State<OrderCardPage> {
                               ]),
                               _showCountriesList
                                   ? new Container(
-                                  padding: new EdgeInsets.only(top: 77.5),
-                                  child: new Row(
-                                    children: <Widget>[
-                                      new Expanded(
-                                          flex: 200,
-                                          child: new Container(
-                                              decoration: theme
-                                                  .autoCompleteBoxDecoration,
-                                              child:
-                                              _getFutureWidgetCountries())),
-                                      new Expanded(
-                                          flex: 128, child: new Container())
-                                    ],
-                                  ))
+                                      padding: new EdgeInsets.only(top: 77.5),
+                                      child: new Row(
+                                        children: <Widget>[
+                                          new Expanded(
+                                              flex: 200,
+                                              child: new Container(
+                                                  decoration: theme.autoCompleteBoxDecoration, child: _getFutureWidgetCountries())),
+                                          new Expanded(flex: 128, child: new Container())
+                                        ],
+                                      ))
                                   : new Container()
                             ]),
                           ],
                         ),
                         _showStatesList
                             ? new Container(
-                            padding: new EdgeInsets.only(top: 77.5),
-                            child: new Row(
-                              children: <Widget>[
-                                new Expanded(
-                                    flex: 208, child: new Container()),
-                                new Expanded(
-                                    flex: 120,
-                                    child: new Container(
-                                        decoration:
-                                        theme.autoCompleteBoxDecoration,
-                                        child: _getFutureWidgetStates()))
-                              ],
-                            ))
+                                padding: new EdgeInsets.only(top: 77.5),
+                                child: new Row(
+                                  children: <Widget>[
+                                    new Expanded(flex: 208, child: new Container()),
+                                    new Expanded(
+                                        flex: 120,
+                                        child: new Container(decoration: theme.autoCompleteBoxDecoration, child: _getFutureWidgetStates()))
+                                  ],
+                                ))
                             : new Container(),
                       ]),
                     ],
@@ -321,21 +299,12 @@ class OrderCardPageState extends State<OrderCardPage> {
                       if (_formKey.currentState.validate()) {
                         _formKey.currentState.save();
                         _breezServer
-                            .orderCard(
-                            _data.fullName,
-                            _data.email,
-                            _data.address,
-                            _data.city,
-                            _data.state,
-                            _data.zip,
-                            _data.country)
+                            .orderCard(_data.fullName, _data.email, _data.address, _data.city, _data.state, _data.zip, _data.country)
                             .then((reply) {
-                          Navigator.pop(context,
-                              "Breez card will be sent shortly to the address you have specified.");
+                          Navigator.pop(context, "Breez card will be sent shortly to the address you have specified.");
                         }).catchError((error) {
                           print(error.toString());
-                          Scaffold.of(context).showSnackBar(new SnackBar(
-                              content: new Text(error.toString())));
+                          Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(error.toString())));
                         });
                       } else {}
                     },
@@ -371,9 +340,7 @@ class OrderCardPageState extends State<OrderCardPage> {
   }
 
   bool _checkCountry(String value) {
-    return _countriesJSON.values.firstWhere(
-            (val) => val.toLowerCase() == _countryController.text.toLowerCase(),
-        orElse: () => null) !=
+    return _countriesJSON.values.firstWhere((val) => val.toLowerCase() == _countryController.text.toLowerCase(), orElse: () => null) !=
         null;
   }
 
@@ -395,19 +362,14 @@ class OrderCardPageState extends State<OrderCardPage> {
             padding: new EdgeInsets.only(left: 10.0),
             alignment: Alignment.centerLeft,
             height: 35.0,
-            child: new Text(_countriesShow[i],
-                overflow: TextOverflow.ellipsis,
-                style: theme.autoCompleteStyle)),
+            child: new Text(_countriesShow[i], overflow: TextOverflow.ellipsis, style: theme.autoCompleteStyle)),
         onTap: () {
           _countryController.text = _countriesShow[i];
         },
       ));
     }
 
-    return new Container(
-        height: list.length * 35.0,
-        width: MediaQuery.of(context).size.width,
-        child: new ListView(children: list));
+    return new Container(height: list.length * 35.0, width: MediaQuery.of(context).size.width, child: new ListView(children: list));
   }
 
   Widget _getFutureWidgetStates() {
@@ -419,39 +381,31 @@ class OrderCardPageState extends State<OrderCardPage> {
             padding: new EdgeInsets.only(left: 10.0),
             alignment: Alignment.centerLeft,
             height: 35.0,
-            child: new Text(_statesShow[i],
-                overflow: TextOverflow.ellipsis,
-                style: theme.autoCompleteStyle)),
+            child: new Text(_statesShow[i], overflow: TextOverflow.ellipsis, style: theme.autoCompleteStyle)),
         onTap: () {
           _stateController.text = _statesShow[i];
         },
       ));
     }
 
-    return new Container(
-        height: list.length * 35.0,
-        width: MediaQuery.of(context).size.width,
-        child: new ListView(children: list));
+    return new Container(height: list.length * 35.0, width: MediaQuery.of(context).size.width, child: new ListView(children: list));
   }
 
   void _iterateMapEntryGetCountriesShow(key, value) {
     String inputText = _countryController.text;
-    if (value.length >= inputText.length &&
-        value.toLowerCase().startsWith(inputText.toLowerCase())) {
+    if (value.length >= inputText.length && value.toLowerCase().startsWith(inputText.toLowerCase())) {
       _countriesShow.add(value);
     }
   }
 
   void _iterateMapEntryGetCountryShort(key, value) {
-    if (value.toString().toLowerCase() ==
-        _countryController.text.toLowerCase()) {
+    if (value.toString().toLowerCase() == _countryController.text.toLowerCase()) {
       _userCountryShort = key;
     }
   }
 
   Future _loadCountries() async {
-    String jsonCountries =
-    await rootBundle.loadString('src/json/countries.json');
+    String jsonCountries = await rootBundle.loadString('src/json/countries.json');
     _countriesJSON = json.decode(jsonCountries);
     _countryController.text = _countriesJSON[_userCountryShort];
   }
@@ -459,8 +413,8 @@ class OrderCardPageState extends State<OrderCardPage> {
   void _loadData() async {
     _specialCountriesShort.add("US");
     _specialCountriesShort.add("CA");
-    final response = await http.get(
-        'http://api.ipstack.com/check?access_key=025a14ce39e8588578966edfe7e7d70a&output=json&fields=country_code');
+    final response =
+        await http.get('http://api.ipstack.com/check?access_key=025a14ce39e8588578966edfe7e7d70a&output=json&fields=country_code');
     if (response.statusCode == 200) {
       Map data = json.decode(response.body);
       _userCountryShort = data["country_code"];
@@ -487,9 +441,7 @@ class OrderCardPageState extends State<OrderCardPage> {
       _countriesShow.clear();
       _countriesJSON.forEach(_iterateMapEntryGetCountriesShow);
 
-      if (_countriesShow.length > 0 &&
-          !_countriesShow.contains(inputText) &&
-          _countryFocusNode.hasFocus) {
+      if (_countriesShow.length > 0 && !_countriesShow.contains(inputText) && _countryFocusNode.hasFocus) {
         _countriesShow.sort();
         setState(() {
           _autoValidateCountry = false;
@@ -518,15 +470,12 @@ class OrderCardPageState extends State<OrderCardPage> {
     if (inputText.length > 0) {
       _statesShow.clear();
       for (int i = 0; i < _states.length; i++) {
-        if (_states[i].length >= inputText.length &&
-            _states[i].toLowerCase().startsWith(inputText.toLowerCase())) {
+        if (_states[i].length >= inputText.length && _states[i].toLowerCase().startsWith(inputText.toLowerCase())) {
           _statesShow.add(_states[i]);
         }
       }
 
-      if (_statesShow.length > 0 &&
-          !_statesShow.contains(inputText) &&
-          _stateFocusNode.hasFocus) {
+      if (_statesShow.length > 0 && !_statesShow.contains(inputText) && _stateFocusNode.hasFocus) {
         _statesShow.sort();
         setState(() {
           _autoValidateState = false;
@@ -549,8 +498,7 @@ class OrderCardPageState extends State<OrderCardPage> {
 
   void _onChangeZip() {
     setState(() {
-      _autoValidateZip =
-      (_zipController.text.length > 0 && !_zipFocusNode.hasFocus);
+      _autoValidateZip = (_zipController.text.length > 0 && !_zipFocusNode.hasFocus);
     });
   }
 
@@ -581,15 +529,10 @@ class OrderCardPageState extends State<OrderCardPage> {
       content: new Text(
           "Name and address are required for sending you a Breez card. Any information provided will be deleted from our systems after card has been sent. You may skip this step and continue using Breez without a card.",
           style: theme.alertStyle),
-      actions: <Widget>[
-        new FlatButton(
-            onPressed: () => Navigator.pop(context),
-            child: new Text("OK", style: theme.buttonStyle))
-      ],
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      actions: <Widget>[new FlatButton(onPressed: () => Navigator.pop(context), child: new Text("OK", style: theme.buttonStyle))],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
     );
-    showDialog(context: context,  builder: (_) => dialog);
+    showDialog(context: context, builder: (_) => dialog);
   }
 
   Widget _showLeadingButton(showSkip) {
@@ -605,9 +548,7 @@ class OrderCardPageState extends State<OrderCardPage> {
       return <Widget>[
         new InkWell(
             child: new Container(
-                margin: new EdgeInsets.only(right: 16.5),
-                alignment: Alignment.center,
-                child: new Text("SKIP", style: theme.skipStyle)),
+                margin: new EdgeInsets.only(right: 16.5), alignment: Alignment.center, child: new Text("SKIP", style: theme.skipStyle)),
             onTap: () {
               Navigator.of(context).pushNamed('/home');
             })
@@ -618,7 +559,9 @@ class OrderCardPageState extends State<OrderCardPage> {
   }
 
   bool _validateEmail(String value) {
-    return RegExp(r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?").hasMatch(value);
+    return RegExp(
+            r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+        .hasMatch(value);
   }
 
   bool _validateZip(String value) {

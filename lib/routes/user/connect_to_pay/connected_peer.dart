@@ -56,34 +56,45 @@ class ConnectedPeer extends StatelessWidget {
       Stack(alignment: AlignmentDirectional.center, children: <Widget>[
         Positioned(
             child: AnimatedOpacity(
-                opacity: showShare && _paymentSessionData.invitationReady ? 1.0 : 0.0, duration: Duration(milliseconds: 1000), child: PulseAnimationDecorator(Container(), 55.0, 45.0))),
+                opacity: showShare && _paymentSessionData.invitationReady ? 1.0 : 0.0,
+                duration: Duration(milliseconds: 1000),
+                child: PulseAnimationDecorator(Container(), 55.0, 45.0))),
         Positioned(child: AnimatedOpacity(duration: Duration(milliseconds: 1000), opacity: !showShare ? 1.0 : 0.0, child: AlienAvatar())),
         Positioned(child: !showShare && !showAlien ? buildPeerAvatar(imagURL) : SizedBox()),
-        Positioned(child: showShare ? _ShareInviteWidget(!_paymentSessionData.invitationReady || _paymentSessionData.sessionSecret == null, _onShareInvite) : SizedBox()),
-        _paymentSessionData.invitationReady || _renderPayer ? Positioned(
-            bottom: 25.0,
-            right: 25.0,
-            height: 24.0,
-            width: 24.0,
-            child: Container(
-                decoration: BoxDecoration(
-              color: Colors.grey,
-              border: Border.all(color: Colors.white, width: 3.0),
-              borderRadius: BorderRadius.all(Radius.circular(12.0)),
-            ))) : SizedBox(),
-        _paymentSessionData.invitationReady || _renderPayer || _online ? Positioned(
-            bottom: 25.0,
-            right: 25.0,
-            height: 24.0,
-            width: 24.0,
-            child: _online ? DelayRender(              	
-              duration: PaymentSessionState.connectionEmulationDuration,	
-              child: Container(
-                  decoration: BoxDecoration(
-                color: Colors.greenAccent[400],
-                border: Border.all(color: Colors.white, width: 3.0),
-                borderRadius: BorderRadius.all(Radius.circular(12.0)),
-              ))) : SizedBox()) : SizedBox()
+        Positioned(
+            child: showShare
+                ? _ShareInviteWidget(!_paymentSessionData.invitationReady || _paymentSessionData.sessionSecret == null, _onShareInvite)
+                : SizedBox()),
+        _paymentSessionData.invitationReady || _renderPayer
+            ? Positioned(
+                bottom: 25.0,
+                right: 25.0,
+                height: 24.0,
+                width: 24.0,
+                child: Container(
+                    decoration: BoxDecoration(
+                  color: Colors.grey,
+                  border: Border.all(color: Colors.white, width: 3.0),
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                )))
+            : SizedBox(),
+        _paymentSessionData.invitationReady || _renderPayer || _online
+            ? Positioned(
+                bottom: 25.0,
+                right: 25.0,
+                height: 24.0,
+                width: 24.0,
+                child: _online
+                    ? DelayRender(
+                        duration: PaymentSessionState.connectionEmulationDuration,
+                        child: Container(
+                            decoration: BoxDecoration(
+                          color: Colors.greenAccent[400],
+                          border: Border.all(color: Colors.white, width: 3.0),
+                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                        )))
+                    : SizedBox())
+            : SizedBox()
       ])
     ]));
   }
@@ -94,9 +105,9 @@ class ConnectedPeer extends StatelessWidget {
     }
 
     return AnimatedOpacity(
-            duration: Duration(milliseconds: 1000),
-            opacity: 1.0,
-            child: BreezAvatar(imageURL, radius: 30.0, backgroundColor: theme.sessionAvatarBackgroundColor));    
+        duration: Duration(milliseconds: 1000),
+        opacity: 1.0,
+        child: BreezAvatar(imageURL, radius: 30.0, backgroundColor: theme.sessionAvatarBackgroundColor));
   }
 }
 
@@ -107,30 +118,25 @@ class _ShareInviteWidget extends StatelessWidget {
   const _ShareInviteWidget(this._loading, this._onShareInvite);
 
   @override
-  Widget build(BuildContext context) {         
-    return Stack(
-      alignment: AlignmentDirectional.center,
-      children: <Widget>[
-        Positioned(          
-        child: AnimatedOpacity(
-          duration: Duration(milliseconds: 1000),
-          opacity: _loading ? 1.0 : 0.0,
-          child: AvatarDecorator(            
-            PendingShareIndicator(),
-          ),
-        )
-      ),
+  Widget build(BuildContext context) {
+    return Stack(alignment: AlignmentDirectional.center, children: <Widget>[
       Positioned(
-        child: AnimatedOpacity(
-          duration: Duration(milliseconds: 1000),
-          opacity: _loading ? 0.0 : 1.0,          
-          child: AvatarDecorator(new IconButton(
-            icon: Icon(Icons.share, color: theme.BreezColors.blue[500]),
-            onPressed: () => _onShareInvite(),
-          )
-      ),
-        ))
-      ]      
-    );   
+          child: AnimatedOpacity(
+        duration: Duration(milliseconds: 1000),
+        opacity: _loading ? 1.0 : 0.0,
+        child: AvatarDecorator(
+          PendingShareIndicator(),
+        ),
+      )),
+      Positioned(
+          child: AnimatedOpacity(
+        duration: Duration(milliseconds: 1000),
+        opacity: _loading ? 0.0 : 1.0,
+        child: AvatarDecorator(new IconButton(
+          icon: Icon(Icons.share, color: theme.BreezColors.blue[500]),
+          onPressed: () => _onShareInvite(),
+        )),
+      ))
+    ]);
   }
 }
