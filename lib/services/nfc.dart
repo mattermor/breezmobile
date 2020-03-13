@@ -9,6 +9,7 @@ class NFCService {
       StreamController<String>();
 
   StreamController<bool> _cardActivationController = StreamController<bool>();
+
   Stream<bool> get cardActivationStream =>
       _cardActivationController.stream.asBroadcastStream();
 
@@ -108,5 +109,9 @@ class NFCService {
         _bolt11StreamController.add(call.arguments);
       }
     });
+  }
+
+  void dispose(filename) {
+    _bolt11BeamController.close();
   }
 }
