@@ -138,8 +138,10 @@ class PosTransactionsPageState extends State<PosTransactionsPage> {
         ),
       );
     }
+    //ignore: missing_required_param
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
+      //ignore: missing_required_param
       child: IconButton(
         icon: Icon(
           Icons.more_vert,

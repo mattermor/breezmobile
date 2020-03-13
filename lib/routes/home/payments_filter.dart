@@ -208,8 +208,10 @@ class PaymentsFilterState extends State<PaymentsFilter> {
         ),
       );
     }
+
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
+      //ignore: missing_required_param
       child: IconButton(
         icon: Icon(
           Icons.more_vert,
