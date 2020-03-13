@@ -5,14 +5,13 @@ import 'package:rxdart/rxdart.dart';
 
 class StatusIndicatorBloc {
   final _statusUpdateController = BehaviorSubject<StatusUpdateModel>();
+
   Sink<StatusUpdateModel> get statusUpdateSink => _statusUpdateController.sink;
 
   final _statusIndicatorUpdatesController = BehaviorSubject<String>();
+
   Stream<String> get statusIndicatorUpdatesStream =>
       _statusIndicatorUpdatesController.stream.asBroadcastStream();
-
-  bool _showingMessage = false;
-  StatusUpdatePriority _currentMessagePriority;
 
   StatusIndicatorBloc() {
     _listenStatusUpdates();
@@ -24,14 +23,11 @@ class StatusIndicatorBloc {
         _blankOutStatusIndicator();
       } else {
         _statusIndicatorUpdatesController.add(update.message);
-        _showingMessage = true;
-        _currentMessagePriority = update.priority;
       }
     });
   }
 
   void _blankOutStatusIndicator() {
-    _showingMessage = false;
     _statusIndicatorUpdatesController.add("");
   }
 

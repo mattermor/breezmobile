@@ -21,7 +21,6 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
   CountDown _paymentTimer;
   StreamSubscription<Duration> _timerSubscription;
   String _countdownString = "3:00";
-  String _debugMessage = "";
 
   StreamSubscription<String> _sentInvoicesSubscription;
   StreamSubscription<bool> _paidInvoicesSubscription;
@@ -48,8 +47,6 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
 
     _sentInvoicesSubscription =
         widget._invoiceBloc.sentInvoicesStream.listen((message) {
-      _debugMessage = message;
-
       setState(() {
         _state = _PosPaymentState.WAITING_FOR_PAYMENT;
       });
