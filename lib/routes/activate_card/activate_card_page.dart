@@ -36,6 +36,7 @@ class ActivateCardPageState extends State<ActivateCardPage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    // ignore: missing_return
     nfc.checkNFCSettings().then((isNfcEnabled) {
       if (!isNfcEnabled) {
         return Timer(Duration(milliseconds: 500), () {

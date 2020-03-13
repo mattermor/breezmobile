@@ -80,6 +80,7 @@ class NFCService {
   }
 
   NFCService() {
+    // ignore: missing_return
     _platform.setMethodCallHandler((MethodCall call) {
       if (call.method == 'receivedBreezId') {
         log.info("Received a Breez ID: " + call.arguments);

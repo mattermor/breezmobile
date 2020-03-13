@@ -87,6 +87,7 @@ class PayNearbyCompleteState extends State<PayNearbyComplete>
   initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // ignore: missing_return
     _nfc.checkNFCSettings().then((isNfcEnabled) {
       if (!isNfcEnabled) {
         return Timer(Duration(milliseconds: 500), () {

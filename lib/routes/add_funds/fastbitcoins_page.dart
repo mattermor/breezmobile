@@ -147,6 +147,7 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
                             if (value.isEmpty) {
                               return "Please enter a voucher code";
                             }
+                            return null;
                           },
                         ),
                       ),
@@ -170,6 +171,7 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
                             } else if (!_validateEmail(value)) {
                               return "Invalid e-mail";
                             }
+                            return null;
                           },
                         ),
                       ),
@@ -203,6 +205,7 @@ class FastbitcoinsPageState extends State<FastbitcoinsPage> {
                                       if (double.tryParse(value) == null) {
                                         return "Please enter a valid number";
                                       }
+                                      return null;
                                     },
                                   ),
                                 ),

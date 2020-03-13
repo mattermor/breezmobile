@@ -477,6 +477,7 @@ class DevViewState extends State<DevView> {
                 message: "Generating graph data...", opacity: 0.8))
         .whenComplete(() => userCancelled = true);
 
+    // ignore: missing_return
     widget._breezBridge.sendCommand("describegraph $filePath").then((_) {
       var encoder = ZipFileEncoder();
       encoder.create('${tempDir.path}/graph.zip');

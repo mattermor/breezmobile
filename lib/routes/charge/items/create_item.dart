@@ -81,6 +81,7 @@ class CreateItemPageState extends State<CreateItemPage> {
                         if (value.length == 0) {
                           return "Item Name is required";
                         }
+                        return null;
                       }),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
@@ -121,6 +122,7 @@ class CreateItemPageState extends State<CreateItemPage> {
                                 if (value.length == 0) {
                                   return "Item Price is required";
                                 }
+                                return null;
                               }),
                         ),
                         SizedBox(

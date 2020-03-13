@@ -58,6 +58,7 @@ class PaymentSessionChannel {
     if (interceptor != null) {
       toSend = interceptor.transformOutgoingMessage(stateString);
     }
+    // ignore: missing_return
     return toSend.then((valueToSend) {
       if (!_terminated) {
         return FirebaseDatabase.instance
