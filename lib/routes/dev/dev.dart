@@ -52,6 +52,7 @@ class Choice {
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+// ignore: must_be_immutable
 class DevView extends StatefulWidget {
   BreezBridge _breezBridge;
   Permissions _permissionsService;
