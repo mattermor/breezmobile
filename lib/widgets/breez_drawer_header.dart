@@ -19,7 +19,7 @@ class BreezDrawerHeader extends DrawerHeader {
     this.duration = const Duration(milliseconds: 250),
     this.curve = Curves.fastOutSlowIn,
     @required this.child,
-  }) : super(key: key);
+  }) : super(key: key, child: child);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class BreezDrawerHeader extends DrawerHeader {
         child: child == null
             ? null
             : DefaultTextStyle(
-                style: theme.textTheme.display1,
+                style: theme.textTheme.headline4,
                 child: MediaQuery.removePadding(
                   context: context,
                   removeTop: true,

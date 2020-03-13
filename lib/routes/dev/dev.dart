@@ -177,7 +177,7 @@ class DevViewState extends State<DevView> {
                                     style: Theme.of(context)
                                         .appBarTheme
                                         .textTheme
-                                        .title,
+                                        .headline6,
                                   ),
                                 ),
                                 body: Column(

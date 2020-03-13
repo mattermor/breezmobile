@@ -126,7 +126,7 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
                       textAlign: TextAlign.center,
                       style: Theme.of(context)
                           .primaryTextTheme
-                          .display1
+                          .headline4
                           .copyWith(fontSize: 16))),
               _cancelButton(),
             ],
@@ -154,7 +154,7 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
                           textAlign: TextAlign.center,
                           style: Theme.of(context)
                               .primaryTextTheme
-                              .display1
+                              .headline4
                               .copyWith(fontSize: 16),
                         ),
                       ),
@@ -186,7 +186,7 @@ class _PosPaymentDialogState extends State<PosPaymentDialog> {
         title,
         textAlign: TextAlign.center,
         style:
-            Theme.of(context).primaryTextTheme.display1.copyWith(fontSize: 16),
+            Theme.of(context).primaryTextTheme.headline4.copyWith(fontSize: 16),
       ),
       Padding(
         padding: EdgeInsets.only(top: 15.0),

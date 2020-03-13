@@ -278,7 +278,7 @@ class POSInvoiceState extends State<POSInvoice> {
                                                               color: Theme.of(
                                                                       context)
                                                                   .textTheme
-                                                                  .headline
+                                                                  .headline5
                                                                   .color),
                                                       textAlign:
                                                           TextAlign.right,
@@ -333,14 +333,14 @@ class POSInvoiceState extends State<POSInvoice> {
                                                                             userProfileBloc),
                                                                         iconEnabledColor: Theme.of(context)
                                                                             .textTheme
-                                                                            .headline
+                                                                            .headline5
                                                                             .color,
                                                                         value: currentCurrency
                                                                             .shortName,
                                                                         style: theme.invoiceAmountStyle.copyWith(
                                                                             color: Theme.of(context)
                                                                                 .textTheme
-                                                                                .headline
+                                                                                .headline5
                                                                                 .color),
                                                                         items: Currency.currencies.map((Currency
                                                                             value) {
@@ -352,7 +352,7 @@ class POSInvoiceState extends State<POSInvoice> {
                                                                                 Text(
                                                                               value.tickerSymbol.toUpperCase(),
                                                                               textAlign: TextAlign.right,
-                                                                              style: theme.invoiceAmountStyle.copyWith(color: Theme.of(context).textTheme.headline.color),
+                                                                              style: theme.invoiceAmountStyle.copyWith(color: Theme.of(context).textTheme.headline5.color),
                                                                             ),
                                                                           );
                                                                         }).toList()
@@ -364,7 +364,7 @@ class POSInvoiceState extends State<POSInvoice> {
                                                                                 child: new Text(
                                                                                   fiat.currencyData.shortName,
                                                                                   textAlign: TextAlign.right,
-                                                                                  style: theme.invoiceAmountStyle.copyWith(color: Theme.of(context).textTheme.headline.color),
+                                                                                  style: theme.invoiceAmountStyle.copyWith(color: Theme.of(context).textTheme.headline5.color),
                                                                                 ),
                                                                               );
                                                                             }).toList(),

@@ -80,7 +80,7 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog>
       });
       _colorAnimation = ColorTween(
         // change to white according to theme
-        begin: Theme.of(context).primaryTextTheme.display1.color,
+        begin: Theme.of(context).primaryTextTheme.headline4.color,
         end: Theme.of(context).primaryTextTheme.button.color,
       ).animate(_controller)
         ..addListener(() {
@@ -259,7 +259,7 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog>
                           "${_fiatAmountController.text.isNotEmpty ? account.currency.format(_convertedSatoshies(account), includeDisplayName: false) : 0} ${account.currency.tickerSymbol}",
                           style: Theme.of(context)
                               .textTheme
-                              .headline
+                              .headline5
                               .copyWith(fontSize: 16.0)),
                       _buildExchangeRateLabel(account.fiatCurrency)
                     ],
@@ -319,12 +319,12 @@ class CurrencyConverterDialogState extends State<CurrencyConverterDialog>
   Widget _buildExchangeRateLabel(FiatConversion fiatConversion) {
     // Empty string widget is returned so that the dialogs height is not changed when the exchange rate is shown
     return _exchangeRate == null
-        ? Text("", style: Theme.of(context).primaryTextTheme.subtitle)
+        ? Text("", style: Theme.of(context).primaryTextTheme.subtitle2)
         : Text(
             "1 BTC = $_exchangeRate ${fiatConversion.currencyData.shortName}",
             style: Theme.of(context)
                 .primaryTextTheme
-                .subtitle
+                .subtitle2
                 .copyWith(color: _colorAnimation.value));
   }
 
