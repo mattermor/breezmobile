@@ -29,15 +29,15 @@ class SaleView extends StatefulWidget {
 }
 
 class SaleViewState extends State<SaleView> {
-  StreamSubscription<Sale> _currentSaleSubscrription;
+  StreamSubscription<Sale> _currentSaleSubscription;
   ScrollController _scrollController = new ScrollController();
 
   @override
   void didChangeDependencies() {
-    if (_currentSaleSubscrription == null) {
+    if (_currentSaleSubscription == null) {
       PosCatalogBloc posCatalogBloc =
           AppBlocsProvider.of<PosCatalogBloc>(context);
-      _currentSaleSubscrription =
+      _currentSaleSubscription =
           posCatalogBloc.currentSaleStream.listen((sale) {
         if (sale.saleLines.length == 0) {
           Navigator.of(context).pop();
@@ -49,7 +49,7 @@ class SaleViewState extends State<SaleView> {
 
   @override
   void dispose() {
-    _currentSaleSubscrription.cancel();
+    _currentSaleSubscription.cancel();
     super.dispose();
   }
 
@@ -261,7 +261,7 @@ class SaleLinesList extends StatelessWidget {
                           if (sl != saleLine) {
                             return sl;
                           }
-                          return sl.copywith(quantity: newQuantity);
+                          return sl.copyWith(quantity: newQuantity);
                         }).toList();
                       }
                       var newSale = currentSale.copyWith(saleLines: saleLines);
@@ -303,7 +303,7 @@ class SaleLineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var currrency =
+    var currency =
         CurrencyWrapper.fromShortName(saleLine.currency, accountModel);
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
@@ -314,8 +314,8 @@ class SaleLineWidget extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
-              currrency.symbol +
-                  currrency.format(saleLine.pricePerItem * saleLine.quantity,
+              currency.symbol +
+                  currency.format(saleLine.pricePerItem * saleLine.quantity,
                       removeTrailingZeros: true),
               style: TextStyle(
                   color: ListTileTheme.of(context).textColor.withOpacity(0.5))),

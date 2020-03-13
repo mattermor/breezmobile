@@ -143,7 +143,7 @@ class InitialWalkthroughPageState extends State<InitialWalkthroughPage>
   }
 
   Future _handleSignInException(SignInFailedException e) async {
-    if (e.provider == BackupSettings.icloudBackupProvider) {
+    if (e.provider == BackupSettings.iCloudBackupProvider) {
       await promptError(
           context,
           "Sign in to iCloud",

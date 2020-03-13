@@ -10,7 +10,7 @@ class BackupProvider {
 enum BackupKeyType { NONE, PIN, PHRASE }
 
 class BackupSettings {
-  static const BackupProvider icloudBackupProvider =
+  static const BackupProvider iCloudBackupProvider =
       BackupProvider("icloud", "Apple iCloud");
   static const BackupProvider googleBackupProvider =
       BackupProvider("gdrive", "Google Drive");
@@ -56,7 +56,7 @@ class BackupSettings {
   static List<BackupProvider> availableBackupProviders() {
     List<BackupProvider> providers = [googleBackupProvider];
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      providers.insert(0, icloudBackupProvider);
+      providers.insert(0, iCloudBackupProvider);
     }
     return providers;
   }

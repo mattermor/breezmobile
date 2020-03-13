@@ -20,8 +20,8 @@ class LSPBloc with AsyncActionsHandler {
   final _lspPromptController = StreamController<bool>.broadcast();
   Stream<bool> get lspPromptStream => _lspPromptController.stream;
 
-  final _lspsStatusController = BehaviorSubject<LSPStatus>();
-  Stream<LSPStatus> get lspStatusStream => _lspsStatusController.stream;
+  final _lspStatusController = BehaviorSubject<LSPStatus>();
+  Stream<LSPStatus> get lspStatusStream => _lspStatusController.stream;
 
   final Stream<AccountModel> accountStream;
   BreezBridge _breezLib;
@@ -45,8 +45,8 @@ class LSPBloc with AsyncActionsHandler {
   }
 
   Future _fetchLSPList(FetchLSPList action) async {
-    if (_lspsStatusController.value.availableLSPs.length > 0) {
-      action.resolve(_lspsStatusController.value.availableLSPs);
+    if (_lspStatusController.value.availableLSPs.length > 0) {
+      action.resolve(_lspStatusController.value.availableLSPs);
       return;
     }
 
@@ -56,18 +56,18 @@ class LSPBloc with AsyncActionsHandler {
         return LSPInfo(entry.value, entry.key);
       }).toList();
 
-      _lspsStatusController.add(
-          _lspsStatusController.value.copyWith(availableLSPs: lspInfoList));
+      _lspStatusController.add(
+          _lspStatusController.value.copyWith(availableLSPs: lspInfoList));
       action.resolve(lspInfoList);
     } catch (err) {
-      _lspsStatusController.add(_lspsStatusController.value
+      _lspStatusController.add(_lspStatusController.value
           .copyWith(lastConnectionError: err.toString()));
       rethrow;
     }
   }
 
   Future _connectLSP(ConnectLSP action) async {
-    _lspsStatusController.add(_lspsStatusController.value.copyWith(
+    _lspStatusController.add(_lspStatusController.value.copyWith(
         connectionStatus: LSPConnectionStatus.InProgress,
         lastConnectionError: null,
         dontPromptToConnect: true));
@@ -81,13 +81,13 @@ class LSPBloc with AsyncActionsHandler {
         } else {
           action.resolve(await _breezLib.connectToLSP(action.lspID));
         }
-        _lspsStatusController.add(_lspsStatusController.value.copyWith(
+        _lspStatusController.add(_lspStatusController.value.copyWith(
             connectionStatus: LSPConnectionStatus.Active,
             lastConnectionError: null));
       }, tryLimit: 3, interval: Duration(seconds: 2));
     } catch (err) {
       log.info("Failed to connect to LSP: " + err.toString());
-      _lspsStatusController.add(_lspsStatusController.value.copyWith(
+      _lspStatusController.add(_lspStatusController.value.copyWith(
           connectionStatus: LSPConnectionStatus.NotSelected,
           lastConnectionError: err.toString()));
       rethrow;
@@ -96,7 +96,7 @@ class LSPBloc with AsyncActionsHandler {
 
   void _updateLSPStatus(SharedPreferences sp) {
     var dontPrompt = sp.getBool(LSP_DONT_PROMPT_PREFERENCES_KEY);
-    _lspsStatusController.add(
+    _lspStatusController.add(
         LSPStatus.initial().copyWith(dontPromptToConnect: dontPrompt ?? false));
     List<Account_AccountStatus> lspSelectedStatuses = [
       Account_AccountStatus.CONNECTED,
@@ -111,12 +111,12 @@ class LSPBloc with AsyncActionsHandler {
           event.type == NotificationEvent_NotificationType.ACCOUNT_CHANGED) {
         _breezLib.getAccount().then((acc) async {
           bool lspSelected = lspSelectedStatuses.contains(acc.status);
-          _lspsStatusController.add(_lspsStatusController.value.copyWith(
+          _lspStatusController.add(_lspStatusController.value.copyWith(
               connectionStatus: lspSelected
                   ? LSPConnectionStatus.Active
                   : LSPConnectionStatus.NotSelected,
               dontPromptToConnect:
-                  _lspsStatusController.value.dontPromptToConnect ||
+                  _lspStatusController.value.dontPromptToConnect ||
                       lspSelected));
         });
       }
@@ -124,7 +124,7 @@ class LSPBloc with AsyncActionsHandler {
   }
 
   void _handleLSPStatusChanges(SharedPreferences sp) {
-    _lspsStatusController.stream.listen((status) {
+    _lspStatusController.stream.listen((status) {
       sp.setBool(LSP_DONT_PROMPT_PREFERENCES_KEY, status.dontPromptToConnect);
       if (status.shouldAutoReconnect) {
         this.actionsSink.add(ConnectLSP(status.availableLSPs[0].lspID, null));
@@ -139,6 +139,6 @@ class LSPBloc with AsyncActionsHandler {
 
   void close() async {
     await dispose();
-    await _lspsStatusController.close();
+    await _lspStatusController.close();
   }
 }

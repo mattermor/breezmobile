@@ -19,7 +19,7 @@ class WeblnHandlers {
   StreamSubscription<CompletedPayment> _sentPaymentResultSubscription;
   StreamSubscription<String> _readyInvoicesSubscription;
   StreamSubscription<AccountModel> _accountModelSubscription;
-  Completer<String> _currentInovoiceRequestCompleter;
+  Completer<String> _currentInvoiceRequestCompleter;
   AccountModel _account;
 
   WeblnHandlers(this.context, this.accountBloc, this.invoiceBloc,
@@ -28,11 +28,11 @@ class WeblnHandlers {
         .asBroadcastStream()
         .where((p) => p != null)
         .listen((bolt11) {
-      _currentInovoiceRequestCompleter?.complete(bolt11);
-      _currentInovoiceRequestCompleter = null;
+      _currentInvoiceRequestCompleter?.complete(bolt11);
+      _currentInvoiceRequestCompleter = null;
     }, onError: (_) {
-      _currentInovoiceRequestCompleter?.completeError("Failed");
-      _currentInovoiceRequestCompleter = null;
+      _currentInvoiceRequestCompleter?.completeError("Failed");
+      _currentInvoiceRequestCompleter = null;
     });
 
     _accountModelSubscription =
@@ -113,8 +113,8 @@ class WeblnHandlers {
   }
 
   Future<String> _trackInvoice() {
-    _currentInovoiceRequestCompleter = Completer<String>();
-    return _currentInovoiceRequestCompleter.future;
+    _currentInvoiceRequestCompleter = Completer<String>();
+    return _currentInvoiceRequestCompleter.future;
   }
 
   Future _trackPayment(String bolt11) {

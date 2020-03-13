@@ -130,7 +130,7 @@ class EnableBackupDialogState extends State<EnableBackupDialog> {
 
                       if (provider != null) {
                         if (widget.signInNeeded &&
-                            provider == BackupSettings.icloudBackupProvider) {
+                            provider == BackupSettings.iCloudBackupProvider) {
                           await promptError(
                               context,
                               "Sign in to iCloud",

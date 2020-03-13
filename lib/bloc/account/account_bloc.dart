@@ -570,7 +570,7 @@ class AccountBloc {
         _completedPaymentsController.add(CompletedPayment(
             PayRequest(paymentRequest, invoice.amount),
             cancelled: false,
-            ignoreGlobalFeeback:
+            ignoreGlobalFeedback:
                 _ignoredFeedbackPayments.containsKey(paymentRequest)));
         _ignoredFeedbackPayments.remove(paymentRequest);
       }
@@ -584,7 +584,7 @@ class AccountBloc {
         var invoice = await _breezLib.decodePaymentRequest(paymentRequest);
         _completedPaymentsController.addError(PaymentError(
             PayRequest(paymentRequest, invoice.amount), error, traceReport,
-            ignoreGlobalFeeback:
+            ignoreGlobalFeedback:
                 _ignoredFeedbackPayments.containsKey(paymentRequest)));
         _ignoredFeedbackPayments.remove(paymentRequest);
       }

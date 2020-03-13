@@ -9,7 +9,7 @@ import 'package:ini/ini.dart';
 import 'package:path_provider/path_provider.dart';
 
 // This is the bridge to the native breez library. Protobuf messages are used as the interface and to generate the classes use the bellow command.
-// Note that the version of protoc comiler must be 3-4-0
+// Note that the version of protoc compiler must be 3-4-0
 // protoc --dart_out=grpc:lib/services/breezlib/data/ -Ilib/services/breezlib/ lib/services/breezlib/rpc.proto
 class BreezBridge {
   static const _methodChannel = MethodChannel('com.breez.client/breez_lib');
